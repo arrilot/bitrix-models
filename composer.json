@@ -1,0 +1,20 @@
+{
+    "name": "arrilot/bitrix-models",
+    "license": "MIT",
+    "keywords": ["bitrix", "models"],
+    "authors": [
+        {
+            "name": "Nekrasov Ilya",
+            "email": "nekrasov.ilya90@gmail.com"
+        }
+    ],
+    "homepage": "https://github.com/Arrilot/bitrix-models",
+    "require": {
+        "php": ">=5.4.0",
+    },
+    "autoload": {
+      "psr-4": {
+        "Arrilot\\BitrixModels\\": "src/"
+      }
+    }
+}
