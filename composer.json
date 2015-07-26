@@ -10,7 +10,7 @@
     ],
     "homepage": "https://github.com/Arrilot/bitrix-models",
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.4.0"
     },
     "autoload": {
       "psr-4": {
