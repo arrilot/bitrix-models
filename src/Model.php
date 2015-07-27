@@ -38,19 +38,24 @@ abstract class Model
      */
     public function get()
     {
-        if (!$this->fields) {
+        if (is_null($this->fields)) {
             $this->fetch();
         }
-
-        $this->fetch();
 
         return $this->fields;
     }
 
     /**
-     * Fetch model fields from database and save them to $this->fields.
+     * Fetch model fields from database and place them to $this->fields.
      *
      * @return null
      */
     abstract public function fetch();
+
+    /**
+     * Delete model with $this->id.
+     *
+     * @return bool
+     */
+    abstract public function delete();
 }

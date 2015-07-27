@@ -11,5 +11,5 @@ class InvalidModelIdException extends Exception
      *
      * @var string
      */
-    protected $message = 'Model was constructed with invalid id';
+    protected $message = 'Model id is not set';
 }

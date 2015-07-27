@@ -24,25 +24,25 @@ class User extends Model
         global $USER;
 
         if (is_null($id)) {
-            $this->id = $USER->GetID();
-            $this->groups = $USER->GetUserGroupArray();
+            $this->id = $USER->getID();
+            $this->groups = $USER->getUserGroupArray();
         } else {
             $this->id = $id;
-            $this->groups = CUser::GetUserGroup($id);
+            $this->groups = (new CUser)->getUserGroup($id);
         }
 
         $this->fields = $fields;
     }
 
     /**
-     * Fetch model fields from database and save them to $this->fields.
+     * Fetch model fields from database and place them to $this->fields.
      *
      * @return null
      * @throws InvalidModelIdException
      */
     public function fetch()
     {
-        $this->fields = CUser::GetByID($this->id)->Fetch();
+        $this->fields = (new CUser)->getByID($this->id)->fetch();
 
         if (!$this->fields) {
             throw new InvalidModelIdException();
@@ -101,5 +101,15 @@ class User extends Model
         global $USER;
 
         return ($USER->getId() == $this->id) && $USER->isAuthorized();
+    }
+
+    /**
+     * Delete user.
+     *
+     * @return bool
+     */
+    public function delete()
+    {
+        return (new CUser)->delete($this->id);
     }
 }
