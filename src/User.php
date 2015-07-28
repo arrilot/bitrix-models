@@ -49,6 +49,7 @@ class User extends Model
         }
 
         $this->fields['GROUPS'] = $this->groups;
+        $this->fields['GROUP_ID'] = $this->groups;
     }
 
     /**
@@ -111,5 +112,21 @@ class User extends Model
     public function delete()
     {
         return (new CUser)->delete($this->id);
+    }
+
+    /**
+     * Save model to database.
+     *
+     * @param array $fields save only these fields instead of all.
+     *
+     * @return bool
+     */
+    public function save(array $fields = [])
+    {
+        $fieldsToUpdate = $fields ? array_only($this->fields, $fields) : $this->fields;
+        echo "<pre>"; print_r($fieldsToUpdate); echo "</pre>";
+        unset($fieldsToUpdate['ID']);
+
+        return (new CUser)->update($this->id, $fieldsToUpdate);
     }
 }

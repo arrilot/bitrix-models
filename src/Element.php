@@ -32,4 +32,18 @@ abstract class Element extends Model
     {
         return (new CIBlockElement)->delete($this->id);
     }
+
+    /**
+     * Save model to database.
+     *
+     * @param array $fields save only these fields instead of all.
+     *
+     * @return bool
+     */
+    public function save(array $fields = [])
+    {
+//        $fieldsToUpdate = $fields ? array_only($this->fields, $fields) : $this->fields;
+//
+//        return (new CUser)->update($this->id, $fieldsToUpdate);
+    }
 }

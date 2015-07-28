@@ -58,4 +58,13 @@ abstract class Model
      * @return bool
      */
     abstract public function delete();
+
+    /**
+     * Save model to database.
+     *
+     * @param array $fields save only these fields instead of all
+     *
+     * @return bool
+     */
+    abstract public function save(array $fields = []);
 }
