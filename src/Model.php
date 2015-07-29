@@ -46,6 +46,58 @@ abstract class Model
     }
 
     /**
+     * Activate model.
+     *
+     * @return bool
+     */
+    public function activate()
+    {
+        $this->fields['ACTIVE'] = 'Y';
+
+        return $this->save(['ACTIVE']);
+    }
+
+    /**
+     * Deactivate model.
+     *
+     * @return bool
+     */
+    public function deactivate()
+    {
+        $this->fields['ACTIVE'] = 'N';
+
+        return $this->save(['ACTIVE']);
+    }
+
+    /**
+     * Update model.
+     *
+     * @param array $fields
+     *
+     * @return bool
+     */
+    public function update(array $fields = [])
+    {
+        $keys = [];
+        foreach ($fields as $key => $value) {
+            $this->fields[$key] = $value;
+            $keys[] = $key;
+        }
+
+        return $this->save($keys);
+    }
+
+    /**
+     * Refresh model from database.
+     *
+     * @return null
+     */
+    public function refresh()
+    {
+        $this->fetch();
+    }
+
+    /**
      * Fetch model fields from database and place them to $this->fields.
      *
      * @return null

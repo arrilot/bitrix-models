@@ -3,8 +3,9 @@
 namespace Arrilot\BitrixModels;
 
 use CIBlockElement;
+use Exception;
 
-abstract class Element extends Model
+class Element extends Model
 {
     /**
      * Fetch element fields from database and place them to $this->fields.
@@ -20,7 +21,60 @@ abstract class Element extends Model
         }
 
         $this->fields = $obElement->getFields();
+
         $this->fields['PROPERTIES'] = $obElement->getProperties();
+
+        $this->setAdditionalFieldsWhileFetching();
+    }
+
+    /**
+     * Add additional fields to $this->fields if they are not set yet.
+     */
+    protected function setAdditionalFieldsWhileFetching()
+    {
+        if (!isset($this->fields['PROPERTY_VALUES']) && !empty($this->fields['PROPERTIES'])) {
+            foreach ($this->fields['PROPERTIES'] as $code => $field) {
+                $this->fields['PROPERTY_VALUES'][$code] = $field['VALUE'];
+            }
+        }
+    }
+
+    /**
+     * Get model fields from cache or database.
+     *
+     * @return array
+     */
+    public function get()
+    {
+        if (is_null($this->fields)) {
+            $this->fetch();
+        }
+
+        $this->setAdditionalFieldsWhileFetching();
+
+        return $this->fields;
+    }
+
+    /**
+     * Create new element in database.
+     *
+     * @param $fields
+     *
+     * @return static
+     * @throws Exception
+     */
+    public static function create($fields)
+    {
+        $element = new CIBlockElement;
+        $id = $element->add($fields);
+
+        if (!$id) {
+            throw new Exception($element->LAST_ERROR);
+        }
+
+        $fields['ID'] = $id;
+
+        return new static($id, $fields);
     }
 
     /**
@@ -36,14 +90,54 @@ abstract class Element extends Model
     /**
      * Save model to database.
      *
-     * @param array $fields save only these fields instead of all.
+     * @param array $selectedFields save only these fields instead of all.
      *
      * @return bool
      */
-    public function save(array $fields = [])
+    public function save(array $selectedFields = [])
     {
-//        $fieldsToUpdate = $fields ? array_only($this->fields, $fields) : $this->fields;
-//
-//        return (new CUser)->update($this->id, $fieldsToUpdate);
+        $this->get();
+
+        $fields = $this->collectFieldsForSave($selectedFields);
+
+        return (new CIBlockElement)->update($this->id, $fields);
+    }
+
+    /**
+     * Create an array of fields that will be saved to database.
+     *
+     * @param $selectedFields
+     *
+     * @return array
+     */
+    protected function collectFieldsForSave($selectedFields)
+    {
+        $blacklisted = [
+            'ID',
+            'IBLOCK_ID',
+            'PROPERTIES'
+        ];
+
+        $fields = [];
+        foreach ($this->fields as $field => $value) {
+            // skip if is not in selected fields
+            if ($selectedFields && !in_array($field, $selectedFields)) {
+                continue;
+            }
+
+            // skip blacklisted fields
+            if (in_array($field, $blacklisted)) {
+                continue;
+            }
+
+            // skip trash fields
+            if ($value === '' || substr($field, 0, 1) === '~') {
+                continue;
+            }
+
+            $fields[$field] = $value;
+        }
+
+        return $fields;
     }
 }
