@@ -25,7 +25,7 @@ abstract class Model
      *
      * @var object
      */
-    protected static $object;
+    public static $object;
 
     /**
      * Corresponding object class name.
@@ -39,15 +39,14 @@ abstract class Model
      *
      * @param      $id
      * @param null $fields
-     * @param null $object
      */
-    public function __construct($id, $fields = null, $object = null)
+    public function __construct($id, $fields = null)
     {
         $this->id = $id;
 
         $this->fields = $fields;
 
-        static::instantiateObject($object);
+        static::instantiateObject();
     }
 
     /**
@@ -140,19 +139,13 @@ abstract class Model
     /**
      * Instantiate bitrix entity object.
      *
-     * @param null $object
-     *
      * @return object
      * @throws Exception
      */
-    public static function instantiateObject($object = null)
+    public static function instantiateObject()
     {
         if (static::$object) {
             return static::$object;
-        }
-
-        if ($object) {
-            return static::$object = $object;
         }
 
         if (class_exists(static::$objectClass)) {

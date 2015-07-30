@@ -16,17 +16,16 @@ class User extends Model
     /**
      * Constructor.
      *
-     * @param      $id
-     * @param      $fields
-     * @param null $object
+     * @param $id
+     * @param $fields
      *
      * @throws Exception
      */
-    public function __construct($id, $fields = null, $object = null)
+    public function __construct($id, $fields = null)
     {
         global $USER;
 
-        static::instantiateObject($object);
+        static::instantiateObject();
         
         $this->id = $id;
 

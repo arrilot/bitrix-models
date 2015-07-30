@@ -15,14 +15,16 @@ class ElementTest extends TestCase
 
     public function testInitialization()
     {
-        $element = new Element(1, null, m::mock('object'));
+        Element::$object = m::mock('object');
+
+        $element = new Element(1);
         $this->assertEquals(1, $element->id);
 
         $fields = [
             'NAME' => 'John',
             'LAST_NAME' => 'Doe',
         ];
-        $element = new Element(1, $fields, m::mock('object'));
+        $element = new Element(1, $fields);
         $this->assertEquals(1, $element->id);
         $this->assertEquals($fields, $element->fields);
     }
@@ -32,7 +34,8 @@ class ElementTest extends TestCase
         $object = m::mock('object');
         $object->shouldReceive('delete')->once()->andReturn(true);
 
-        $element = new Element(1, null, $object);
+        Element::$object = $object;
+        $element = new Element(1);
 
         $this->assertTrue($element->delete());
     }
@@ -42,7 +45,8 @@ class ElementTest extends TestCase
         $object = m::mock('object');
         $object->shouldReceive('update')->with(1, ['ACTIVE'=>'Y'])->once()->andReturn(true);
 
-        $element = new Element(1, null, $object);
+        Element::$object = $object;
+        $element = new Element(1);
 
         $this->assertTrue($element->activate());
     }
@@ -52,7 +56,8 @@ class ElementTest extends TestCase
         $object = m::mock('object');
         $object->shouldReceive('update')->with(1, ['ACTIVE'=>'N'])->once()->andReturn(true);
 
-        $element = new Element(1, null, $object);
+        Element::$object = $object;
+        $element = new Element(1);
 
         $this->assertTrue($element->deactivate());
     }
@@ -72,7 +77,8 @@ class ElementTest extends TestCase
             ]
         ]);
 
-        $element = new Element(1, null, $object);
+        Element::$object = $object;
+        $element = new Element(1);
 
         $expected = [
             'NAME' => 'John Doe',
@@ -110,7 +116,8 @@ class ElementTest extends TestCase
             ]
         ]);
 
-        $element = new Element(1, null, $object);
+        Element::$object = $object;
+        $element = new Element(1);
 
         $expected = [
             'NAME' => 'John Doe',
@@ -137,8 +144,9 @@ class ElementTest extends TestCase
     public function testSave()
     {
         $object = m::mock('object');
-
-        $element = m::mock('Arrilot\BitrixModels\Element[get]',[1, null, $object]);
+        
+        Element::$object = $object;
+        $element = m::mock('Arrilot\BitrixModels\Element[get]',[1]);
         $fields = [
             'ID' => 1,
             'IBLOCK_ID' => 1,
@@ -174,9 +182,8 @@ class ElementTest extends TestCase
 
     public function testUpdate()
     {
-        $object = m::mock('object');
-
-        $element = m::mock('Arrilot\BitrixModels\Element[save]',[1, null, $object]);
+        Element::$object = m::mock('object');
+        $element = m::mock('Arrilot\BitrixModels\Element[save]',[1]);
         $element->shouldReceive('save')->with(['NAME'])->andReturn(true);
 
         $this->assertTrue($element->update(['NAME'=>'John Doe']));
@@ -188,8 +195,7 @@ class ElementTest extends TestCase
         $object = m::mock('object');
         $object->shouldReceive('add')->with(['NAME' => 'John Doe'])->once()->andReturn(2);
 
-        // create an instance to setup mock object instead of CIblockElement object
-        $element = new Element(1, null , $object);
+        Element::$object = $object;
 
         $newElement = Element::create(['NAME' => 'John Doe']);
 
