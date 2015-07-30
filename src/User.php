@@ -7,30 +7,34 @@ use Exception;
 class User extends Model
 {
     /**
-     * Bitrix entity class.
+     * Corresponding object class name.
      *
-     * @var CUser
+     * @var string
      */
-    protected static $entityClass = 'CUser';
-
+    protected static $objectClass = 'CUser';
+    
     /**
      * Constructor.
      *
-     * @param $id
-     * @param $fields
+     * @param      $id
+     * @param      $fields
+     * @param null $object
+     *
+     * @throws Exception
      */
-    public function __construct($id, $fields = null)
+    public function __construct($id, $fields = null, $object = null)
     {
         global $USER;
 
-        $this->entity = new self::$entityClass;
+        static::instantiateObject($object);
+        
         $this->id = $id;
 
         $currentUserId = $USER->getID();
         if (empty($fields['GROUP_ID'])) {
             $fields['GROUP_ID'] = ($currentUserId && $id == $currentUserId)
                 ? $USER->getUserGroupArray()
-                : $this->entity->getUserGroup($id);
+                : static::$object->getUserGroup($id);
         }
 
         $fields['GROUPS'] = $fields['GROUP_ID']; // for backward compatibility
@@ -46,7 +50,7 @@ class User extends Model
      */
     public function fetch()
     {
-        $this->fields = $this->entity->getByID($this->id)->fetch();
+        $this->fields = static::$object->getByID($this->id)->fetch();
 
         if (!$this->fields) {
             throw new InvalidModelIdException();
@@ -63,7 +67,7 @@ class User extends Model
     protected function setAdditionalFieldsWhileFetching()
     {
         if (!isset($this->fields['GROUP_ID'])) {
-            $this->fields['GROUP_ID'] = $this->entity->getUserGroup($this->id);
+            $this->fields['GROUP_ID'] = static::$object->getUserGroup($this->id);
             $this->fields['GROUPS'] = $this->fields['GROUP_ID'];
         }
     }
@@ -114,7 +118,7 @@ class User extends Model
      */
     public static function create($fields)
     {
-        $user = new self::$entityClass;
+        $user = static::instantiateObject();
         $id = $user->add($fields);
 
         if (!$id) {
@@ -159,16 +163,6 @@ class User extends Model
     }
 
     /**
-     * Delete user.
-     *
-     * @return bool
-     */
-    public function delete()
-    {
-        return $this->entity->delete($this->id);
-    }
-
-    /**
      * Save model to database.
      *
      * @param array $selectedFields save only these fields instead of all.
@@ -181,7 +175,7 @@ class User extends Model
 
         $fields = $this->collectFieldsForSave($selectedFields);
 
-        return $this->entity->update($this->id, $fields);
+        return static::$object->update($this->id, $fields);
     }
 
     /**

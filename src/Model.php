@@ -2,6 +2,8 @@
 
 namespace Arrilot\BitrixModels;
 
+use Exception;
+
 abstract class Model
 {
     /**
@@ -19,32 +21,33 @@ abstract class Model
     public $fields;
 
     /**
-     * Bitrix entity object for this type of model.
+     * Bitrix entity object.
      *
      * @var object
      */
-    protected $entity;
+    protected static $object;
 
     /**
-     * Bitrix entity class.
+     * Corresponding object class name.
      *
      * @var string
      */
-    protected static $entityClass = 'stdClass';
+    protected static $objectClass = 'CIBlockElement';
 
     /**
      * Constructor.
      *
-     * @param $id
+     * @param      $id
      * @param null $fields
+     * @param null $object
      */
-    public function __construct($id, $fields = null)
+    public function __construct($id, $fields = null, $object = null)
     {
         $this->id = $id;
 
         $this->fields = $fields;
 
-        $this->entity = new self::$entityClass;
+        static::instantiateObject($object);
     }
 
     /**
@@ -96,6 +99,16 @@ abstract class Model
     }
 
     /**
+     * Delete model.
+     *
+     * @return bool
+     */
+    public function delete()
+    {
+        return static::$object->delete($this->id);
+    }
+
+    /**
      * Update model.
      *
      * @param array $fields
@@ -123,19 +136,48 @@ abstract class Model
         $this->fetch();
     }
 
+
+    /**
+     * Instantiate bitrix entity object.
+     *
+     * @param null $object
+     *
+     * @return object
+     * @throws Exception
+     */
+    public static function instantiateObject($object = null)
+    {
+        if (static::$object) {
+            return static::$object;
+        }
+
+        if ($object) {
+            return static::$object = $object;
+        }
+
+        if (class_exists(static::$objectClass)) {
+            return static::$object = new static::$objectClass;
+        }
+
+        throw new Exception('Object initialization failed');
+    }
+
+    /**
+     * Destroy bitrix entity object.
+     *
+     * @return null
+     */
+    public static function destroyObject()
+    {
+        static::$object = null;
+    }
+
     /**
      * Fetch model fields from database and place them to $this->fields.
      *
      * @return null
      */
     abstract public function fetch();
-
-    /**
-     * Delete model with $this->id.
-     *
-     * @return bool
-     */
-    abstract public function delete();
 
     /**
      * Save model to database.

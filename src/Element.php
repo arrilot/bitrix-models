@@ -7,11 +7,11 @@ use Exception;
 class Element extends Model
 {
     /**
-     * Bitrix entity class.
+     * Corresponding object class name.
      *
      * @var string
      */
-    protected static $entityClass = 'CIBlockElement';
+    protected static $objectClass = 'CIBlockElement';
 
     /**
      * Fetch element fields from database and place them to $this->fields.
@@ -21,7 +21,7 @@ class Element extends Model
      */
     public function fetch()
     {
-        $obElement = $this->entity->getByID($this->id)->getNextElement();
+        $obElement = static::$object->getByID($this->id)->getNextElement();
         if (!$obElement) {
             throw new InvalidModelIdException();
         }
@@ -73,7 +73,7 @@ class Element extends Model
      */
     public static function create($fields)
     {
-        $element = new self::$entityClass;
+        $element = static::instantiateObject();
         $id = $element->add($fields);
 
         if (!$id) {
@@ -83,16 +83,6 @@ class Element extends Model
         $fields['ID'] = $id;
 
         return new static($id, $fields);
-    }
-
-    /**
-     * Delete element.
-     *
-     * @return bool
-     */
-    public function delete()
-    {
-        return $this->entity->delete($this->id);
     }
 
     /**
@@ -108,7 +98,7 @@ class Element extends Model
 
         $fields = $this->collectFieldsForSave($selectedFields);
 
-        return $this->entity->update($this->id, $fields);
+        return static::$object->update($this->id, $fields);
     }
 
     /**
