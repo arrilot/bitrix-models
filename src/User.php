@@ -2,17 +2,16 @@
 
 namespace Arrilot\BitrixModels;
 
-use CUser;
 use Exception;
 
 class User extends Model
 {
     /**
-     * The array of user groups.
+     * Bitrix entity class.
      *
-     * @var array
+     * @var CUser
      */
-    public $groups;
+    protected static $entityClass = 'CUser';
 
     /**
      * Constructor.
@@ -24,14 +23,19 @@ class User extends Model
     {
         global $USER;
 
-        $currentUserId = $USER->getID();
-
+        $this->entity = new self::$entityClass;
         $this->id = $id;
-        $this->fields = $fields;
 
-        $this->groups = ($currentUserId && $id == $currentUserId)
-            ? $USER->getUserGroupArray()
-            : (new CUser)->getUserGroup($id);
+        $currentUserId = $USER->getID();
+        if (empty($fields['GROUP_ID'])) {
+            $fields['GROUP_ID'] = ($currentUserId && $id == $currentUserId)
+                ? $USER->getUserGroupArray()
+                : $this->entity->getUserGroup($id);
+        }
+
+        $fields['GROUPS'] = $fields['GROUP_ID']; // for backward compatibility
+
+        $this->fields = $fields;
     }
 
     /**
@@ -42,7 +46,7 @@ class User extends Model
      */
     public function fetch()
     {
-        $this->fields = (new CUser)->getByID($this->id)->fetch();
+        $this->fields = $this->entity->getByID($this->id)->fetch();
 
         if (!$this->fields) {
             throw new InvalidModelIdException();
@@ -53,11 +57,14 @@ class User extends Model
 
     /**
      * Add additional fields to $this->fields if they are not set yet.
+     *
+     * @return null
      */
     protected function setAdditionalFieldsWhileFetching()
     {
-        if (!isset($this->fields['GROUPS'])) {
-            $this->fields['GROUPS'] = $this->groups; // for BC
+        if (!isset($this->fields['GROUP_ID'])) {
+            $this->fields['GROUP_ID'] = $this->entity->getUserGroup($this->id);
+            $this->fields['GROUPS'] = $this->fields['GROUP_ID'];
         }
     }
 
@@ -68,13 +75,23 @@ class User extends Model
      */
     public function get()
     {
-        if (is_null($this->fields)) {
+        if (!$this->isFetched()) {
             $this->fetch();
         }
 
         $this->setAdditionalFieldsWhileFetching();
 
         return $this->fields;
+    }
+
+    /**
+     * Determine if model has already been fetched or filled with all fields.
+     *
+     * @return bool
+     */
+    protected function isFetched()
+    {
+        return isset($this->fields['NAME']);
     }
 
     /**
@@ -97,7 +114,7 @@ class User extends Model
      */
     public static function create($fields)
     {
-        $user = new CUser;
+        $user = new self::$entityClass;
         $id = $user->add($fields);
 
         if (!$id) {
@@ -126,7 +143,7 @@ class User extends Model
      */
     public function hasRoleWithId($role_id)
     {
-        return in_array($role_id, $this->groups);
+        return in_array($role_id, $this->fields['GROUP_ID']);
     }
 
     /**
@@ -148,7 +165,7 @@ class User extends Model
      */
     public function delete()
     {
-        return (new CUser)->delete($this->id);
+        return $this->entity->delete($this->id);
     }
 
     /**
@@ -164,7 +181,7 @@ class User extends Model
 
         $fields = $this->collectFieldsForSave($selectedFields);
 
-        return (new CUser)->update($this->id, $fields);
+        return $this->entity->update($this->id, $fields);
     }
 
     /**
@@ -181,13 +198,9 @@ class User extends Model
             'GROUPS',
         ];
 
-        $extraPossibleFields = [
-            'GROUP_ID' => $this->groups,
-        ];
-
         $fields = [];
 
-        foreach (array_merge($this->fields, $extraPossibleFields) as $field => $value) {
+        foreach ($this->fields as $field => $value) {
             // skip if it is not in selected fields
             if ($selectedFields && !in_array($field, $selectedFields)) {
                 continue;

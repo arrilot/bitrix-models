@@ -19,6 +19,20 @@ abstract class Model
     public $fields;
 
     /**
+     * Bitrix entity object for this type of model.
+     *
+     * @var object
+     */
+    protected $entity;
+
+    /**
+     * Bitrix entity class.
+     *
+     * @var string
+     */
+    protected static $entityClass = 'stdClass';
+
+    /**
      * Constructor.
      *
      * @param $id
@@ -29,6 +43,8 @@ abstract class Model
         $this->id = $id;
 
         $this->fields = $fields;
+
+        $this->entity = new self::$entityClass;
     }
 
     /**
@@ -38,11 +54,21 @@ abstract class Model
      */
     public function get()
     {
-        if (is_null($this->fields)) {
+        if (!$this->isFetched()) {
             $this->fetch();
         }
 
         return $this->fields;
+    }
+
+    /**
+     * Determine if model has already been fetched or filled with all fields.
+     *
+     * @return bool
+     */
+    protected function isFetched()
+    {
+        return !is_null($this->fields);
     }
 
     /**

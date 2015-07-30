@@ -2,11 +2,17 @@
 
 namespace Arrilot\BitrixModels;
 
-use CIBlockElement;
 use Exception;
 
 class Element extends Model
 {
+    /**
+     * Bitrix entity class.
+     *
+     * @var string
+     */
+    protected static $entityClass = 'CIBlockElement';
+
     /**
      * Fetch element fields from database and place them to $this->fields.
      *
@@ -15,7 +21,7 @@ class Element extends Model
      */
     public function fetch()
     {
-        $obElement = CIBlockElement::getByID($this->id)->getNextElement();
+        $obElement = $this->entity->getByID($this->id)->getNextElement();
         if (!$obElement) {
             throw new InvalidModelIdException();
         }
@@ -29,6 +35,8 @@ class Element extends Model
 
     /**
      * Add additional fields to $this->fields if they are not set yet.
+     *
+     * @return null
      */
     protected function setAdditionalFieldsWhileFetching()
     {
@@ -46,7 +54,7 @@ class Element extends Model
      */
     public function get()
     {
-        if (is_null($this->fields)) {
+        if (!$this->isFetched()) {
             $this->fetch();
         }
 
@@ -65,7 +73,7 @@ class Element extends Model
      */
     public static function create($fields)
     {
-        $element = new CIBlockElement;
+        $element = new self::$entityClass;
         $id = $element->add($fields);
 
         if (!$id) {
@@ -84,7 +92,7 @@ class Element extends Model
      */
     public function delete()
     {
-        return (new CIBlockElement)->delete($this->id);
+        return $this->entity->delete($this->id);
     }
 
     /**
@@ -100,7 +108,7 @@ class Element extends Model
 
         $fields = $this->collectFieldsForSave($selectedFields);
 
-        return (new CIBlockElement)->update($this->id, $fields);
+        return $this->entity->update($this->id, $fields);
     }
 
     /**
