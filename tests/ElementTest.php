@@ -2,7 +2,8 @@
 
 namespace Arrilot\BitrixModels\Test;
 
-use Arrilot\BitrixModels\Element;
+use Arrilot\BitrixModels\Test\Models\Element;
+
 use Mockery as m;
 
 class ElementTest extends TestCase
@@ -17,16 +18,16 @@ class ElementTest extends TestCase
     {
         Element::$object = m::mock('object');
 
-        $element = new Element(1);
-        $this->assertEquals(1, $element->id);
+        $Element = new Element(1);
+        $this->assertEquals(1, $Element->id);
 
         $fields = [
             'NAME' => 'John',
             'LAST_NAME' => 'Doe',
         ];
-        $element = new Element(1, $fields);
-        $this->assertEquals(1, $element->id);
-        $this->assertEquals($fields, $element->fields);
+        $Element = new Element(1, $fields);
+        $this->assertEquals(1, $Element->id);
+        $this->assertEquals($fields, $Element->fields);
     }
 
     public function testDelete()
@@ -35,9 +36,9 @@ class ElementTest extends TestCase
         $object->shouldReceive('delete')->once()->andReturn(true);
 
         Element::$object = $object;
-        $element = new Element(1);
+        $Element = new Element(1);
 
-        $this->assertTrue($element->delete());
+        $this->assertTrue($Element->delete());
     }
 
     public function testActivate()
@@ -46,9 +47,9 @@ class ElementTest extends TestCase
         $object->shouldReceive('update')->with(1, ['ACTIVE'=>'Y'])->once()->andReturn(true);
 
         Element::$object = $object;
-        $element = new Element(1);
+        $Element = new Element(1);
 
-        $this->assertTrue($element->activate());
+        $this->assertTrue($Element->activate());
     }
 
     public function testDeactivate()
@@ -57,9 +58,9 @@ class ElementTest extends TestCase
         $object->shouldReceive('update')->with(1, ['ACTIVE'=>'N'])->once()->andReturn(true);
 
         Element::$object = $object;
-        $element = new Element(1);
+        $Element = new Element(1);
 
-        $this->assertTrue($element->deactivate());
+        $this->assertTrue($Element->deactivate());
     }
 
     public function testGet()
@@ -78,7 +79,7 @@ class ElementTest extends TestCase
         ]);
 
         Element::$object = $object;
-        $element = new Element(1);
+        $Element = new Element(1);
 
         $expected = [
             'NAME' => 'John Doe',
@@ -93,12 +94,12 @@ class ElementTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $element->get());
-        $this->assertEquals($expected, $element->fields);
+        $this->assertEquals($expected, $Element->get());
+        $this->assertEquals($expected, $Element->fields);
 
         // second call to make sure we do not query database twice.
-        $this->assertEquals($expected, $element->get());
-        $this->assertEquals($expected, $element->fields);
+        $this->assertEquals($expected, $Element->get());
+        $this->assertEquals($expected, $Element->fields);
     }
 
     public function testRefresh()
@@ -117,7 +118,7 @@ class ElementTest extends TestCase
         ]);
 
         Element::$object = $object;
-        $element = new Element(1);
+        $Element = new Element(1);
 
         $expected = [
             'NAME' => 'John Doe',
@@ -132,21 +133,21 @@ class ElementTest extends TestCase
             ],
         ];
 
-        $element->refresh();
-        $this->assertEquals($expected, $element->fields);
+        $Element->refresh();
+        $this->assertEquals($expected, $Element->fields);
 
-        $element->fields = 'Jane Doe';
+        $Element->fields = 'Jane Doe';
 
-        $element->refresh();
-        $this->assertEquals($expected, $element->fields);
+        $Element->refresh();
+        $this->assertEquals($expected, $Element->fields);
     }
 
     public function testSave()
     {
         $object = m::mock('object');
-        
+
         Element::$object = $object;
-        $element = m::mock('Arrilot\BitrixModels\Element[get]',[1]);
+        $Element = m::mock('Arrilot\BitrixModels\Element[get]',[1]);
         $fields = [
             'ID' => 1,
             'IBLOCK_ID' => 1,
@@ -161,8 +162,8 @@ class ElementTest extends TestCase
                 'FOO_PROPERTY' => 'bar',
             ],
         ];
-        $element->shouldReceive('get')->andReturn($fields);
-        $element->fields = $fields;
+        $Element->shouldReceive('get')->andReturn($fields);
+        $Element->fields = $fields;
 
         $expected1 = [
             'NAME' => 'John Doe',
@@ -176,18 +177,18 @@ class ElementTest extends TestCase
         $object->shouldReceive('update')->with(1, $expected1)->once()->andReturn(true);
         $object->shouldReceive('update')->with(1, $expected2)->once()->andReturn(true);
 
-        $this->assertTrue($element->save());
-        $this->assertTrue($element->save(['NAME']));
+        $this->assertTrue($Element->save());
+        $this->assertTrue($Element->save(['NAME']));
     }
 
     public function testUpdate()
     {
         Element::$object = m::mock('object');
-        $element = m::mock('Arrilot\BitrixModels\Element[save]',[1]);
-        $element->shouldReceive('save')->with(['NAME'])->andReturn(true);
+        $Element = m::mock('Arrilot\BitrixModels\Element[save]',[1]);
+        $Element->shouldReceive('save')->with(['NAME'])->andReturn(true);
 
-        $this->assertTrue($element->update(['NAME'=>'John Doe']));
-        $this->assertEquals('John Doe', $element->fields['NAME']);
+        $this->assertTrue($Element->update(['NAME'=>'John Doe']));
+        $this->assertEquals('John Doe', $Element->fields['NAME']);
     }
 
     public function testCreate()

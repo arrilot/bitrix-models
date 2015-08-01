@@ -21,6 +21,13 @@ abstract class Model
     public $fields;
 
     /**
+     * Were fields already fetched from DB?
+     *
+     * @var bool
+     */
+    protected $hasBeenFetched = false;
+
+    /**
      * Bitrix entity object.
      *
      * @var object
@@ -42,11 +49,15 @@ abstract class Model
      */
     public function __construct($id, $fields = null)
     {
+        static::instantiateObject();
+
         $this->id = $id;
 
-        $this->fields = $fields;
+        if (!is_null($fields)) {
+            $this->hasBeenFetched = true;
+        }
 
-        static::instantiateObject();
+        $this->fields = $fields;
     }
 
     /**
@@ -56,21 +67,11 @@ abstract class Model
      */
     public function get()
     {
-        if (!$this->isFetched()) {
+        if (!$this->hasBeenFetched) {
             $this->fetch();
         }
 
         return $this->fields;
-    }
-
-    /**
-     * Determine if model has already been fetched or filled with all fields.
-     *
-     * @return bool
-     */
-    protected function isFetched()
-    {
-        return !is_null($this->fields);
     }
 
     /**
@@ -134,7 +135,6 @@ abstract class Model
     {
         $this->fetch();
     }
-
 
     /**
      * Instantiate bitrix entity object.

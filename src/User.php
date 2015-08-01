@@ -23,22 +23,17 @@ class User extends Model
      */
     public function __construct($id, $fields = null)
     {
-        global $USER;
+        parent::__construct($id, $fields);
 
-        static::instantiateObject();
-        
-        $this->id = $id;
-
-        $currentUserId = $USER->getID();
         if (empty($fields['GROUP_ID'])) {
+            global $USER;
+            $currentUserId = $USER->getID();
             $fields['GROUP_ID'] = ($currentUserId && $id == $currentUserId)
                 ? $USER->getUserGroupArray()
                 : static::$object->getUserGroup($id);
         }
 
         $fields['GROUPS'] = $fields['GROUP_ID']; // for backward compatibility
-
-        $this->fields = $fields;
     }
 
     /**
@@ -56,6 +51,8 @@ class User extends Model
         }
 
         $this->setAdditionalFieldsWhileFetching();
+
+        $this->hasBeenFetched = true;
     }
 
     /**
@@ -78,23 +75,13 @@ class User extends Model
      */
     public function get()
     {
-        if (!$this->isFetched()) {
+        if (!$this->hasBeenFetched) {
             $this->fetch();
         }
 
         $this->setAdditionalFieldsWhileFetching();
 
         return $this->fields;
-    }
-
-    /**
-     * Determine if model has already been fetched or filled with all fields.
-     *
-     * @return bool
-     */
-    protected function isFetched()
-    {
-        return isset($this->fields['NAME']);
     }
 
     /**
