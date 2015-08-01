@@ -1,6 +1,6 @@
 <?
 
-namespace Arrilot\BitrixModels\Test\Stubs;
+namespace Arrilot\Tests\BitrixModels\Stubs;
 
 class BxUserStub
 {

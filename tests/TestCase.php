@@ -1,6 +1,6 @@
 <?php
 
-namespace Arrilot\BitrixModels\Test;
+namespace Arrilot\Tests\BitrixModels;
 
 use Mockery;
 use PHPUnit_Framework_TestCase;

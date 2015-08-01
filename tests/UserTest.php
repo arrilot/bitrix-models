@@ -1,9 +1,9 @@
 <?php
 
-namespace Arrilot\BitrixModels\Test;
+namespace Arrilot\Tests\BitrixModels;
 
-use Arrilot\BitrixModels\Test\Stubs\BxUserStub;
-use Arrilot\BitrixModels\Test\Models\User;
+use Arrilot\Tests\BitrixModels\Stubs\BxUserStub;
+use Arrilot\Tests\BitrixModels\Models\User;
 
 use Mockery as m;
 use Mockery\MockInterface;

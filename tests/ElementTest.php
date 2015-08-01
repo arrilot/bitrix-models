@@ -1,8 +1,8 @@
 <?php
 
-namespace Arrilot\BitrixModels\Test;
+namespace Arrilot\Tests\BitrixModels;
 
-use Arrilot\BitrixModels\Test\Models\Element;
+use Arrilot\Tests\BitrixModels\Models\Element;
 
 use Mockery as m;
 

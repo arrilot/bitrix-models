@@ -1,6 +1,6 @@
 <?
 
-namespace Arrilot\BitrixModels\Test\Models;
+namespace Arrilot\Tests\BitrixModels\Models;
 
 use Arrilot\BitrixModels\User as BaseUser;
 
