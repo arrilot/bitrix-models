@@ -203,4 +203,42 @@ class ElementTest extends TestCase
         $this->assertEquals(2, $newElement->id);
         $this->assertEquals(['NAME' => 'John Doe', 'ID' => 2], $newElement->fields);
     }
+
+    public function testGetList()
+    {
+        $object = m::mock('object');
+        $object->shouldReceive('getList')->with(["SORT" => "ASC"], ['ACTIVE' => 'Y', 'IBLOCK_ID' => 1], false, false, ['ID', 'IBLOCK_ID'])->once()->andReturn(m::self());
+        $object->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
+        $object->shouldReceive('getFields')->andReturn(['ID' => 1], ['ID' => 2]);
+
+        Element::$object = $object;
+        $elements = Element::getlist([
+            'select' => ['ID', 'IBLOCK_ID'],
+            'filter' => ['ACTIVE' => 'Y'],
+        ]);
+
+        $expected = [
+            1 => ['ID' => 1],
+            2 => ['ID' => 2],
+        ];
+
+        $this->assertEquals($expected, $elements);
+    }
+
+    public function testCount()
+    {
+        $object = m::mock('object');
+        $object->shouldReceive('getList')->with(false, ['ACTIVE' => 'Y'], [])->once()->andReturn(2);
+
+        Element::$object = $object;
+
+        $this->assertEquals(2, Element::count(['ACTIVE' => 'Y']));
+
+        $object = m::mock('object');
+        $object->shouldReceive('getList')->with(false, [], [])->once()->andReturn(3);
+
+        Element::$object = $object;
+
+        $this->assertEquals(3, Element::count());
+    }
 }

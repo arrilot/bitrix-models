@@ -30,11 +30,11 @@ class Element extends Model
      */
     public static function create($fields)
     {
-        $element = static::instantiateObject();
-        $id = $element->add($fields);
+        $object = static::instantiateObject();
+        $id = $object->add($fields);
 
         if (!$id) {
-            throw new Exception($element->LAST_ERROR);
+            throw new Exception($object->LAST_ERROR);
         }
 
         $fields['ID'] = $id;
@@ -43,30 +43,34 @@ class Element extends Model
     }
 
     /**
-     * Create new element in database.
+     * CIblockElement::getList substitution.
      *
      * @param array $params
      *
-     * @return static
-     * @throws Exception
+     * @return array
      */
     public static function getList($params = [])
     {
-        $element = static::instantiateObject();
+        $object = static::instantiateObject();
 
-        self::normalizeGetListParams($params);
+        static::normalizeGetListParams($params);
 
         $items = [];
-        $rsItems = $element->getList($params['sort'], $params['filter'], $params['groupBy'], $params['navigation'], $params['select']);
-        while($obItem = $rsItems->GetNextElement())
-        {
+        $rsItems = $object->getList($params['sort'], $params['filter'], $params['groupBy'], $params['navigation'], $params['select']);
+        while($obItem = $rsItems->getNextElement()) {
             $item = $obItem->getFields();
             if ($params['withProps']) {
                 $item['PROPERTIES'] = $obItem->getProperties();
                 static::setPropertyValues($item);
             }
 
-            $items[$item['ID']] = $item;
+            $listByValue = ($params['listBy'] && isset($item[$params['listBy']])) ? $item[$params['listBy']] : false;
+
+            if ($listByValue) {
+                $items[$listByValue] = $item;
+            } else {
+                $items[] = $item;
+            }
         }
 
         return $items;
@@ -77,17 +81,19 @@ class Element extends Model
      *
      * @param $params
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     protected static function normalizeGetListParams(&$params)
     {
         $inspectedParamsWithDefaults = [
-            'sort'       => ["SORT" => "ASC"],
+            'sort'       => ['SORT' => 'ASC'],
             'filter'     => [],
             'groupBy'    => false,
             'navigation' => false,
             'select'     => [],
-            'withProps'  => true,
+            'withProps'  => false,
+            'listBy'     => 'ID',
         ];
 
         foreach ($inspectedParamsWithDefaults as $param => $default) {
@@ -96,9 +102,25 @@ class Element extends Model
             }
         }
 
-        if (static::$iblockId) {
-            $params['filter']['IBLOCK_ID'] = static::$iblockId;
+        if (!static::$iblockId) {
+            throw new Exception('iblockId property is not set');
         }
+
+        $params['filter']['IBLOCK_ID'] = static::$iblockId;
+    }
+
+    /**
+     * Get count of elements that match $filter.
+     *
+     * @param array $filter
+     *
+     * @return int
+     */
+    public static function count($filter = [])
+    {
+        $object = static::instantiateObject();
+
+        return $object->getList(false, $filter, []);
     }
 
     /**
@@ -119,16 +141,16 @@ class Element extends Model
     /**
      * Fetch element fields from database and place them to $this->fields.
      *
-     * @return null
-     * @throws InvalidModelIdException
+     * @return array
+     * @throws NotSetModelIdException
      */
-    public function fetch()
+    protected function fetch()
     {
-        $obElement = static::$object->getByID($this->id)->getNextElement();
-        if (!$obElement) {
-            throw new InvalidModelIdException();
+        if (!$this->id) {
+            throw new NotSetModelIdException();
         }
 
+        $obElement = static::$object->getByID($this->id)->getNextElement();
         $this->fields = $obElement->getFields();
 
         $this->fields['PROPERTIES'] = $obElement->getProperties();
@@ -136,6 +158,8 @@ class Element extends Model
         static::setPropertyValues($this->fields);
 
         $this->hasBeenFetched = true;
+
+        return $this->fields;
     }
 
     /**

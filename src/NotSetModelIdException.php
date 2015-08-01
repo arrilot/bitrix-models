@@ -4,7 +4,7 @@ namespace Arrilot\BitrixModels;
 
 use Exception;
 
-class InvalidModelIdException extends Exception
+class NotSetModelIdException extends Exception
 {
     /**
      * Exception message.

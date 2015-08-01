@@ -21,7 +21,7 @@ abstract class Model
     public $fields;
 
     /**
-     * Were fields already fetched from DB?
+     * Have fields been already fetched from DB?
      *
      * @var bool
      */
@@ -129,7 +129,7 @@ abstract class Model
     /**
      * Refresh model from database.
      *
-     * @return null
+     * @return void
      */
     public function refresh()
     {
@@ -158,7 +158,7 @@ abstract class Model
     /**
      * Destroy bitrix entity object.
      *
-     * @return null
+     * @return void
      */
     public static function destroyObject()
     {
@@ -168,9 +168,9 @@ abstract class Model
     /**
      * Fetch model fields from database and place them to $this->fields.
      *
-     * @return null
+     * @return void
      */
-    abstract public function fetch();
+    abstract protected function fetch();
 
     /**
      * Save model to database.
