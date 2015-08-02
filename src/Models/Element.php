@@ -23,6 +23,21 @@ class Element extends Base
     protected static $objectClass = 'CIBlockElement';
 
     /**
+     * List of params that can modify query.
+     *
+     * @var array
+     */
+    protected static $queryModifiers = [
+        'sort',
+        'filter',
+        'groupBy',
+        'navigation',
+        'select',
+        'withProps',
+        'listBy',
+    ];
+
+    /**
      * Corresponding iblock id.
      * MUST be overriden.
      *
@@ -42,57 +57,6 @@ class Element extends Base
     public static function query()
     {
         return new ElementQuery(static::instantiateObject(), static::iblockId());
-    }
-
-    /**
-     * Create new element in database.
-     *
-     * @param $fields
-     *
-     * @return static
-     * @throws Exception
-     */
-    public static function create($fields)
-    {
-        $object = static::instantiateObject();
-        $id = $object->add($fields);
-
-        if (!$id) {
-            throw new Exception($object->LAST_ERROR);
-        }
-
-        $fields['ID'] = $id;
-
-        return new static($id, $fields);
-    }
-
-    /**
-     * CIblockElement::getList substitution.
-     *
-     * @param array $params
-     *
-     * @return array
-     */
-    public static function getList($params = [])
-    {
-        $query = static::query();
-
-        $modifiers = [
-            'sort',
-            'filter',
-            'groupBy',
-            'navigation',
-            'select',
-            'withProps',
-            'listBy',
-        ];
-        foreach ($modifiers as $modifier) {
-            if (isset($params[$modifier])) {
-                $query = $query->{$modifier}($params[$modifier]);
-            }
-        }
-
-        return $query->getList();
     }
 
     /**

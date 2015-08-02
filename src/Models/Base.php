@@ -10,14 +10,14 @@ abstract class Base
     /**
      * ID of the model.
      *
-     * @var int
+     * @var null|int
      */
     public $id;
 
     /**
      * Array of model fields.
      *
-     * @var array
+     * @var null|array
      */
     public $fields;
 
@@ -83,6 +83,48 @@ abstract class Base
         $this->fields['ACTIVE'] = 'N';
 
         return $this->save(['ACTIVE']);
+    }
+
+    /**
+     * Create new item in database.
+     *
+     * @param $fields
+     *
+     * @return static
+     * @throws Exception
+     */
+    public static function create($fields)
+    {
+        $object = static::instantiateObject();
+        $id = $object->add($fields);
+
+        if (!$id) {
+            throw new Exception($object->LAST_ERROR);
+        }
+
+        $fields['ID'] = $id;
+
+        return new static($id, $fields);
+    }
+
+    /**
+     * Get list of items.
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    public static function getList($params = [])
+    {
+        $query = static::query();
+
+        foreach (static::$queryModifiers as $modifier) {
+            if (isset($params[$modifier])) {
+                $query = $query->{$modifier}($params[$modifier]);
+            }
+        }
+
+        return $query->getList();
     }
 
     /**

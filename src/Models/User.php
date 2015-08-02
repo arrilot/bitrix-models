@@ -8,7 +8,6 @@ use Exception;
 
 class User extends Base
 {
-
     /**
      * Bitrix entity object.
      *
@@ -24,12 +23,27 @@ class User extends Base
     protected static $objectClass = 'CUser';
 
     /**
+     * List of params that can modify query.
+     *
+     * @var array
+     */
+    protected static $queryModifiers = [
+        'sort',
+        'filter',
+        'navigation',
+        'select',
+        'withProps',
+        'withGroups',
+        'listBy',
+    ];
+
+    /**
      * Have groups been already fetched from DB?
      *
      * @var bool
      */
     protected $groupsHaveBeenFetched = false;
-    
+
     /**
      * Constructor.
      *
@@ -70,57 +84,6 @@ class User extends Base
         global $USER;
 
         return new static($USER->getId(), $fields);
-    }
-
-    /**
-     * Create new user in database.
-     *
-     * @param $fields
-     *
-     * @return static
-     * @throws Exception
-     */
-    public static function create($fields)
-    {
-        $user = static::instantiateObject();
-        $id = $user->add($fields);
-
-        if (!$id) {
-            throw new Exception($user->LAST_ERROR);
-        }
-
-        $fields['ID'] = $id;
-
-        return new static($id, $fields);
-    }
-
-    /**
-     * CUser::getList substitution.
-     *
-     * @param array $params
-     *
-     * @return array
-     */
-    public static function getList($params = [])
-    {
-        $query = static::query();
-
-        $modifiers = [
-            'sort',
-            'filter',
-            'navigation',
-            'select',
-            'withProps',
-            'withGroups',
-            'listBy',
-        ];
-        foreach ($modifiers as $modifier) {
-            if (isset($params[$modifier])) {
-                $query = $query->{$modifier}($params[$modifier]);
-            }
-        }
-
-        return $query->getList();
     }
 
     /**
