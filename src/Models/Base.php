@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace Arrilot\BitrixModels\Models;
 
@@ -27,20 +27,6 @@ abstract class Base
      * @var bool
      */
     protected $hasBeenFetched = false;
-
-    /**
-     * Bitrix entity object.
-     *
-     * @var object
-     */
-    public static $object;
-
-    /**
-     * Corresponding object class name.
-     *
-     * @var string
-     */
-    protected static $objectClass = 'CIBlockElement';
 
     /**
      * Constructor.
@@ -145,12 +131,12 @@ abstract class Base
      */
     public static function instantiateObject()
     {
-        if (class_exists(static::$objectClass)) {
-            return static::$object = new static::$objectClass;
-        }
-
         if (static::$object) {
             return static::$object;
+        }
+
+        if (class_exists(static::$objectClass)) {
+            return static::$object = new static::$objectClass;
         }
 
         throw new Exception('Object initialization failed');
@@ -184,7 +170,7 @@ abstract class Base
      *
      * @return int
      */
-    public static function count($filter = [])
+    public static function count(array $filter = [])
     {
         return static::query()->filter($filter)->count();
     }

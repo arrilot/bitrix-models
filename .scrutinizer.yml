@@ -3,6 +3,11 @@ filter:
         - 'src/*'
     excluded_paths:
         - 'vendor/*'
+        - 'tests/*'
 tools:
     php_cs_fixer:
         config: { level: psr2 }
+checks:
+    php:
+        code_rating: true
+        duplication: true

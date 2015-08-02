@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace Arrilot\BitrixModels\Models;
 
@@ -8,6 +8,14 @@ use Exception;
 
 class User extends Base
 {
+
+    /**
+     * Bitrix entity object.
+     *
+     * @var object
+     */
+    public static $object;
+
     /**
      * Corresponding object class name.
      *

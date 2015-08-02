@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace Arrilot\BitrixModels\Queries;
 
@@ -71,13 +71,13 @@ abstract class BaseQuery
     /**
      * Setter for filter.
      *
-     * @param $value
+     * @param array $filter
      *
      * @return $this
      */
-    public function filter($value)
+    public function filter(array $filter = [])
     {
-        $this->filter = $value;
+        $this->filter = $filter;
 
         return $this;
     }

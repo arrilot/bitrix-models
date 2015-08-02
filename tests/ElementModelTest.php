@@ -225,20 +225,20 @@ class ElementsModelTest extends TestCase
         $this->assertEquals($expected, $elements);
     }
 
-    public function testCount()
-    {
-        $object = m::mock('object');
-        $object->shouldReceive('getList')->with(false, ['ACTIVE' => 'Y'], [])->once()->andReturn(2);
-
-        TestElement::$object = $object;
-
-        $this->assertEquals(2, TestElement::count(['ACTIVE' => 'Y']));
-
-        $object = m::mock('object');
-        $object->shouldReceive('getList')->with(false, [], [])->once()->andReturn(3);
-
-        TestElement::$object = $object;
-
-        $this->assertEquals(3, TestElement::count());
-    }
+//    public function testCount()
+//    {
+//        $object = m::mock('object');
+//        $object->shouldReceive('getList')->with(false, ['ACTIVE' => 'Y'], [])->once()->andReturn(2);
+//
+//        TestElement::$object = $object;
+//
+//        $this->assertEquals(2, TestElement::count(['ACTIVE' => 'Y']));
+//
+//        $object = m::mock('object');
+//        $object->shouldReceive('getList')->with(false, [], [])->once()->andReturn(3);
+//
+//        TestElement::$object = $object;
+//
+//        $this->assertEquals(3, TestElement::count());
+//    }
 }

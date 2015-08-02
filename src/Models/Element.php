@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace Arrilot\BitrixModels\Models;
 
@@ -8,6 +8,13 @@ use Exception;
 
 class Element extends Base
 {
+    /**
+     * Bitrix entity object.
+     *
+     * @var object
+     */
+    public static $object;
+
     /**
      * Corresponding object class name.
      *
@@ -86,18 +93,6 @@ class Element extends Base
         }
 
         return $query->getList();
-    }
-
-    /**
-     * Get count of elements that match $filter.
-     *
-     * @param array $filter
-     *
-     * @return int
-     */
-    public static function count(array $filter = [])
-    {
-        return static::query()->filter($filter)->count();
     }
 
     /**
