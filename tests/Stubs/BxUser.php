@@ -2,7 +2,7 @@
 
 namespace Arrilot\Tests\BitrixModels\Stubs;
 
-class BxUserStub
+class BxUser
 {
     public function getId()
     {

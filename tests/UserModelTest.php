@@ -2,22 +2,22 @@
 
 namespace Arrilot\Tests\BitrixModels;
 
-use Arrilot\Tests\BitrixModels\Stubs\BxUserStub;
-use Arrilot\Tests\BitrixModels\Models\User;
+use Arrilot\Tests\BitrixModels\Stubs\BxUser;
+use Arrilot\Tests\BitrixModels\Stubs\TestUser;
 
 use Mockery as m;
 use Mockery\MockInterface;
 
-class UserTest extends TestCase
+class TestUserModelTest extends TestCase
 {
     public function setUp()
     {
-        $GLOBALS['USER'] = new BxUserStub;
+        $GLOBALS['USER'] = new BxUser;
     }
 
     public function tearDown()
     {
-        User::destroyObject();
+        TestUser::destroyObject();
         m::close();
     }
 
@@ -25,8 +25,8 @@ class UserTest extends TestCase
     {
         $object = m::mock('object');
 
-        User::$object = $object;
-        $user = new User(2, ['NAME' => 'John Doe']);
+        TestUser::$object = $object;
+        $user = new TestUser(2, ['NAME' => 'John Doe']);
 
         $this->assertEquals(2, $user->id);
         $this->assertEquals(['NAME' => 'John Doe'], $user->fields);
@@ -36,9 +36,9 @@ class UserTest extends TestCase
     {
         global $USER;
 
-        User::$object = m::mock('object');
+        TestUser::$object = m::mock('object');
 
-        $user = User::current();
+        $user = TestUser::current();
 
         $this->assertEquals($USER->getId(), $user->id);
         $this->assertEquals(null, $user->fields);
@@ -49,8 +49,8 @@ class UserTest extends TestCase
         $object = m::mock('object');
         $object->shouldReceive('delete')->once()->andReturn(true);
 
-        User::$object = $object;
-        $user = new User(1);
+        TestUser::$object = $object;
+        $user = new TestUser(1);
 
         $this->assertTrue($user->delete());
     }
@@ -60,8 +60,8 @@ class UserTest extends TestCase
         $object = m::mock('object');
         $object->shouldReceive('update')->with(1, ['ACTIVE'=>'Y'])->once()->andReturn(true);
 
-        User::$object = $object;
-        $user = new User(1);
+        TestUser::$object = $object;
+        $user = new TestUser(1);
 
         $this->assertTrue($user->activate());
     }
@@ -71,8 +71,8 @@ class UserTest extends TestCase
         $object = m::mock('object');
         $object->shouldReceive('update')->with(1, ['ACTIVE'=>'N'])->once()->andReturn(true);
 
-        User::$object = $object;
-        $user = new User(1);
+        TestUser::$object = $object;
+        $user = new TestUser(1);
 
         $this->assertTrue($user->deactivate());
     }
@@ -81,7 +81,7 @@ class UserTest extends TestCase
 //    {
 //        $object = m::mock('object');
 //        $object->shouldReceive('getByID')->with(1)->once()->andReturn(m::self());
-//        $object->shouldReceive('getNextUser')->once()->andReturn(m::self());
+//        $object->shouldReceive('getNextTestUser')->once()->andReturn(m::self());
 //        $object->shouldReceive('getFields')->once()->andReturn([
 //            'NAME' => 'John Doe'
 //        ]);
@@ -92,8 +92,8 @@ class UserTest extends TestCase
 //            ]
 //        ]);
 //
-//        User::$object = $object;
-//        $user = new User(1);
+//        TestUser::$object = $object;
+//        $user = new TestUser(1);
 //
 //        $expected = [
 //            'NAME' => 'John Doe',
@@ -120,7 +120,7 @@ class UserTest extends TestCase
 //    {
 //        $object = m::mock('object');
 //        $object->shouldReceive('getByID')->with(1)->twice()->andReturn(m::self());
-//        $object->shouldReceive('getNextUser')->twice()->andReturn(m::self());
+//        $object->shouldReceive('getNextTestUser')->twice()->andReturn(m::self());
 //        $object->shouldReceive('getFields')->twice()->andReturn([
 //            'NAME' => 'John Doe'
 //        ]);
@@ -131,8 +131,8 @@ class UserTest extends TestCase
 //            ]
 //        ]);
 //
-//        User::$object = $object;
-//        $user = new User(1);
+//        TestUser::$object = $object;
+//        $user = new TestUser(1);
 //
 //        $expected = [
 //            'NAME' => 'John Doe',
@@ -160,8 +160,8 @@ class UserTest extends TestCase
 //    {
 //        $object = m::mock('object');
 //
-//        User::$object = $object;
-//        $user = m::mock('Arrilot\BitrixModels\User[get]',[1]);
+//        TestUser::$object = $object;
+//        $user = m::mock('Arrilot\BitrixModels\TestUser[get]',[1]);
 //        $fields = [
 //            'ID' => 1,
 //            'IBLOCK_ID' => 1,
@@ -197,8 +197,8 @@ class UserTest extends TestCase
 //
 //    public function testUpdate()
 //    {
-//        User::$object = m::mock('object');
-//        $user = m::mock('Arrilot\BitrixModels\User[save]',[1]);
+//        TestUser::$object = m::mock('object');
+//        $user = m::mock('Arrilot\BitrixModels\TestUser[save]',[1]);
 //        $user->shouldReceive('save')->with(['NAME'])->andReturn(true);
 //
 //        $this->assertTrue($user->update(['NAME'=>'John Doe']));
@@ -210,26 +210,26 @@ class UserTest extends TestCase
         $object = m::mock('object');
         $object->shouldReceive('add')->with(['NAME' => 'John Doe'])->once()->andReturn(3);
 
-        User::$object = $object;
+        TestUser::$object = $object;
 
-        $newUser = User::create(['NAME' => 'John Doe']);
+        $newTestUser = TestUser::create(['NAME' => 'John Doe']);
 
-        $this->assertEquals(3, $newUser->id);
+        $this->assertEquals(3, $newTestUser->id);
         $this->assertEquals([
             'NAME' => 'John Doe',
             'ID' => 3,
-        ], $newUser->fields);
+        ], $newTestUser->fields);
     }
 //
 //    public function testGetList()
 //    {
 //        $object = m::mock('object');
 //        $object->shouldReceive('getList')->with(["SORT" => "ASC"], ['ACTIVE' => 'Y', 'IBLOCK_ID' => 1], false, false, ['ID', 'IBLOCK_ID'])->once()->andReturn(m::self());
-//        $object->shouldReceive('getNextUser')->andReturn(m::self(), m::self(), false);
+//        $object->shouldReceive('getNextTestUser')->andReturn(m::self(), m::self(), false);
 //        $object->shouldReceive('getFields')->andReturn(['ID' => 1], ['ID' => 2]);
 //
-//        User::$object = $object;
-//        $users = User::getlist([
+//        TestUser::$object = $object;
+//        $users = TestUser::getlist([
 //            'select' => ['ID', 'IBLOCK_ID'],
 //            'filter' => ['ACTIVE' => 'Y'],
 //        ]);
@@ -252,9 +252,9 @@ class UserTest extends TestCase
         ])->once()->andReturn(m::self());
         $object->NavRecordCount = 2;
 
-        User::$object = $object;
+        TestUser::$object = $object;
 
-        $this->assertEquals(2, User::count(['ACTIVE' => 'Y']));
+        $this->assertEquals(2, TestUser::count(['ACTIVE' => 'Y']));
 
         $object = m::mock('object');
         $object->shouldReceive('getList')->with("ID", "ASC", [],[
@@ -264,14 +264,14 @@ class UserTest extends TestCase
         ])->once()->andReturn(m::self());
         $object->NavRecordCount = 3;
 
-        User::$object = $object;
+        TestUser::$object = $object;
 
-        $this->assertEquals(3, User::count());
+        $this->assertEquals(3, TestUser::count());
     }
 
-    protected function mockGetUserGroups(MockInterface $object)
+    protected function mockGetTestUserGroups(MockInterface $object)
     {
-        $object->shouldReceive('getUserGroup')->andReturn([1,2]);
+        $object->shouldReceive('getTestUserGroup')->andReturn([1,2]);
 
         return [1,2];
     }

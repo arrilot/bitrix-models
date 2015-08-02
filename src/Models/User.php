@@ -1,10 +1,12 @@
 <?
 
-namespace Arrilot\BitrixModels;
+namespace Arrilot\BitrixModels\Models;
 
+use Arrilot\BitrixModels\NotSetModelIdException;
+use Arrilot\BitrixModels\Queries\UserQuery;
 use Exception;
 
-class User extends Model
+class User extends Base
 {
     /**
      * Corresponding object class name.
@@ -36,6 +38,16 @@ class User extends Model
         $id = is_null($id) ? $currentUserId : $id;
 
         parent::__construct($id, $fields);
+    }
+
+    /**
+     * Instantiate a query object for the model.
+     *
+     * @return UserQuery
+     */
+    public static function query()
+    {
+        return new UserQuery(static::instantiateObject());
     }
 
     /**
@@ -83,80 +95,24 @@ class User extends Model
      */
     public static function getList($params = [])
     {
-        $object = static::instantiateObject();
+        $query = static::query();
 
-        static::normalizeGetListParams($params);
-
-        $users = [];
-        $rsUsers = $object->getList($params['sort'], $sortOrder = false, $params['filter'], $params['arParams']);
-        while ($arUser = $rsUsers->fetch()) {
-
-            if ($params['withGroups']) {
-                $arUser['GROUP_ID'] = $object->getUserGroup($arUser['ID']);
-            }
-
-            $listByValue = ($params['listBy'] && isset($arUser[$params['listBy']])) ? $arUser[$params['listBy']] : false;
-
-            if ($listByValue) {
-                $users[$listByValue] = $arUser;
-            } else {
-                $users[] = $arUser;
-            }
-        }
-
-        return $users;
-    }
-
-    /**
-     * Normalize params for static::getList().
-     *
-     * @param $params
-     *
-     * @return void
-     */
-    protected static function normalizeGetListParams(&$params)
-    {
-        $inspectedParamsWithDefaults = [
-            'sort'       => ['last_name' => 'asc'],
-            'filter'     => [],
-            'navigation' => false,
-            'select'     => false,
-            'withProps'  => false,
-            'withGroups' => false,
-            'listBy'     => 'ID',
+        $modifiers = [
+            'sort',
+            'filter',
+            'navigation',
+            'select',
+            'withProps',
+            'withGroups',
+            'listBy',
         ];
-
-        foreach ($inspectedParamsWithDefaults as $param => $default) {
-            if (!isset($params[$param])) {
-                $params[$param] = $default;
+        foreach ($modifiers as $modifier) {
+            if (isset($params[$modifier])) {
+                $query = $query->{$modifier}($params[$modifier]);
             }
         }
 
-        if (!isset($params['arParams'])) {
-            $params['arParams'] = [
-                'SELECT' => $params['withProps'] === true ? ['UF_*'] : $params['withProps'],
-                'NAV_PARAMS' => $params['navigation'],
-                'FIELDS' => $params['select']
-            ];
-        }
-    }
-
-    /**
-     * Get count of elements that match $filter.
-     *
-     * @param array $filter
-     *
-     * @return int
-     */
-    public static function count($filter = [])
-    {
-        $object = static::instantiateObject();
-
-        return $object->getList($order = 'ID', $by = 'ASC', $filter, [
-            'NAV_PARAMS' => [
-                "nTopCount" => 0
-            ]
-        ])->NavRecordCount;
+        return $query->getList();
     }
 
     /**
@@ -340,7 +296,7 @@ class User extends Model
     {
         $field = $key === 'groups' ? 'GROUP_ID' : $key;
 
-        return $this->fields[$field];
+        return isset($this->fields[$field]) ? $this->fields[$field] : null;
     }
 
     /**

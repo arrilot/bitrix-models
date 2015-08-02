@@ -2,11 +2,11 @@
 
 namespace Arrilot\Tests\BitrixModels;
 
-use Arrilot\Tests\BitrixModels\Models\TestElement;
+use Arrilot\Tests\BitrixModels\Stubs\TestElement;
 
 use Mockery as m;
 
-class TestElementTest extends TestCase
+class ElementsModelTest extends TestCase
 {
     public function tearDown()
     {
@@ -147,7 +147,7 @@ class TestElementTest extends TestCase
         $object = m::mock('object');
 
         TestElement::$object = $object;
-        $element = m::mock('Arrilot\Tests\BitrixModels\Models\TestElement[get]',[1]);
+        $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get]',[1]);
         $fields = [
             'ID' => 1,
             'IBLOCK_ID' => 1,
@@ -184,7 +184,7 @@ class TestElementTest extends TestCase
     public function testUpdate()
     {
         TestElement::$object = m::mock('object');
-        $element = m::mock('Arrilot\Tests\BitrixModels\Models\TestElement[save]',[1]);
+        $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[save]',[1]);
         $element->shouldReceive('save')->with(['NAME'])->andReturn(true);
 
         $this->assertTrue($element->update(['NAME'=>'John Doe']));

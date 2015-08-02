@@ -1,10 +1,12 @@
 <?
 
-namespace Arrilot\BitrixModels;
+namespace Arrilot\BitrixModels\Models;
 
+use Arrilot\BitrixModels\NotSetModelIdException;
+use Arrilot\BitrixModels\Queries\ElementQuery;
 use Exception;
 
-class Element extends Model
+class Element extends Base
 {
     /**
      * Corresponding object class name.
@@ -23,6 +25,16 @@ class Element extends Model
     public static function iblockId()
     {
         throw new Exception('public static function iblockId() MUST be overriden');
+    }
+
+    /**
+     * Instantiate a query object for the model.
+     *
+     * @return ElementQuery
+     */
+    public static function query()
+    {
+        return new ElementQuery(static::instantiateObject(), static::iblockId());
     }
 
     /**
@@ -56,58 +68,24 @@ class Element extends Model
      */
     public static function getList($params = [])
     {
-        $object = static::instantiateObject();
+        $query = static::query();
 
-        static::normalizeGetListParams($params);
-
-        $items = [];
-        $rsItems = $object->getList($params['sort'], $params['filter'], $params['groupBy'], $params['navigation'], $params['select']);
-        while($obItem = $rsItems->getNextElement()) {
-            $item = $obItem->getFields();
-            if ($params['withProps']) {
-                $item['PROPERTIES'] = $obItem->getProperties();
-                static::setPropertyValues($item);
-            }
-
-            $listByValue = ($params['listBy'] && isset($item[$params['listBy']])) ? $item[$params['listBy']] : false;
-
-            if ($listByValue) {
-                $items[$listByValue] = $item;
-            } else {
-                $items[] = $item;
-            }
-        }
-
-        return $items;
-    }
-
-    /**
-     * Normalize params for static::getList().
-     *
-     * @param $params
-     *
-     * @return void
-     * @throws Exception
-     */
-    protected static function normalizeGetListParams(&$params)
-    {
-        $inspectedParamsWithDefaults = [
-            'sort'       => ['SORT' => 'ASC'],
-            'filter'     => [],
-            'groupBy'    => false,
-            'navigation' => false,
-            'select'     => [],
-            'withProps'  => false,
-            'listBy'     => 'ID',
+        $modifiers = [
+            'sort',
+            'filter',
+            'groupBy',
+            'navigation',
+            'select',
+            'withProps',
+            'listBy',
         ];
-
-        foreach ($inspectedParamsWithDefaults as $param => $default) {
-            if (!isset($params[$param])) {
-                $params[$param] = $default;
+        foreach ($modifiers as $modifier) {
+            if (isset($params[$modifier])) {
+                $query = $query->{$modifier}($params[$modifier]);
             }
         }
 
-        $params['filter']['IBLOCK_ID'] = static::iblockId();
+        return $query->getList();
     }
 
     /**
@@ -117,11 +95,9 @@ class Element extends Model
      *
      * @return int
      */
-    public static function count($filter = [])
+    public static function count(array $filter = [])
     {
-        $object = static::instantiateObject();
-
-        return $object->getList(false, $filter, []);
+        return static::query()->filter($filter)->count();
     }
 
     /**
