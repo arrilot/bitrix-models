@@ -26,7 +26,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Arrilot\\Tests\\BitrixModels\\": "tests"
+      "Arrilot\\Tests\\BitrixModels\\": "tests/"
     }
   }
 }

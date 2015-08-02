@@ -15,10 +15,15 @@ class Element extends Model
 
     /**
      * Corresponding iblock id.
+     * MUST be overriden.
      *
-     * @var null|int
+     * @return int
+     * @throws Exception
      */
-    protected static $iblockId;
+    public static function iblockId()
+    {
+        throw new Exception('public static function iblockId() MUST be overriden');
+    }
 
     /**
      * Create new element in database.
@@ -102,11 +107,7 @@ class Element extends Model
             }
         }
 
-        if (!static::$iblockId) {
-            throw new Exception('iblockId property is not set');
-        }
-
-        $params['filter']['IBLOCK_ID'] = static::$iblockId;
+        $params['filter']['IBLOCK_ID'] = static::iblockId();
     }
 
     /**

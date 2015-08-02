@@ -4,7 +4,10 @@ namespace Arrilot\Tests\BitrixModels\Models;
 
 use Arrilot\BitrixModels\Element as BaseElement;
 
-class Element extends BaseElement
+class TestElement extends BaseElement
 {
-    protected static $iblockId = 1;
+    public static function iblockId()
+    {
+        return 1;
+    }
 }
