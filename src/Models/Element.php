@@ -2,7 +2,7 @@
 
 namespace Arrilot\BitrixModels\Models;
 
-use Arrilot\BitrixModels\NotSetModelIdException;
+use Arrilot\BitrixModels\Exceptions\NotSetModelIdException;
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use Exception;
 
