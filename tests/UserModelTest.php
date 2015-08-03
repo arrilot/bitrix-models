@@ -23,13 +23,17 @@ class TestUserModelTest extends TestCase
 
     public function testInitialization()
     {
-        $object = m::mock('object');
-
-        TestUser::$object = $object;
+        TestUser::$object = m::mock('object');
         $user = new TestUser(2, ['NAME' => 'John Doe']);
 
-        $this->assertEquals(2, $user->id);
-        $this->assertEquals(['NAME' => 'John Doe'], $user->fields);
+        $this->assertSame(2, $user->id);
+        $this->assertSame(['NAME' => 'John Doe'], $user->fields);
+
+        $user = new TestUser(2, ['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]]);
+
+        $this->assertSame(2, $user->id);
+        $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]], $user->get());
+        $this->assertSame([1, 2], $user->getGroups());
     }
 
     public function testInitializationWithCurrent()
@@ -39,9 +43,14 @@ class TestUserModelTest extends TestCase
         TestUser::$object = m::mock('object');
 
         $user = TestUser::current();
+        $this->assertSame($USER->getId(), $user->id);
+        $this->assertSame(null, $user->fields);
 
-        $this->assertEquals($USER->getId(), $user->id);
-        $this->assertEquals(null, $user->fields);
+        $user = TestUser::current(['NAME' => 'John Doe', 'GROUP_ID' => [1,2]]);
+        $this->assertSame($USER->getId(), $user->id);
+        $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1,2]], $user->fields);
+        $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1,2]], $user->get());
+        $this->assertSame([1,2], $user->getGroups());
     }
 
     public function testDelete()
@@ -108,12 +117,12 @@ class TestUserModelTest extends TestCase
 //            ],
 //        ];
 //
-//        $this->assertEquals($expected, $user->get());
-//        $this->assertEquals($expected, $user->fields);
+//        $this->assertSame($expected, $user->get());
+//        $this->assertSame($expected, $user->fields);
 //
 //        // second call to make sure we do not query database twice.
-//        $this->assertEquals($expected, $user->get());
-//        $this->assertEquals($expected, $user->fields);
+//        $this->assertSame($expected, $user->get());
+//        $this->assertSame($expected, $user->fields);
 //    }
 //
 //    public function testRefresh()
@@ -148,12 +157,12 @@ class TestUserModelTest extends TestCase
 //        ];
 //
 //        $user->refresh();
-//        $this->assertEquals($expected, $user->fields);
+//        $this->assertSame($expected, $user->fields);
 //
 //        $user->fields = 'Jane Doe';
 //
 //        $user->refresh();
-//        $this->assertEquals($expected, $user->fields);
+//        $this->assertSame($expected, $user->fields);
 //    }
 //
 //    public function testSave()
@@ -202,7 +211,7 @@ class TestUserModelTest extends TestCase
 //        $user->shouldReceive('save')->with(['NAME'])->andReturn(true);
 //
 //        $this->assertTrue($user->update(['NAME'=>'John Doe']));
-//        $this->assertEquals('John Doe', $user->fields['NAME']);
+//        $this->assertSame('John Doe', $user->fields['NAME']);
 //    }
 //
     public function testCreate()
@@ -214,8 +223,8 @@ class TestUserModelTest extends TestCase
 
         $newTestUser = TestUser::create(['NAME' => 'John Doe']);
 
-        $this->assertEquals(3, $newTestUser->id);
-        $this->assertEquals([
+        $this->assertSame(3, $newTestUser->id);
+        $this->assertSame([
             'NAME' => 'John Doe',
             'ID' => 3,
         ], $newTestUser->fields);
@@ -239,7 +248,7 @@ class TestUserModelTest extends TestCase
 //            2 => ['ID' => 2],
 //        ];
 //
-//        $this->assertEquals($expected, $users);
+//        $this->assertSame($expected, $users);
 //    }
 //
     public function testCount()
@@ -254,7 +263,7 @@ class TestUserModelTest extends TestCase
 
         TestUser::$object = $object;
 
-        $this->assertEquals(2, TestUser::count(['ACTIVE' => 'Y']));
+        $this->assertSame(2, TestUser::count(['ACTIVE' => 'Y']));
 
         $object = m::mock('object');
         $object->shouldReceive('getList')->with("ID", "ASC", [],[
@@ -266,13 +275,43 @@ class TestUserModelTest extends TestCase
 
         TestUser::$object = $object;
 
-        $this->assertEquals(3, TestUser::count());
+        $this->assertSame(3, TestUser::count());
     }
 
-    protected function mockGetTestUserGroups(MockInterface $object)
+    public function testFill()
     {
-        $object->shouldReceive('getTestUserGroup')->andReturn([1,2]);
+        TestUser::$object = m::mock('object');
+        $user = new TestUser(1);
 
-        return [1,2];
+        $fields = ['ID' => 2, 'NAME' => 'John Doe','GROUP_ID' => [1,2]];
+        $user->fill($fields);
+
+        $this->assertSame(2, $user->id);
+        $this->assertSame($fields, $user->fields);
+        $this->assertSame($fields, $user->get());
+
+        $object = m::mock('object');
+        $object->shouldReceive('getUserGroup')->once()->andReturn([1]);
+        TestUser::$object = $object;
+        $user = new TestUser(1);
+
+        $fields = ['ID' => 2, 'NAME' => 'John Doe'];
+        $user->fill($fields);
+
+        $this->assertSame(2, $user->id);
+        $this->assertSame($fields, $user->fields);
+        $this->assertSame($fields + ['GROUP_ID' => [1]], $user->get());
+    }
+
+    public function testFillGroups()
+    {
+        TestUser::$object = m::mock('object');
+        $user = new TestUser(1);
+
+        $user->fillGroups([1,2]);
+
+        $this->assertSame(1, $user->id);
+        $this->assertSame(['GROUP_ID' => [1,2]], $user->fields);
+        $this->assertSame([1,2], $user->getGroups());
     }
 }

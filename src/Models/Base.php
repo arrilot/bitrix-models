@@ -34,20 +34,16 @@ abstract class Base implements ArrayAccess, IteratorAggregate
     /**
      * Constructor.
      *
-     * @param      $id
-     * @param null $fields
+     * @param $id
+     * @param $fields
      */
-    public function __construct($id, $fields = null)
+    public function __construct($id = null, $fields = null)
     {
         static::instantiateObject();
 
         $this->id = $id;
 
-        if (!is_null($fields)) {
-            $this->hasBeenFetched = true;
-        }
-
-        $this->fields = $fields;
+        $this->fill($fields);
     }
 
     /**
@@ -62,6 +58,33 @@ abstract class Base implements ArrayAccess, IteratorAggregate
         }
 
         return $this->fields;
+    }
+
+    /**
+     * Fill model fields if they are already known.
+     * Saves DB queries.
+     *
+     * @param array $fields
+     *
+     * @return null
+     */
+    public function fill($fields)
+    {
+        if (!is_array($fields)) {
+            return;
+        }
+
+        if (isset($fields['ID'])) {
+            $this->id = $fields['ID'];
+        }
+
+        $this->fields = $fields;
+
+        $this->hasBeenFetched = true;
+
+        if (method_exists($this, 'afterFill')) {
+            $this->afterFill($fields);
+        }
     }
 
     /**

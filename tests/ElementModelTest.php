@@ -19,15 +19,15 @@ class ElementsModelTest extends TestCase
         TestElement::$object = m::mock('object');
 
         $element = new TestElement(1);
-        $this->assertEquals(1, $element->id);
+        $this->assertSame(1, $element->id);
 
         $fields = [
             'NAME' => 'John',
             'LAST_NAME' => 'Doe',
         ];
         $element = new TestElement(1, $fields);
-        $this->assertEquals(1, $element->id);
-        $this->assertEquals($fields, $element->fields);
+        $this->assertSame(1, $element->id);
+        $this->assertSame($fields, $element->fields);
     }
 
     public function testDelete()
@@ -98,8 +98,8 @@ class ElementsModelTest extends TestCase
         $this->assertEquals($expected, $element->fields);
 
         // second call to make sure we do not query database twice.
-        $this->assertEquals($expected, $element->get());
-        $this->assertEquals($expected, $element->fields);
+        $this->assertSame($expected, $element->get());
+        $this->assertSame($expected, $element->fields);
     }
 
     public function testRefresh()
@@ -139,7 +139,7 @@ class ElementsModelTest extends TestCase
         $element->fields = 'Jane Doe';
 
         $element->refresh();
-        $this->assertEquals($expected, $element->fields);
+        $this->assertSame($expected, $element->fields);
     }
 
     public function testSave()
@@ -188,7 +188,7 @@ class ElementsModelTest extends TestCase
         $element->shouldReceive('save')->with(['NAME'])->andReturn(true);
 
         $this->assertTrue($element->update(['NAME'=>'John Doe']));
-        $this->assertEquals('John Doe', $element->fields['NAME']);
+        $this->assertSame('John Doe', $element->fields['NAME']);
     }
 
     public function testCreate()
@@ -200,8 +200,8 @@ class ElementsModelTest extends TestCase
 
         $newElement = TestElement::create(['NAME' => 'John Doe']);
 
-        $this->assertEquals(2, $newElement->id);
-        $this->assertEquals(['NAME' => 'John Doe', 'ID' => 2], $newElement->fields);
+        $this->assertSame(2, $newElement->id);
+        $this->assertSame(['NAME' => 'John Doe', 'ID' => 2], $newElement->fields);
     }
 
     public function testGetList()
@@ -222,7 +222,7 @@ class ElementsModelTest extends TestCase
             2 => ['ID' => 2],
         ];
 
-        $this->assertEquals($expected, $elements);
+        $this->assertSame($expected, $elements);
     }
 
     public function testCount()
@@ -239,14 +239,44 @@ class ElementsModelTest extends TestCase
 
         TestElement::$object = $object;
 
-        $this->assertEquals(3, TestElement::count());
+        $this->assertSame(3, TestElement::count());
     }
 
     public function testToArray()
     {
         TestElement::$object = m::mock('object');
+
         $element = new TestElement(1, ['ID' => 1, 'NAME' => 'John Doe']);
 
-        $this->assertEquals(['ID' => 1, 'NAME' => 'John Doe'], $element->toArray());
+        $this->assertSame(['ID' => 1, 'NAME' => 'John Doe'], $element->toArray());
+    }
+
+    public function testFill()
+    {
+        TestElement::$object = m::mock('object');
+
+        $element = new TestElement(1);
+        $element->fill(['ID' => 2, 'NAME' => 'John Doe']);
+
+        $this->assertSame(2, $element->id);
+        $this->assertSame(['ID' => 2, 'NAME' => 'John Doe'], $element->get());
+        $this->assertSame(['ID' => 2, 'NAME' => 'John Doe'], $element->fields);
+    }
+
+    public function testArrayAccess()
+    {
+        TestElement::$object = m::mock('object');
+
+        $element = new TestElement(1);
+        $element->fill(['ID' => 2, 'NAME' => 'John Doe', 'GROUP_ID' => [1, 2]]);
+        $values = [];
+        foreach ($element as $value) {
+            $values[] = $value;
+        }
+
+        $this->assertSame(2, $element['ID']);
+        $this->assertSame('John Doe', $element['NAME']);
+        $this->assertSame([1, 2], $element['GROUP_ID']);
+        $this->assertSame([2, 'John Doe', [1, 2]], $values);
     }
 }

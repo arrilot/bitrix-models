@@ -45,24 +45,6 @@ class User extends Base
     protected $groupsHaveBeenFetched = false;
 
     /**
-     * Constructor.
-     *
-     * @param $id
-     * @param $fields
-     *
-     * @throws Exception
-     */
-    public function __construct($id = null, $fields = null)
-    {
-        global $USER;
-        $currentUserId = $USER->getID();
-
-        $id = is_null($id) ? $currentUserId : $id;
-
-        parent::__construct($id, $fields);
-    }
-
-    /**
      * Instantiate a query object for the model.
      *
      * @return UserQuery
@@ -83,7 +65,13 @@ class User extends Base
     {
         global $USER;
 
-        return new static($USER->getId(), $fields);
+        $user = new static($USER->getId());
+
+        if (!is_null($fields)) {
+            $user->fill($fields);
+        }
+
+        return $user;
     }
 
     /**
@@ -100,6 +88,35 @@ class User extends Base
         $this->getGroups();
 
         return $this->fields;
+    }
+
+    /**
+     * Fill extra fields when $this->field is called.
+     *
+     * @param $fields
+     *
+     * @return null
+     */
+    protected function afterFill($fields)
+    {
+        if (isset($fields['GROUP_ID']) && is_array(['GROUP_ID'])) {
+            $this->groupsHaveBeenFetched = true;
+        }
+    }
+
+    /**
+     * Fill model groups if they are already known.
+     * Saves DB queries.
+     *
+     * @param array $groups
+     *
+     * @return null
+     */
+    public function fillGroups($groups)
+    {
+        $this->fields['GROUP_ID'] = $groups;
+
+        $this->groupsHaveBeenFetched = true;
     }
 
     /**
@@ -154,8 +171,6 @@ class User extends Base
         $this->fields['GROUP_ID'] = $this->isCurrent()
             ? $USER->getUserGroupArray()
             : static::$object->getUserGroup($this->id);
-
-        $this->fields['GROUPS'] = $this->fields['GROUP_ID']; // for backward compatibility
 
         $this->groupsHaveBeenFetched = true;
 

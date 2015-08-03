@@ -60,18 +60,15 @@ class Element extends Base
     }
 
     /**
-     * Constructor.
+     * Fill extra fields when $this->field is called.
      *
-     * @param $id
      * @param $fields
      *
-     * @throws Exception
+     * @return null
      */
-    public function __construct($id, $fields = null)
+    protected function afterFill($fields)
     {
-        parent::__construct($id, $fields);
-
-        static::setPropertyValues($this->fields);
+        $this->setPropertyValuesFromProperties();
     }
 
     /**
@@ -90,8 +87,7 @@ class Element extends Base
         $this->fields = $obElement->getFields();
 
         $this->fields['PROPERTIES'] = $obElement->getProperties();
-
-        static::setPropertyValues($this->fields);
+        $this->setPropertyValuesFromProperties();
 
         $this->hasBeenFetched = true;
 
@@ -99,23 +95,19 @@ class Element extends Base
     }
 
     /**
-     * Set $field['PROPERTY_VALUES'] from $field['PROPERTIES'].
+     * Set $this->fields['PROPERTY_VALUES'] from $this->fields['PROPERTIES'].
      *
-     * @param array $fields
-     *
-     * @return null
+     * @return void
      */
-    protected static function setPropertyValues(&$fields)
+    protected function setPropertyValuesFromProperties()
     {
-        if (empty($fields) || empty($fields['PROPERTIES'])) {
+        if (empty($this->fields) || empty($this->fields['PROPERTIES'])) {
             return;
         }
 
-        foreach ($fields['PROPERTIES'] as $code => $prop) {
-            $fields['PROPERTY_VALUES'][$code] = $prop['VALUE'];
+        foreach ($this->fields['PROPERTIES'] as $code => $prop) {
+            $this->fields['PROPERTY_VALUES'][$code] = $prop['VALUE'];
         }
-
-        return;
     }
 
     /**
