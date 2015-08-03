@@ -255,33 +255,4 @@ class User extends Base
 
         return $fields;
     }
-
-    /**
-     * Dynamically retrieve attributes on the model.
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        $field = $key === 'groups' ? 'GROUP_ID' : $key;
-
-        return isset($this->fields[$field]) ? $this->fields[$field] : null;
-    }
-
-    /**
-     * Dynamically set attributes on the model.
-     *
-     * @param string $key
-     * @param mixed $value
-     *
-     * @return void
-     */
-    public function __set($key, $value)
-    {
-        $field = $key === 'groups' ? 'GROUP_ID' : $key;
-
-        $this->fields[$field] = $value;
-    }
 }

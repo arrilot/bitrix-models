@@ -2,10 +2,13 @@
 
 namespace Arrilot\BitrixModels\Models;
 
+use ArrayAccess;
+use ArrayIterator;
 use Arrilot\BitrixModels\Queries\BaseQuery;
 use Exception;
+use IteratorAggregate;
 
-abstract class Base
+abstract class Base implements ArrayAccess, IteratorAggregate
 {
     /**
      * ID of the model.
@@ -163,6 +166,79 @@ abstract class Base
     public function refresh()
     {
         $this->fetch();
+    }
+
+    /**
+     * Set method for ArrayIterator.
+     *
+     * @param $offset
+     * @param $value
+     *
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        if (is_null($offset)) {
+            $this->fields[] = $value;
+        } else {
+            $this->fields[$offset] = $value;
+        }
+    }
+
+    /**
+     * Exists method for ArrayIterator
+     *
+     * @param $offset
+     *
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->fields[$offset]);
+    }
+
+    /**
+     * Unset method for ArrayIterator
+     *
+     * @param $offset
+     *
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->fields[$offset]);
+    }
+
+    /**
+     * Get method for ArrayIterator.
+     *
+     * @param $offset
+     *
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return isset($this->fields[$offset]) ? $this->fields[$offset] : null;
+    }
+
+    /**
+     * Get an iterator for fields.
+     *
+     * @return ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->fields);
+    }
+
+    /**
+     * Cast model to array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->fields;
     }
 
     /**
