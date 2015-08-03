@@ -225,20 +225,28 @@ class ElementsModelTest extends TestCase
         $this->assertEquals($expected, $elements);
     }
 
-//    public function testCount()
-//    {
-//        $object = m::mock('object');
-//        $object->shouldReceive('getList')->with(false, ['ACTIVE' => 'Y'], [])->once()->andReturn(2);
-//
-//        TestElement::$object = $object;
-//
-//        $this->assertEquals(2, TestElement::count(['ACTIVE' => 'Y']));
-//
-//        $object = m::mock('object');
-//        $object->shouldReceive('getList')->with(false, [], [])->once()->andReturn(3);
-//
-//        TestElement::$object = $object;
-//
-//        $this->assertEquals(3, TestElement::count());
-//    }
+    public function testCount()
+    {
+        $object = m::mock('object');
+        $object->shouldReceive('getList')->with(false, ['ACTIVE' => 'Y','IBLOCK_ID' => 1], [])->once()->andReturn(2);
+
+        TestElement::$object = $object;
+
+        $this->assertEquals(2, TestElement::count(['ACTIVE' => 'Y','IBLOCK_ID' => 1]));
+
+        $object = m::mock('object');
+        $object->shouldReceive('getList')->with(false, ['IBLOCK_ID' => 1], [])->once()->andReturn(3);
+
+        TestElement::$object = $object;
+
+        $this->assertEquals(3, TestElement::count());
+    }
+
+    public function testToArray()
+    {
+        TestElement::$object = m::mock('object');
+        $element = new TestElement(1, ['ID' => 1, 'NAME' => 'John Doe']);
+
+        $this->assertEquals(['ID' => 1, 'NAME' => 'John Doe'], $element->toArray());
+    }
 }
