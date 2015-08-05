@@ -2,15 +2,20 @@
 
 namespace Arrilot\Tests\BitrixModels\Stubs;
 
-class BxUser
+class BxUserWithoutAuth
 {
     public function getId()
     {
-        return 1;
+        return null;
     }
 
     public function getUserGroupArray()
     {
-        return [1,2,3];
+        return [2];
+    }
+
+    public function isAuthorized()
+    {
+        return false;
     }
 }

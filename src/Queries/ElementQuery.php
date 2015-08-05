@@ -43,6 +43,8 @@ class ElementQuery extends BaseQuery
         $this->object = $object;
 
         $this->iblockId = $iblockId;
+
+        $this->filter = ['IBLOCK_ID' => $iblockId];
     }
 
     /**
@@ -68,9 +70,8 @@ class ElementQuery extends BaseQuery
      */
     public function filter(array $filter = [])
     {
-        $this->filter = array_merge($filter, [
-            'IBLOCK_ID' => $this->iblockId
-        ]);
+        $this->filter = $filter;
+        $this->filter['IBLOCK_ID'] = $this->iblockId;
 
         return $this;
     }
@@ -86,18 +87,12 @@ class ElementQuery extends BaseQuery
         $rsItems = $this->object->getList($this->sort, $this->filter, $this->groupBy, $this->navigation, $this->select);
         while($obItem = $rsItems->getNextElement()) {
             $item = $obItem->getFields();
-            if ($this->withProps) {
+            if ($this->withoutProps === false) {
                 $item['PROPERTIES'] = $obItem->getProperties();
                 $this->setPropertyValues($item);
             }
 
-            $listByValue = ($this->listBy && isset($item[$this->listBy])) ? $item[$this->listBy] : false;
-
-            if ($listByValue) {
-                $items[$listByValue] = $item;
-            } else {
-                $items[] = $item;
-            }
+            $this->addUsingKeyBy($items, $item);
         }
 
         return $items;

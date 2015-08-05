@@ -2,9 +2,7 @@
 
 namespace Arrilot\BitrixModels\Models;
 
-use Arrilot\BitrixModels\Exceptions\NotSetModelIdException;
 use Arrilot\BitrixModels\Queries\UserQuery;
-use Exception;
 
 class User extends Base
 {
@@ -32,9 +30,9 @@ class User extends Base
         'filter',
         'navigation',
         'select',
-        'withProps',
-        'withGroups',
-        'listBy',
+        'withoutProps',
+        'withoutGroups',
+        'keyBy',
     ];
 
     /**
@@ -42,7 +40,7 @@ class User extends Base
      *
      * @var bool
      */
-    protected $groupsHaveBeenFetched = false;
+    protected $groupsAreFetched = false;
 
     /**
      * Instantiate a query object for the model.
@@ -75,22 +73,6 @@ class User extends Base
     }
 
     /**
-     * Get model fields from cache or database.
-     *
-     * @return array
-     */
-    public function get()
-    {
-        if (!$this->hasBeenFetched) {
-            $this->fetch();
-        }
-
-        $this->getGroups();
-
-        return $this->fields;
-    }
-
-    /**
      * Fill extra fields when $this->field is called.
      *
      * @param $fields
@@ -100,7 +82,7 @@ class User extends Base
     protected function afterFill($fields)
     {
         if (isset($fields['GROUP_ID']) && is_array(['GROUP_ID'])) {
-            $this->groupsHaveBeenFetched = true;
+            $this->groupsAreFetched = true;
         }
     }
 
@@ -116,26 +98,19 @@ class User extends Base
     {
         $this->fields['GROUP_ID'] = $groups;
 
-        $this->groupsHaveBeenFetched = true;
+        $this->groupsAreFetched = true;
     }
 
     /**
-     * Fetch model fields from database and place them to $this->fields.
+     * Get all model attributes from cache or database.
      *
      * @return array
-     * @throws NotSetModelIdException
      */
-    protected function fetch()
+    public function get()
     {
-        if (!$this->id) {
-            throw new NotSetModelIdException();
-        }
+        $this->getFields();
 
-        $this->fields = static::$object->getByID($this->id)->fetch();
-
-        $this->fetchGroups();
-
-        $this->hasBeenFetched = true;
+        $this->getGroups();
 
         return $this->fields;
     }
@@ -147,23 +122,60 @@ class User extends Base
      */
     public function getGroups()
     {
-        if ($this->groupsHaveBeenFetched) {
+        if ($this->groupsAreFetched) {
             return $this->fields['GROUP_ID'];
         }
 
-        return $this->fetchGroups();
+        return $this->refreshGroups();
     }
 
     /**
-     * Fetch user groups and save them to a class field.
+     * Refresh model from database and place data to $this->fields.
      *
      * @return array
-     * @throws NotSetModelIdException
      */
-    protected function fetchGroups()
+    public function refresh()
+    {
+        $this->refreshFields();
+
+        $this->refreshGroups();
+
+        return $this->fields;
+    }
+
+    /**
+     * Refresh user fields and save them to a class field.
+     *
+     * @return array
+     */
+    public function refreshFields()
     {
         if (!$this->id) {
-            throw new NotSetModelIdException();
+            return  $this->fields = [];
+        }
+
+        $groupBackup = isset($this->fields['GROUP_ID']) ? $this->fields['GROUP_ID'] : null;
+
+        $this->fields = static::$object->getByID($this->id)->fetch();
+
+        if ($groupBackup) {
+            $this->fields['GROUP_ID'] = $groupBackup;
+        }
+
+        $this->$fieldsAreFetched = true;
+
+        return $this->fields;
+    }
+
+    /**
+     * Refresh user groups and save them to a class field.
+     *
+     * @return array
+     */
+    public function refreshGroups()
+    {
+        if (!$this->id) {
+            return [];
         }
 
         global $USER;
@@ -172,7 +184,7 @@ class User extends Base
             ? $USER->getUserGroupArray()
             : static::$object->getUserGroup($this->id);
 
-        $this->groupsHaveBeenFetched = true;
+        $this->groupsAreFetched = true;
 
         return $this->fields['GROUP_ID'];
     }

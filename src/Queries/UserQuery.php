@@ -12,11 +12,11 @@ class UserQuery extends BaseQuery
     protected $sort = ['last_name' => 'asc'];
 
     /**
-     * Are groups needed in results?
+     * Do not fetch groups.
      *
      * @var bool
      */
-    protected $withGroups = false;
+    protected $withoutGroups = false;
 
     /**
      * Constructor.
@@ -29,15 +29,15 @@ class UserQuery extends BaseQuery
     }
 
     /**
-     * Setter for withGroups.
+     * Setter for withoutGroups.
      *
      * @param $value
      *
      * @return $this
      */
-    public function withGroups($value = true)
+    public function withoutGroups($value = true)
     {
-        $this->withGroups = $value;
+        $this->withoutGroups = $value;
 
         return $this;
     }
@@ -50,7 +50,7 @@ class UserQuery extends BaseQuery
     public function getList()
     {
         $params = [
-            'SELECT' => $this->withProps === true ? ['UF_*'] : $this->withProps,
+            'SELECT' => $this->withoutProps === false ? ['UF_*'] : false,
             'NAV_PARAMS' => $this->navigation,
             'FIELDS' => $this->select,
         ];
@@ -59,17 +59,11 @@ class UserQuery extends BaseQuery
         $rsUsers = $this->object->getList($this->sort, $sortOrder = false, $this->filter, $params);
         while ($arUser = $rsUsers->fetch()) {
 
-            if ($this->withGroups) {
+            if ($this->withoutGroups === false) {
                 $arUser['GROUP_ID'] = $this->object->getUserGroup($arUser['ID']);
             }
 
-            $listByValue = ($this->listBy && isset($arUser[$this->listBy])) ? $arUser[$this->listBy] : false;
-
-            if ($listByValue) {
-                $users[$listByValue] = $arUser;
-            } else {
-                $users[] = $arUser;
-            }
+            $this->addUsingKeyBy($users, $arUser);
         }
 
         return $users;

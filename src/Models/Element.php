@@ -2,7 +2,6 @@
 
 namespace Arrilot\BitrixModels\Models;
 
-use Arrilot\BitrixModels\Exceptions\NotSetModelIdException;
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use Exception;
 
@@ -33,9 +32,16 @@ class Element extends Base
         'groupBy',
         'navigation',
         'select',
-        'withProps',
-        'listBy',
+        'withoutProps',
+        'keyBy',
     ];
+
+    /**
+     * Have props been already fetched from DB?
+     *
+     * @var bool
+     */
+    protected $propsAreFetched = false;
 
     /**
      * Corresponding iblock id.
@@ -72,35 +78,18 @@ class Element extends Base
     }
 
     /**
-     * Fetch element fields from database and place them to $this->fields.
-     *
-     * @return array
-     * @throws NotSetModelIdException
-     */
-    protected function fetch()
-    {
-        if (!$this->id) {
-            throw new NotSetModelIdException();
-        }
-
-        $obElement = static::$object->getByID($this->id)->getNextElement();
-        $this->fields = $obElement->getFields();
-
-        $this->fields['PROPERTIES'] = $obElement->getProperties();
-        $this->setPropertyValuesFromProperties();
-
-        $this->hasBeenFetched = true;
-
-        return $this->fields;
-    }
-
-    /**
      * Set $this->fields['PROPERTY_VALUES'] from $this->fields['PROPERTIES'].
      *
      * @return void
      */
     protected function setPropertyValuesFromProperties()
     {
+        if (isset($this->fields['PROPERTY_VALUES'])) {
+            $this->propsAreFetched = true;
+
+            return;
+        }
+
         if (empty($this->fields) || empty($this->fields['PROPERTIES'])) {
             return;
         }
@@ -108,20 +97,82 @@ class Element extends Base
         foreach ($this->fields['PROPERTIES'] as $code => $prop) {
             $this->fields['PROPERTY_VALUES'][$code] = $prop['VALUE'];
         }
+
+        $this->propsAreFetched = true;
     }
 
     /**
-     * Get model fields from cache or database.
+     * Get all model attributes from cache or database.
      *
      * @return array
      */
     public function get()
     {
-        if (!$this->hasBeenFetched) {
-            $this->fetch();
-        }
+        $this->getFields();
+
+        $this->getProps();
 
         return $this->fields;
+    }
+
+    /**
+     * Get elements props from cache or database.
+     *
+     * @return array
+     */
+    public function getProps()
+    {
+        if ($this->propsAreFetched) {
+            return $this->fields['PROPERTY_VALUES'];
+        }
+
+        return $this->refreshProps();
+    }
+
+    /**
+     * Refresh model from database and place data to $this->fields.
+     *
+     * @return array
+     */
+    public function refresh()
+    {
+        return $this->refreshFields();
+    }
+
+    /**
+     * Refresh element fields and save them to a class field.
+     *
+     * @return array
+     */
+    public function refreshFields()
+    {
+        if (!$this->id) {
+            return $this->fields = [];
+        }
+
+        $obElement = static::$object->getByID($this->id)->getNextElement();
+        $this->fields = $obElement->getFields();
+        $this->fields['PROPERTIES'] = $obElement->getProperties();
+        $this->setPropertyValuesFromProperties();
+
+        $this->fieldsAreFetched = true;
+        $this->propsAreFetched = true;
+
+        return $this->fields;
+    }
+
+    /**
+     * Refresh element fields and save them to a class field.
+     *
+     * @return array
+     */
+    public function refreshProps()
+    {
+        // Refresh fields as long as we can't actually refresh props
+        // without refreshing the fields
+        $this->refreshFields();
+
+        return $this->fields['PROPERTY_VALUES'];
     }
 
     /**

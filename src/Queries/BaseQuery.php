@@ -2,6 +2,8 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
+use Base;
+
 abstract class BaseQuery
 {
     /**
@@ -45,14 +47,36 @@ abstract class BaseQuery
      *
      * @var string|bool
      */
-    protected $listBy = 'ID';
+    protected $keyBy = 'ID';
 
     /**
-     * Are props needed in results?
+     * Do not fetch props.
      *
      * @var bool
      */
-    protected $withProps = false;
+    protected $withoutProps = false;
+
+    /**
+     * Get count of users that match $filter.
+     *
+     * @return int
+     */
+    abstract public function count();
+
+//    /**
+//     * Get item by its id.
+//     *
+//     * @return Base
+//     */
+//    abstract public function getById();
+
+    /**
+     * Get list of items.
+     *
+     * @return array
+     */
+    abstract public function getList();
+
 
     /**
      * Setter for sort.
@@ -111,44 +135,49 @@ abstract class BaseQuery
     }
 
     /**
-     * Setter for listBy.
+     * Setter for keyBy.
      *
      * @param $value
      *
      * @return $this
      */
-    public function listBy($value)
+    public function keyBy($value)
     {
-        $this->listBy = $value;
+        $this->keyBy = $value;
 
         return $this;
     }
 
     /**
-     * Setter for withProps.
+     * Setter for withoutProps.
      *
      * @param $value
      *
      * @return $this
      */
-    public function withProps($value = true)
+    public function withoutProps($value = true)
     {
-        $this->withProps = $value;
+        $this->withoutProps = $value;
 
         return $this;
     }
 
     /**
-     * Get count of users that match $filter.
+     * Adds $item to $results using keyBy value
      *
-     * @return int
-     */
-    abstract public function count();
-
-    /**
-     * Get list of items.
+     * @param $results
+     * @param $item
      *
      * @return array
      */
-     abstract public function getList();
+    protected function addUsingKeyBy(&$results, &$item)
+    {
+        $keyByValue = ($this->keyBy && isset($item[$this->keyBy])) ? $item[$this->keyBy] : false;
+
+        if ($keyByValue) {
+            $results[$keyByValue] = $item;
+        } else {
+            $results[] = $item;
+        }
+    }
 }

@@ -2,19 +2,14 @@
 
 namespace Arrilot\Tests\BitrixModels;
 
-use Arrilot\Tests\BitrixModels\Stubs\BxUser;
+use Arrilot\Tests\BitrixModels\Stubs\BxUserWithAuth;
+use Arrilot\Tests\BitrixModels\Stubs\BxUserWithoutAuth;
 use Arrilot\Tests\BitrixModels\Stubs\TestUser;
 
 use Mockery as m;
-use Mockery\MockInterface;
 
 class TestUserModelTest extends TestCase
 {
-    public function setUp()
-    {
-        $GLOBALS['USER'] = new BxUser;
-    }
-
     public function tearDown()
     {
         TestUser::destroyObject();
@@ -38,6 +33,7 @@ class TestUserModelTest extends TestCase
 
     public function testInitializationWithCurrent()
     {
+        $GLOBALS['USER'] = new BxUserWithAuth;
         global $USER;
 
         TestUser::$object = m::mock('object');
@@ -51,6 +47,60 @@ class TestUserModelTest extends TestCase
         $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1,2]], $user->fields);
         $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1,2]], $user->get());
         $this->assertSame([1,2], $user->getGroups());
+    }
+
+    public function testInitializationWithCurrentNotAuth()
+    {
+        $GLOBALS['USER'] = new BxUserWithoutAuth;
+
+        TestUser::$object = m::mock('object');
+
+        $user = TestUser::current();
+        $this->assertSame(null, $user->id);
+        $this->assertSame(null, $user->fields);
+    }
+
+    public function testHasRoleWithId()
+    {
+        $GLOBALS['USER'] = new BxUserWithoutAuth;
+        TestUser::$object = m::mock('object');
+
+        $user = TestUser::current();
+        $this->assertFalse($user->hasRoleWithId(1));
+
+        $user = new TestUser(2, ['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]]);
+
+        $this->assertTrue($user->hasRoleWithId(1));
+        $this->assertTrue($user->hasRoleWithId(2));
+        $this->assertFalse($user->hasRoleWithId(3));
+    }
+
+    public function testIsCurrent()
+    {
+        $GLOBALS['USER'] = new BxUserWithAuth;
+        TestUser::$object = m::mock('object');
+
+        $user = TestUser::current();
+        $this->assertTrue($user->isCurrent());
+
+        $user = new TestUser(1);
+        $this->assertTrue($user->isCurrent());
+
+        $user = new TestUser(263);
+        $this->assertFalse($user->isCurrent());
+    }
+
+    public function testIsAuthorized()
+    {
+        TestUser::$object = m::mock('object');
+
+        $GLOBALS['USER'] = new BxUserWithAuth;
+        $user = TestUser::current();
+        $this->assertTrue($user->isAuthorized());
+
+        $GLOBALS['USER'] = new BxUserWithoutAuth;
+        $user = TestUser::current();
+        $this->assertFalse($user->isAuthorized());
     }
 
     public function testDelete()
@@ -85,135 +135,7 @@ class TestUserModelTest extends TestCase
 
         $this->assertTrue($user->deactivate());
     }
-//
-//    public function testGet()
-//    {
-//        $object = m::mock('object');
-//        $object->shouldReceive('getByID')->with(1)->once()->andReturn(m::self());
-//        $object->shouldReceive('getNextTestUser')->once()->andReturn(m::self());
-//        $object->shouldReceive('getFields')->once()->andReturn([
-//            'NAME' => 'John Doe'
-//        ]);
-//        $object->shouldReceive('getProperties')->once()->andReturn([
-//            'FOO_PROPERTY' => [
-//                'VALUE' => 'bar',
-//                'DESCRIPTION' => 'baz',
-//            ]
-//        ]);
-//
-//        TestUser::$object = $object;
-//        $user = new TestUser(1);
-//
-//        $expected = [
-//            'NAME' => 'John Doe',
-//            'PROPERTIES' => [
-//                'FOO_PROPERTY' => [
-//                    'VALUE' => 'bar',
-//                    'DESCRIPTION' => 'baz',
-//                ],
-//            ],
-//            'PROPERTY_VALUES' => [
-//                'FOO_PROPERTY' => 'bar',
-//            ],
-//        ];
-//
-//        $this->assertSame($expected, $user->get());
-//        $this->assertSame($expected, $user->fields);
-//
-//        // second call to make sure we do not query database twice.
-//        $this->assertSame($expected, $user->get());
-//        $this->assertSame($expected, $user->fields);
-//    }
-//
-//    public function testRefresh()
-//    {
-//        $object = m::mock('object');
-//        $object->shouldReceive('getByID')->with(1)->twice()->andReturn(m::self());
-//        $object->shouldReceive('getNextTestUser')->twice()->andReturn(m::self());
-//        $object->shouldReceive('getFields')->twice()->andReturn([
-//            'NAME' => 'John Doe'
-//        ]);
-//        $object->shouldReceive('getProperties')->twice()->andReturn([
-//            'FOO_PROPERTY' => [
-//                'VALUE' => 'bar',
-//                'DESCRIPTION' => 'baz',
-//            ]
-//        ]);
-//
-//        TestUser::$object = $object;
-//        $user = new TestUser(1);
-//
-//        $expected = [
-//            'NAME' => 'John Doe',
-//            'PROPERTIES' => [
-//                'FOO_PROPERTY' => [
-//                    'VALUE' => 'bar',
-//                    'DESCRIPTION' => 'baz',
-//                ],
-//            ],
-//            'PROPERTY_VALUES' => [
-//                'FOO_PROPERTY' => 'bar',
-//            ],
-//        ];
-//
-//        $user->refresh();
-//        $this->assertSame($expected, $user->fields);
-//
-//        $user->fields = 'Jane Doe';
-//
-//        $user->refresh();
-//        $this->assertSame($expected, $user->fields);
-//    }
-//
-//    public function testSave()
-//    {
-//        $object = m::mock('object');
-//
-//        TestUser::$object = $object;
-//        $user = m::mock('Arrilot\BitrixModels\TestUser[get]',[1]);
-//        $fields = [
-//            'ID' => 1,
-//            'IBLOCK_ID' => 1,
-//            'NAME'            => 'John Doe',
-//            'PROPERTIES'      => [
-//                'FOO_PROPERTY' => [
-//                    'VALUE'       => 'bar',
-//                    'DESCRIPTION' => 'baz',
-//                ],
-//            ],
-//            'PROPERTY_VALUES' => [
-//                'FOO_PROPERTY' => 'bar',
-//            ],
-//        ];
-//        $user->shouldReceive('get')->andReturn($fields);
-//        $user->fields = $fields;
-//
-//        $expected1 = [
-//            'NAME' => 'John Doe',
-//            'PROPERTY_VALUES' => [
-//                'FOO_PROPERTY' => 'bar',
-//            ],
-//        ];
-//        $expected2 = [
-//            'NAME' => 'John Doe',
-//        ];
-//        $object->shouldReceive('update')->with(1, $expected1)->once()->andReturn(true);
-//        $object->shouldReceive('update')->with(1, $expected2)->once()->andReturn(true);
-//
-//        $this->assertTrue($user->save());
-//        $this->assertTrue($user->save(['NAME']));
-//    }
-//
-//    public function testUpdate()
-//    {
-//        TestUser::$object = m::mock('object');
-//        $user = m::mock('Arrilot\BitrixModels\TestUser[save]',[1]);
-//        $user->shouldReceive('save')->with(['NAME'])->andReturn(true);
-//
-//        $this->assertTrue($user->update(['NAME'=>'John Doe']));
-//        $this->assertSame('John Doe', $user->fields['NAME']);
-//    }
-//
+
     public function testCreate()
     {
         $object = m::mock('object');
@@ -229,28 +151,7 @@ class TestUserModelTest extends TestCase
             'ID' => 3,
         ], $newTestUser->fields);
     }
-//
-//    public function testGetList()
-//    {
-//        $object = m::mock('object');
-//        $object->shouldReceive('getList')->with(["SORT" => "ASC"], ['ACTIVE' => 'Y', 'IBLOCK_ID' => 1], false, false, ['ID', 'IBLOCK_ID'])->once()->andReturn(m::self());
-//        $object->shouldReceive('getNextTestUser')->andReturn(m::self(), m::self(), false);
-//        $object->shouldReceive('getFields')->andReturn(['ID' => 1], ['ID' => 2]);
-//
-//        TestUser::$object = $object;
-//        $users = TestUser::getlist([
-//            'select' => ['ID', 'IBLOCK_ID'],
-//            'filter' => ['ACTIVE' => 'Y'],
-//        ]);
-//
-//        $expected = [
-//            1 => ['ID' => 1],
-//            2 => ['ID' => 2],
-//        ];
-//
-//        $this->assertSame($expected, $users);
-//    }
-//
+
     public function testCount()
     {
         $object = m::mock('object');

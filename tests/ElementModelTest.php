@@ -215,6 +215,7 @@ class ElementsModelTest extends TestCase
         $elements = TestElement::getlist([
             'select' => ['ID', 'IBLOCK_ID'],
             'filter' => ['ACTIVE' => 'Y'],
+            'withoutProps' => true
         ]);
 
         $expected = [
@@ -259,8 +260,24 @@ class ElementsModelTest extends TestCase
         $element->fill(['ID' => 2, 'NAME' => 'John Doe']);
 
         $this->assertSame(2, $element->id);
-        $this->assertSame(['ID' => 2, 'NAME' => 'John Doe'], $element->get());
+        $this->assertSame(['ID' => 2, 'NAME' => 'John Doe'], $element->getFields());
         $this->assertSame(['ID' => 2, 'NAME' => 'John Doe'], $element->fields);
+
+        TestElement::$object = m::mock('object');
+
+        $element = new TestElement(1);
+        $fields = [
+            'ID' => 2,
+            'NAME' =>'John Doe',
+            'PROPERTY_VALUES' => [
+                'GUID' =>'foo'
+            ]
+        ];
+        $element->fill($fields);
+
+        $this->assertSame(2, $element->id);
+        $this->assertSame($fields, $element->get());
+        $this->assertSame($fields, $element->fields);
     }
 
     public function testArrayAccess()

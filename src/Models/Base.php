@@ -29,7 +29,7 @@ abstract class Base implements ArrayAccess, IteratorAggregate
      *
      * @var bool
      */
-    protected $hasBeenFetched = false;
+    protected $fieldsAreFetched = false;
 
     /**
      * Constructor.
@@ -47,17 +47,31 @@ abstract class Base implements ArrayAccess, IteratorAggregate
     }
 
     /**
-     * Get model fields from cache or database.
+     * Get all model attributes from cache or database.
      *
      * @return array
      */
     public function get()
     {
-        if (!$this->hasBeenFetched) {
-            $this->fetch();
+        if (!$this->fieldsAreFetched) {
+            $this->refresh();
         }
 
         return $this->fields;
+    }
+
+    /**
+     * Get user groups from cache or database.
+     *
+     * @return array
+     */
+    public function getFields()
+    {
+        if ($this->fieldsAreFetched) {
+            return $this->fields;
+        }
+
+        return $this->refreshFields();
     }
 
     /**
@@ -80,7 +94,7 @@ abstract class Base implements ArrayAccess, IteratorAggregate
 
         $this->fields = $fields;
 
-        $this->hasBeenFetched = true;
+        $this->fieldsAreFetched = true;
 
         if (method_exists($this, 'afterFill')) {
             $this->afterFill($fields);
@@ -179,16 +193,6 @@ abstract class Base implements ArrayAccess, IteratorAggregate
         }
 
         return $this->save($keys);
-    }
-
-    /**
-     * Refresh model from database.
-     *
-     * @return void
-     */
-    public function refresh()
-    {
-        $this->fetch();
     }
 
     /**
@@ -317,11 +321,18 @@ abstract class Base implements ArrayAccess, IteratorAggregate
     }
 
     /**
-     * Fetch model fields from database and place them to $this->fields.
+     * Refresh model from database and place data to $this->fields.
      *
-     * @return void
+     * @return array
      */
-    abstract protected function fetch();
+    abstract public function refresh();
+
+    /**
+     * Refresh model fields from database and place them to $this->fields.
+     *
+     * @return array
+     */
+    abstract public function refreshFields();
 
     /**
      * Save model to database.
