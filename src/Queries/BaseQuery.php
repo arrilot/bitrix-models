@@ -75,7 +75,7 @@ abstract class BaseQuery
      *
      * @param int $id
      *
-     * @return Base
+     * @return Base|false
      */
     public function getById($id)
     {
@@ -89,7 +89,7 @@ abstract class BaseQuery
 
         $items = $this->getList();
 
-        return ($items && isset($items[0])) ? $items[0] : false;
+        return !empty($items) ? $items[0] : false;
     }
 
     /**
