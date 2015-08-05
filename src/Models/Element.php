@@ -32,8 +32,8 @@ class Element extends Base
         'groupBy',
         'navigation',
         'select',
-        'withoutProps',
-        'keyBy',
+        'withProps',
+        'listBy',
     ];
 
     /**
@@ -147,7 +147,7 @@ class Element extends Base
     public function refreshFields()
     {
         if (!$this->id) {
-            return $this->fields = [];
+            throw new NotSetModelIdException();
         }
 
         $obElement = static::$object->getByID($this->id)->getNextElement();

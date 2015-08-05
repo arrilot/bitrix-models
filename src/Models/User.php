@@ -162,7 +162,7 @@ class User extends Base
             $this->fields['GROUP_ID'] = $groupBackup;
         }
 
-        $this->$fieldsAreFetched = true;
+        $this->fieldsAreFetched = true;
 
         return $this->fields;
     }
