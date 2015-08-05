@@ -63,13 +63,6 @@ abstract class BaseQuery
      */
     abstract public function count();
 
-//    /**
-//     * Get item by its id.
-//     *
-//     * @return Base
-//     */
-//    abstract public function getById();
-
     /**
      * Get list of items.
      *
@@ -77,6 +70,27 @@ abstract class BaseQuery
      */
     abstract public function getList();
 
+    /**
+     * Get item by its id.
+     *
+     * @param int $id
+     *
+     * @return Base
+     */
+    public function getById($id)
+    {
+        if (!$id) {
+            return false;
+        }
+
+        $this->sort = [];
+        $this->keyBy = false;
+        $this->filter['ID'] = $id;
+
+        $items = $this->getList();
+
+        return ($items && isset($items[0])) ? $items[0] : false;
+    }
 
     /**
      * Setter for sort.

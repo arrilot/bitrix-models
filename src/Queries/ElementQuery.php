@@ -2,6 +2,8 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
+use Arrilot\BitrixModels\Models\Element;
+
 class ElementQuery extends BaseQuery
 {
     /**
@@ -77,7 +79,7 @@ class ElementQuery extends BaseQuery
     }
 
     /**
-     * CIblockElement::getList substitution.
+     * Get list of items.
      *
      * @return array
      */

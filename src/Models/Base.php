@@ -148,6 +148,30 @@ abstract class Base implements ArrayAccess, IteratorAggregate
     }
 
     /**
+     * Get count of items that match $filter.
+     *
+     * @param array $filter
+     *
+     * @return int
+     */
+    public static function count(array $filter = [])
+    {
+        return static::query()->filter($filter)->count();
+    }
+
+    /**
+     * Get item by its id.
+     *
+     * @param int $id
+     *
+     * @return Base
+     */
+    public static function getById($id)
+    {
+        return static::query()->getById($id);
+    }
+
+    /**
      * Get list of items.
      *
      * @param array $params
@@ -306,18 +330,6 @@ abstract class Base implements ArrayAccess, IteratorAggregate
     public static function query()
     {
         throw new Exception('public static function query() is not implemented');
-    }
-
-    /**
-     * Get count of items that match $filter.
-     *
-     * @param array $filter
-     *
-     * @return int
-     */
-    public static function count(array $filter = [])
-    {
-        return static::query()->filter($filter)->count();
     }
 
     /**

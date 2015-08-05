@@ -2,6 +2,8 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
+use Arrilot\BitrixModels\Models\User;
+
 class UserQuery extends BaseQuery
 {
     /**
@@ -78,7 +80,7 @@ class UserQuery extends BaseQuery
     {
         return $this->object->getList($order = 'ID', $by = 'ASC', $this->filter, [
             'NAV_PARAMS' => [
-                "nTopCount" => 0
+                'nTopCount' => 0
             ]
         ])->NavRecordCount;
     }
