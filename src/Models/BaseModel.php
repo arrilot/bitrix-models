@@ -8,7 +8,7 @@ use Arrilot\BitrixModels\Queries\BaseQuery;
 use Exception;
 use IteratorAggregate;
 
-abstract class Base implements ArrayAccess, IteratorAggregate
+abstract class BaseModel implements ArrayAccess, IteratorAggregate
 {
     /**
      * ID of the model.
@@ -30,6 +30,13 @@ abstract class Base implements ArrayAccess, IteratorAggregate
      * @var bool
      */
     protected $fieldsAreFetched = false;
+
+    /**
+     * List of params that can modify query.
+     *
+     * @var array
+     */
+    protected static $queryModifiers = [];
 
     /**
      * Constructor.
@@ -164,7 +171,7 @@ abstract class Base implements ArrayAccess, IteratorAggregate
      *
      * @param int $id
      *
-     * @return Base
+     * @return static
      */
     public static function getById($id)
     {
@@ -176,7 +183,7 @@ abstract class Base implements ArrayAccess, IteratorAggregate
      *
      * @param array $params
      *
-     * @return array
+     * @return static[]
      */
     public static function getList($params = [])
     {

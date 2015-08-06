@@ -2,9 +2,9 @@
 
 namespace Arrilot\Tests\BitrixModels\Stubs;
 
-use Arrilot\BitrixModels\Models\User;
+use Arrilot\BitrixModels\Models\UserModel;
 
-class TestUser extends User
+class TestUser extends UserModel
 {
 
 }

@@ -2,7 +2,7 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
-use Arrilot\BitrixModels\Models\Element;
+use Arrilot\BitrixModels\Models\ElementModel;
 
 class ElementQuery extends BaseQuery
 {
@@ -12,13 +12,6 @@ class ElementQuery extends BaseQuery
      * @var array
      */
     protected $sort = ['SORT' => 'ASC'];
-
-    /**
-     * Query select.
-     *
-     * @var array|bool
-     */
-    protected $select = [];
 
     /**
      * Query group by.
@@ -38,12 +31,13 @@ class ElementQuery extends BaseQuery
      * Constructor.
      *
      * @param object $object
+     * @param string $modelName
      * @param int $iblockId
      */
-    public function __construct($object, $iblockId)
+    public function __construct($object, $modelName, $iblockId)
     {
         $this->object = $object;
-
+        $this->modelName = $modelName;
         $this->iblockId = $iblockId;
 
         $this->filter = ['IBLOCK_ID' => $iblockId];
@@ -79,20 +73,38 @@ class ElementQuery extends BaseQuery
     }
 
     /**
+     * Get item by its id.
+     *
+     * @param int $id
+     *
+     * @return ElementModel|false
+     */
+    public function getById($id)
+    {
+        return parent::getById($id);
+    }
+
+    /**
      * Get list of items.
      *
-     * @return array
+     * @return ElementModel[]
      */
     public function getList()
     {
+        $select = $this->fieldsMustBeSelected() ? [] : $this->prepareSelectForGetList();
+
         $items = [];
-        $rsItems = $this->object->getList($this->sort, $this->filter, $this->groupBy, $this->navigation, $this->select);
+        $rsItems = $this->object->getList($this->sort, $this->filter, $this->groupBy, $this->navigation, $select);
         while($obItem = $rsItems->getNextElement()) {
-            $item = $obItem->getFields();
-            if ($this->withoutProps === false) {
-                $item['PROPERTIES'] = $obItem->getProperties();
-                $this->setPropertyValues($item);
+            $arItem = $obItem->getFields();
+            if ($this->propsMustBeSelected()) {
+                $arItem['PROPERTIES'] = $obItem->getProperties();
+                $this->setPropertyValues($arItem);
             }
+
+            /** @var ElementModel $item */
+            $item = new $this->modelName;
+            $item->fill($arItem);
 
             $this->addUsingKeyBy($items, $item);
         }

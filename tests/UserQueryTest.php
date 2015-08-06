@@ -4,6 +4,7 @@ namespace Arrilot\Tests\BitrixModels;
 
 
 use Arrilot\BitrixModels\Queries\UserQuery;
+use Arrilot\Tests\BitrixModels\Stubs\TestUser;
 use Mockery as m;
 
 class UserQueryTest extends TestCase
@@ -22,7 +23,8 @@ class UserQueryTest extends TestCase
      */
     protected function createQuery($object)
     {
-        return new UserQuery($object);
+        TestUser::$object = m::mock('object');
+        return new UserQuery($object, 'Arrilot\Tests\BitrixModels\Stubs\TestUser');
     }
 
     public function testCount()

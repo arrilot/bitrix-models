@@ -2,7 +2,7 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
-use Arrilot\BitrixModels\Models\User;
+use Arrilot\BitrixModels\Models\UserModel;
 
 class UserQuery extends BaseQuery
 {
@@ -14,58 +14,43 @@ class UserQuery extends BaseQuery
     protected $sort = ['last_name' => 'asc'];
 
     /**
-     * Do not fetch groups.
+     * Get item by its id.
      *
-     * @var bool
-     */
-    protected $withoutGroups = false;
-
-    /**
-     * Constructor.
+     * @param int $id
      *
-     * @param object $object
+     * @return UserModel|false
      */
-    public function __construct($object)
+    public function getById($id)
     {
-        $this->object = $object;
-    }
-
-    /**
-     * Setter for withoutGroups.
-     *
-     * @param $value
-     *
-     * @return $this
-     */
-    public function withoutGroups($value = true)
-    {
-        $this->withoutGroups = $value;
-
-        return $this;
+        return parent::getById($id);
     }
 
     /**
      * CUser::getList substitution.
      *
-     * @return array
+     * @return UserModel[]
      */
     public function getList()
     {
         $params = [
-            'SELECT' => $this->withoutProps === false ? ['UF_*'] : false,
+            'SELECT' => $this->propsMustBeSelected() ? ['UF_*'] : false,
             'NAV_PARAMS' => $this->navigation,
-            'FIELDS' => $this->select,
+            'FIELDS' => $this->prepareSelectForGetList(),
         ];
 
         $users = [];
         $rsUsers = $this->object->getList($this->sort, $sortOrder = false, $this->filter, $params);
         while ($arUser = $rsUsers->fetch()) {
 
-            if ($this->withoutGroups === false) {
+            if ($this->groupsMustBeSelected()) {
                 $arUser['GROUP_ID'] = $this->object->getUserGroup($arUser['ID']);
             }
 
-            $this->addUsingKeyBy($users, $arUser);
+            /** @var UserModel $user */
+            $user = new $this->modelName;
+            $user->fill($arUser);
+
+            $this->addUsingKeyBy($users, $user);
         }
 
         return $users;
@@ -83,5 +68,15 @@ class UserQuery extends BaseQuery
                 'nTopCount' => 0
             ]
         ])->NavRecordCount;
+    }
+
+    /**
+     * Determine if groups must be selected.
+     *
+     * @return bool
+     */
+    protected function groupsMustBeSelected()
+    {
+        return in_array('GROUPS', $this->select) || in_array('GROUP_ID', $this->select);
     }
 }

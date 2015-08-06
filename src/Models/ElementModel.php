@@ -5,7 +5,7 @@ namespace Arrilot\BitrixModels\Models;
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use Exception;
 
-class Element extends Base
+class ElementModel extends BaseModel
 {
     /**
      * Bitrix entity object.
@@ -32,8 +32,7 @@ class Element extends Base
         'groupBy',
         'navigation',
         'select',
-        'withProps',
-        'listBy',
+        'keyBy',
     ];
 
     /**
@@ -62,7 +61,7 @@ class Element extends Base
      */
     public static function query()
     {
-        return new ElementQuery(static::instantiateObject(), static::iblockId());
+        return new ElementQuery(static::instantiateObject(), get_called_class(), static::iblockId());
     }
 
     /**
@@ -146,8 +145,8 @@ class Element extends Base
      */
     public function refreshFields()
     {
-        if (!$this->id) {
-            throw new NotSetModelIdException();
+        if ($this->id === null) {
+            return  $this->fields = [];
         }
 
         $obElement = static::$object->getByID($this->id)->getNextElement();

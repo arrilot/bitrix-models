@@ -66,13 +66,13 @@ class TestUserModelTest extends TestCase
         TestUser::$object = m::mock('object');
 
         $user = TestUser::current();
-        $this->assertFalse($user->hasRoleWithId(1));
+        $this->assertFalse($user->hasGroupWithId(1));
 
         $user = new TestUser(2, ['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]]);
 
-        $this->assertTrue($user->hasRoleWithId(1));
-        $this->assertTrue($user->hasRoleWithId(2));
-        $this->assertFalse($user->hasRoleWithId(3));
+        $this->assertTrue($user->hasGroupWithId(1));
+        $this->assertTrue($user->hasGroupWithId(2));
+        $this->assertFalse($user->hasGroupWithId(3));
     }
 
     public function testIsCurrent()

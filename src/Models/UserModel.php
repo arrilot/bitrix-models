@@ -4,7 +4,7 @@ namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\Queries\UserQuery;
 
-class User extends Base
+class UserModel extends BaseModel
 {
     /**
      * Bitrix entity object.
@@ -30,8 +30,6 @@ class User extends Base
         'filter',
         'navigation',
         'select',
-        'withoutProps',
-        'withoutGroups',
         'keyBy',
     ];
 
@@ -49,7 +47,7 @@ class User extends Base
      */
     public static function query()
     {
-        return new UserQuery(static::instantiateObject());
+        return new UserQuery(static::instantiateObject(), get_called_class());
     }
 
     /**
@@ -150,7 +148,7 @@ class User extends Base
      */
     public function refreshFields()
     {
-        if (!$this->id) {
+        if ($this->id === null) {
             return  $this->fields = [];
         }
 
@@ -174,7 +172,7 @@ class User extends Base
      */
     public function refreshGroups()
     {
-        if (!$this->id) {
+        if ($this->id === null) {
             return [];
         }
 
@@ -194,7 +192,7 @@ class User extends Base
      */
     public function isAdmin()
     {
-        return $this->hasRoleWithId(1);
+        return $this->hasGroupWithId(1);
     }
 
     /**
@@ -214,7 +212,7 @@ class User extends Base
      *
      * @return bool
      */
-    public function hasRoleWithId($role_id)
+    public function hasGroupWithId($role_id)
     {
         return in_array($role_id, $this->getGroups());
     }
@@ -254,12 +252,15 @@ class User extends Base
      */
     protected function collectFieldsForSave($selectedFields)
     {
+        $fields = [];
+        if ($this->fields === null) {
+            return $fields;
+        }
+
         $blacklistedFields = [
             'ID',
             'GROUPS',
         ];
-
-        $fields = [];
 
         foreach ($this->fields as $field => $value) {
             // skip if it is not in selected fields

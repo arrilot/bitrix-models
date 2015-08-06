@@ -2,9 +2,9 @@
 
 namespace Arrilot\Tests\BitrixModels\Stubs;
 
-use Arrilot\BitrixModels\Models\Element;
+use Arrilot\BitrixModels\Models\ElementModel;
 
-class TestElement extends Element
+class TestElement extends ElementModel
 {
     public static function iblockId()
     {

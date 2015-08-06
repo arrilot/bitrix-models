@@ -2,7 +2,7 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
-use Base;
+use Arrilot\BitrixModels\Models\BaseModel;
 
 abstract class BaseQuery
 {
@@ -12,6 +12,13 @@ abstract class BaseQuery
      * @var object
      */
     protected $object;
+
+    /**
+     * Name of the model that calls the query.
+     *
+     * @var string
+     */
+    protected $modelName;
 
     /**
      * Query sort.
@@ -37,9 +44,9 @@ abstract class BaseQuery
     /**
      * Query select.
      *
-     * @var array|bool
+     * @var array
      */
-    protected $select = false;
+    protected $select = ['FIELDS', 'PROPS'];
 
     /**
      * The key to list items in array of results.
@@ -48,13 +55,6 @@ abstract class BaseQuery
      * @var string|bool
      */
     protected $keyBy = 'ID';
-
-    /**
-     * Do not fetch props.
-     *
-     * @var bool
-     */
-    protected $withoutProps = false;
 
     /**
      * Get count of users that match $filter.
@@ -71,11 +71,23 @@ abstract class BaseQuery
     abstract public function getList();
 
     /**
+     * Constructor.
+     *
+     * @param object $object
+     * @param string $modelName
+     */
+    public function __construct($object, $modelName)
+    {
+        $this->object = $object;
+        $this->modelName = $modelName;
+    }
+
+    /**
      * Get item by its id.
      *
      * @param int $id
      *
-     * @return Base|false
+     * @return BaseModel|false
      */
     public function getById($id)
     {
@@ -143,7 +155,7 @@ abstract class BaseQuery
      */
     public function select($value)
     {
-        $this->select = $value;
+        $this->select = is_array($value) ? $value : func_get_args();
 
         return $this;
     }
@@ -158,20 +170,6 @@ abstract class BaseQuery
     public function keyBy($value)
     {
         $this->keyBy = $value;
-
-        return $this;
-    }
-
-    /**
-     * Setter for withoutProps.
-     *
-     * @param $value
-     *
-     * @return $this
-     */
-    public function withoutProps($value = true)
-    {
-        $this->withoutProps = $value;
 
         return $this;
     }
@@ -193,5 +191,39 @@ abstract class BaseQuery
         } else {
             $results[] = $item;
         }
+    }
+
+    /**
+     * Determine if all fields must be selected.
+     *
+     * @return bool
+     */
+    protected function fieldsMustBeSelected()
+    {
+        return !$this->select && in_array('FIELDS', $this->select);
+    }
+
+    /**
+     * Determine if all fields must be selected.
+     *
+     * @return bool
+     */
+    protected function propsMustBeSelected()
+    {
+        return in_array('PROPS', $this->select)
+            || in_array('PROPERTIES', $this->select)
+            || in_array('PROPERTY_VALUES', $this->select);
+    }
+
+    /**
+     * Remove extra fields from $this->select before sending it to bitrix's getList.
+     *
+     * @return array
+     */
+    protected function prepareSelectForGetList()
+    {
+        $strip = ['FIELDS', 'PROPS', 'PROPERTIES', 'PROPERTY_VALUES', 'GROUPS', 'GROUP_ID'];
+
+        return array_diff($this->select, $strip);
     }
 }

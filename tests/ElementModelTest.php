@@ -222,8 +222,9 @@ class ElementsModelTest extends TestCase
             1 => ['ID' => 1],
             2 => ['ID' => 2],
         ];
-
-        $this->assertSame($expected, $elements);
+        foreach ($elements as $k => $item) {
+            $this->assertSame($expected[$k], $item->toArray());
+        }
     }
 
     public function testCount()
@@ -294,6 +295,9 @@ class ElementsModelTest extends TestCase
         $this->assertSame(2, $element['ID']);
         $this->assertSame('John Doe', $element['NAME']);
         $this->assertSame([1, 2], $element['GROUP_ID']);
+        $this->assertTrue(in_array(1, $element['GROUP_ID']));
+        $this->assertTrue(!empty($element['GROUP_ID'][0]));
+        $this->assertTrue(empty($element['GROUP_ID'][2]));
         $this->assertSame([2, 'John Doe', [1, 2]], $values);
     }
 }
