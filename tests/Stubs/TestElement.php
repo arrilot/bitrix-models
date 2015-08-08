@@ -6,8 +6,25 @@ use Arrilot\BitrixModels\Models\ElementModel;
 
 class TestElement extends ElementModel
 {
+    protected $appends = ['ACCESSOR_THREE'];
+
     public static function iblockId()
     {
         return 1;
+    }
+
+    public function getAccessorOneField($value)
+    {
+        return '!'.$value.'!';
+    }
+
+    public function getAccessorTwoField()
+    {
+        return 'Respond from accessor for not existing field';
+    }
+
+    public function getAccessorThreeField()
+    {
+        return [];
     }
 }

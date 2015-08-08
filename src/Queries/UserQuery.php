@@ -4,6 +4,10 @@ namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Models\UserModel;
 
+/**
+ * @method UserQuery fromGroup($groupId)
+ * @method UserQuery active()
+ */
 class UserQuery extends BaseQuery
 {
     /**
@@ -11,19 +15,7 @@ class UserQuery extends BaseQuery
      *
      * @var array
      */
-    protected $sort = ['last_name' => 'asc'];
-
-    /**
-     * Get item by its id.
-     *
-     * @param int $id
-     *
-     * @return UserModel|false
-     */
-    public function getById($id)
-    {
-        return parent::getById($id);
-    }
+    public $sort = ['last_name' => 'asc'];
 
     /**
      * CUser::getList substitution.
@@ -35,22 +27,18 @@ class UserQuery extends BaseQuery
         $params = [
             'SELECT' => $this->propsMustBeSelected() ? ['UF_*'] : false,
             'NAV_PARAMS' => $this->navigation,
-            'FIELDS' => $this->prepareSelectForGetList(),
+            'FIELDS' => $this->normalizeSelect(),
         ];
 
         $users = [];
-        $rsUsers = $this->object->getList($this->sort, $sortOrder = false, $this->filter, $params);
+        $rsUsers = $this->object->getList($this->sort, $sortOrder = false, $this->normalizeFilter(), $params);
         while ($arUser = $rsUsers->fetch()) {
 
             if ($this->groupsMustBeSelected()) {
                 $arUser['GROUP_ID'] = $this->object->getUserGroup($arUser['ID']);
             }
 
-            /** @var UserModel $user */
-            $user = new $this->modelName;
-            $user->fill($arUser);
-
-            $this->addUsingKeyBy($users, $user);
+            $this->addItemToResultsUsingKeyBy($users, new $this->modelName($arUser['ID'], $arUser));
         }
 
         return $users;
@@ -63,7 +51,7 @@ class UserQuery extends BaseQuery
      */
     public function count()
     {
-        return $this->object->getList($order = 'ID', $by = 'ASC', $this->filter, [
+        return $this->object->getList($order = 'ID', $by = 'ASC', $this->normalizeFilter(), [
             'NAV_PARAMS' => [
                 'nTopCount' => 0
             ]
@@ -78,5 +66,33 @@ class UserQuery extends BaseQuery
     protected function groupsMustBeSelected()
     {
         return in_array('GROUPS', $this->select) || in_array('GROUP_ID', $this->select);
+    }
+
+
+    /**
+     * Normalize filter before sending it to getList.
+     * This prevents some inconsistency.
+     *
+     * @return array
+     */
+    protected function normalizeFilter()
+    {
+        $this->substituteField($this->filter, 'GROUPS', 'GROUPS_ID');
+        $this->substituteField($this->filter, 'GROUP_ID', 'GROUPS_ID');
+
+        return $this->filter;
+    }
+
+    /**
+     * Normalize select before sending it to getList.
+     * This prevents some inconsistency.
+     *
+     * @return array
+     */
+    protected function normalizeSelect()
+    {
+        $strip = ['FIELDS', 'PROPS', 'GROUPS', 'GROUP_ID'];
+
+        return array_diff($this->select, $strip);
     }
 }

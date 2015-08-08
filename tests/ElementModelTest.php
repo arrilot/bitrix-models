@@ -8,6 +8,11 @@ use Mockery as m;
 
 class ElementsModelTest extends TestCase
 {
+    public function setUp()
+    {
+        TestElement::$object = m::mock('object');
+    }
+
     public function tearDown()
     {
         TestElement::destroyObject();
@@ -16,8 +21,6 @@ class ElementsModelTest extends TestCase
 
     public function testInitialization()
     {
-        TestElement::$object = m::mock('object');
-
         $element = new TestElement(1);
         $this->assertSame(1, $element->id);
 
@@ -183,7 +186,6 @@ class ElementsModelTest extends TestCase
 
     public function testUpdate()
     {
-        TestElement::$object = m::mock('object');
         $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[save]',[1]);
         $element->shouldReceive('save')->with(['NAME'])->andReturn(true);
 
@@ -223,7 +225,7 @@ class ElementsModelTest extends TestCase
             2 => ['ID' => 2],
         ];
         foreach ($elements as $k => $item) {
-            $this->assertSame($expected[$k], $item->toArray());
+            $this->assertSame($expected[$k], $item->fields);
         }
     }
 
@@ -246,25 +248,26 @@ class ElementsModelTest extends TestCase
 
     public function testToArray()
     {
-        TestElement::$object = m::mock('object');
-
         $element = new TestElement(1, ['ID' => 1, 'NAME' => 'John Doe']);
 
-        $this->assertSame(['ID' => 1, 'NAME' => 'John Doe'], $element->toArray());
+        $this->assertSame(['ID' => 1, 'NAME' => 'John Doe', 'ACCESSOR_THREE' => []], $element->toArray());
+    }
+
+    public function testToJson()
+    {
+        $element = new TestElement(1, ['ID' => 1, 'NAME' => 'John Doe']);
+
+        $this->assertSame(json_encode(['ID' => 1, 'NAME' => 'John Doe', 'ACCESSOR_THREE' => []]), $element->toJson());
     }
 
     public function testFill()
     {
-        TestElement::$object = m::mock('object');
-
         $element = new TestElement(1);
         $element->fill(['ID' => 2, 'NAME' => 'John Doe']);
 
         $this->assertSame(2, $element->id);
         $this->assertSame(['ID' => 2, 'NAME' => 'John Doe'], $element->getFields());
         $this->assertSame(['ID' => 2, 'NAME' => 'John Doe'], $element->fields);
-
-        TestElement::$object = m::mock('object');
 
         $element = new TestElement(1);
         $fields = [
@@ -283,8 +286,6 @@ class ElementsModelTest extends TestCase
 
     public function testArrayAccess()
     {
-        TestElement::$object = m::mock('object');
-
         $element = new TestElement(1);
         $element->fill(['ID' => 2, 'NAME' => 'John Doe', 'GROUP_ID' => [1, 2]]);
         $values = [];
@@ -299,5 +300,21 @@ class ElementsModelTest extends TestCase
         $this->assertTrue(!empty($element['GROUP_ID'][0]));
         $this->assertTrue(empty($element['GROUP_ID'][2]));
         $this->assertSame([2, 'John Doe', [1, 2]], $values);
+    }
+
+    public function testAccessors()
+    {
+        $element = new TestElement(1);
+        $element->fill(['ID' => 2, 'NAME' => 'John Doe', 'ACCESSOR_ONE' => 'foo']);
+
+        $this->assertSame('!foo!', $element['ACCESSOR_ONE']);
+        $this->assertTrue(isset($element['ACCESSOR_ONE']));
+        $this->assertTrue(!empty($element['ACCESSOR_ONE']));
+        $this->assertSame('Respond from accessor for not existing field', $element['ACCESSOR_TWO']);
+        $this->assertTrue(isset($element['ACCESSOR_TWO']));
+        $this->assertTrue(!empty($element['ACCESSOR_TWO']));
+        $this->assertSame([], $element['ACCESSOR_THREE']);
+        $this->assertTrue(isset($element['ACCESSOR_THREE']));
+        $this->assertFalse(!empty($element['ACCESSOR_THREE']));
     }
 }

@@ -244,6 +244,21 @@ class UserModel extends BaseModel
     }
 
     /**
+     * Scope to get only active items.
+     *
+     * @param UserQuery $query
+     * @param int|array $groupId
+     *
+     * @return UserQuery
+     */
+    public function scopeFromGroup($query, $groupId)
+    {
+        $query->filter['GROUPS_ID'] = $groupId;
+
+        return $query;
+    }
+
+    /**
      * Create an array of fields that will be saved to database.
      *
      * @param $selectedFields

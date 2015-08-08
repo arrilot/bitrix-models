@@ -4,6 +4,9 @@ namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Models\ElementModel;
 
+/**
+ * @method UserQuery active()
+ */
 class ElementQuery extends BaseQuery
 {
     /**
@@ -11,14 +14,14 @@ class ElementQuery extends BaseQuery
      *
      * @var array
      */
-    protected $sort = ['SORT' => 'ASC'];
+    public $sort = ['SORT' => 'ASC'];
 
     /**
      * Query group by.
      *
      * @var array
      */
-    protected $groupBy = false;
+    public $groupBy = false;
 
     /**
      * Iblock id.
@@ -36,11 +39,9 @@ class ElementQuery extends BaseQuery
      */
     public function __construct($object, $modelName, $iblockId)
     {
-        $this->object = $object;
-        $this->modelName = $modelName;
-        $this->iblockId = $iblockId;
+        parent::__construct($object, $modelName);
 
-        $this->filter = ['IBLOCK_ID' => $iblockId];
+        $this->iblockId = $iblockId;
     }
 
     /**
@@ -73,28 +74,20 @@ class ElementQuery extends BaseQuery
     }
 
     /**
-     * Get item by its id.
-     *
-     * @param int $id
-     *
-     * @return ElementModel|false
-     */
-    public function getById($id)
-    {
-        return parent::getById($id);
-    }
-
-    /**
      * Get list of items.
      *
      * @return ElementModel[]
      */
     public function getList()
     {
-        $select = $this->fieldsMustBeSelected() ? [] : $this->prepareSelectForGetList();
-
         $items = [];
-        $rsItems = $this->object->getList($this->sort, $this->filter, $this->groupBy, $this->navigation, $select);
+        $rsItems = $this->object->getList(
+            $this->sort,
+            $this->normalizeFilter(),
+            $this->groupBy,
+            $this->navigation,
+            $this->normalizeSelect()
+        );
         while($obItem = $rsItems->getNextElement()) {
             $arItem = $obItem->getFields();
             if ($this->propsMustBeSelected()) {
@@ -102,11 +95,7 @@ class ElementQuery extends BaseQuery
                 $this->setPropertyValues($arItem);
             }
 
-            /** @var ElementModel $item */
-            $item = new $this->modelName;
-            $item->fill($arItem);
-
-            $this->addUsingKeyBy($items, $item);
+            $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
         }
 
         return $items;
@@ -119,7 +108,7 @@ class ElementQuery extends BaseQuery
      */
     public function count()
     {
-        return $this->object->getList(false, $this->filter, []);
+        return $this->object->getList(false, $this->normalizeFilter(), []);
     }
 
     /**
@@ -140,5 +129,35 @@ class ElementQuery extends BaseQuery
         }
 
         return;
+    }
+
+    /**
+     * Normalize filter before sending it to getList.
+     * This prevents some inconsistency.
+     *
+     * @return array
+     */
+    protected function normalizeFilter()
+    {
+        $this->filter['IBLOCK_ID'] = $this->iblockId;
+
+        return $this->filter;
+    }
+
+    /**
+     * Normalize select before sending it to getList.
+     * This prevents some inconsistency.
+     *
+     * @return array
+     */
+    protected function normalizeSelect()
+    {
+        if ($this->fieldsMustBeSelected()) {
+            return [];
+        }
+
+        $strip = ['FIELDS', 'PROPS', 'PROPERTIES', 'PROPERTY_VALUES'];
+
+        return array_diff($this->select, $strip);
     }
 }

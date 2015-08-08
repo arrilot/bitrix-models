@@ -29,6 +29,7 @@ class ElementsQueryTest extends TestCase
     public function testCount()
     {
         $object = m::mock('object');
+        TestElement::$object = $object;
         $object->shouldReceive('getList')->with([], ['IBLOCK_ID' => 1], [])->once()->andReturn(6);
 
         $query = $this->createQuery($object);
@@ -38,6 +39,7 @@ class ElementsQueryTest extends TestCase
 
 
         $object = m::mock('object');
+        TestElement::$object = $object;
         $object->shouldReceive('getList')->with([], ['ACTIVE'=>'Y', 'IBLOCK_ID' => 1], [])->once()->andReturn(3);
 
         $query = $this->createQuery($object);
@@ -63,7 +65,7 @@ class ElementsQueryTest extends TestCase
             2 => ['ID' => 2, 'NAME' =>'bar'],
         ];
         foreach ($items as $k => $item) {
-            $this->assertSame($expected[$k], $item->toArray());
+            $this->assertSame($expected[$k], $item->fields);
         }
     }
 
@@ -82,7 +84,7 @@ class ElementsQueryTest extends TestCase
             1 => ['ID' => 2, 'NAME' =>'bar'],
         ];
         foreach ($items as $k => $item) {
-            $this->assertSame($expected[$k], $item->toArray());
+            $this->assertSame($expected[$k], $item->fields);
         }
 
 
@@ -99,7 +101,28 @@ class ElementsQueryTest extends TestCase
             'bar' => ['ID' => 2, 'NAME' =>'bar'],
         ];
         foreach ($items as $k => $item) {
-            $this->assertSame($expected[$k], $item->toArray());
+            $this->assertSame($expected[$k], $item->fields);
+        }
+    }
+
+    public function testScopeActive()
+    {
+        $object = m::mock('object');
+        TestElement::$object = $object;
+        $object->shouldReceive('getList')->with(["SORT" => "ASC"], ['NAME'=> 'John', 'ACTIVE' => 'Y', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME'])->once()->andReturn(m::self());
+        $object->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
+        $object->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' =>'foo'], ['ID' => 2, 'NAME' =>'bar']);
+
+        $query = $this->createQuery($object);
+        $items = $query->filter(['NAME'=>'John'])->active()->select('ID', 'NAME')->getList();
+
+
+        $expected = [
+            1 => ['ID' => 1, 'NAME' =>'foo'],
+            2 => ['ID' => 2, 'NAME' =>'bar'],
+        ];
+        foreach ($items as $k => $item) {
+            $this->assertSame($expected[$k], $item->fields);
         }
     }
 

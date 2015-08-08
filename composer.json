@@ -13,7 +13,8 @@
   ],
   "homepage": "https://github.com/Arrilot/bitrix-models",
   "require": {
-    "php": ">=5.4.0"
+    "php": ">=5.4.0",
+    "illuminate/support": "5.*"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0",

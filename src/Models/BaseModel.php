@@ -25,6 +25,13 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
     public $fields;
 
     /**
+     * Array of accessors to append during array transformation.
+     *
+     * @var array
+     */
+    protected $appends = [];
+
+    /**
      * Have fields been already fetched from DB?
      *
      * @var bool
@@ -173,6 +180,18 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      *
      * @return static
      */
+    public static function find($id)
+    {
+        return static::query()->getById($id);
+    }
+
+    /**
+     * Get item by its id.
+     *
+     * @param int $id
+     *
+     * @return static
+     */
     public static function getById($id)
     {
         return static::query()->getById($id);
@@ -252,7 +271,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      */
     public function offsetExists($offset)
     {
-        return isset($this->fields[$offset]);
+        return $this->getAccessor($offset) ? true : isset($this->fields[$offset]);
     }
 
     /**
@@ -276,7 +295,10 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      */
     public function offsetGet($offset)
     {
-        return isset($this->fields[$offset]) ? $this->fields[$offset] : null;
+        $fieldValue = isset($this->fields[$offset]) ? $this->fields[$offset] : null;
+        $accessor = $this->getAccessor($offset);
+
+        return $accessor ? $this->$accessor($fieldValue) : $fieldValue;
     }
 
     /**
@@ -290,13 +312,46 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
     }
 
     /**
+     * Get accessor method name if it exists.
+     *
+     * @param string $field
+     *
+     * @return string|false
+     */
+    private function getAccessor($field)
+    {
+        $method = 'get'.camel_case($field).'Field';
+
+        return method_exists($this, $method) ? $method : false;
+    }
+
+    /**
      * Cast model to array.
      *
      * @return array
      */
     public function toArray()
     {
-        return $this->fields;
+        $array = $this->fields;
+
+        foreach ($this->appends as $accessor) {
+            if (isset($this[$accessor])) {
+                $array[$accessor] = $this[$accessor];
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Convert model to json.
+     *
+     * @param int $options
+     * @return string
+     */
+    public function toJson($options = 0)
+    {
+        return json_encode($this->toArray(), $options);
     }
 
     /**
@@ -337,6 +392,20 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
     public static function query()
     {
         throw new Exception('public static function query() is not implemented');
+    }
+
+    /**
+     * Scope to get only active items.
+     *
+     * @param BaseQuery $query
+     *
+     * @return BaseQuery
+     */
+    public function scopeActive($query)
+    {
+        $query->filter['ACTIVE'] = 'Y';
+
+        return $query;
     }
 
     /**

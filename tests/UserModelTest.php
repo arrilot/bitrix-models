@@ -10,6 +10,11 @@ use Mockery as m;
 
 class TestUserModelTest extends TestCase
 {
+    public function setUp()
+    {
+        TestUser::$object = m::mock('object');
+    }
+
     public function tearDown()
     {
         TestUser::destroyObject();
@@ -18,7 +23,6 @@ class TestUserModelTest extends TestCase
 
     public function testInitialization()
     {
-        TestUser::$object = m::mock('object');
         $user = new TestUser(2, ['NAME' => 'John Doe']);
 
         $this->assertSame(2, $user->id);
@@ -36,8 +40,6 @@ class TestUserModelTest extends TestCase
         $GLOBALS['USER'] = new BxUserWithAuth;
         global $USER;
 
-        TestUser::$object = m::mock('object');
-
         $user = TestUser::current();
         $this->assertSame($USER->getId(), $user->id);
         $this->assertSame(null, $user->fields);
@@ -53,8 +55,6 @@ class TestUserModelTest extends TestCase
     {
         $GLOBALS['USER'] = new BxUserWithoutAuth;
 
-        TestUser::$object = m::mock('object');
-
         $user = TestUser::current();
         $this->assertSame(null, $user->id);
         $this->assertSame(null, $user->fields);
@@ -63,7 +63,6 @@ class TestUserModelTest extends TestCase
     public function testHasRoleWithId()
     {
         $GLOBALS['USER'] = new BxUserWithoutAuth;
-        TestUser::$object = m::mock('object');
 
         $user = TestUser::current();
         $this->assertFalse($user->hasGroupWithId(1));
@@ -78,7 +77,6 @@ class TestUserModelTest extends TestCase
     public function testIsCurrent()
     {
         $GLOBALS['USER'] = new BxUserWithAuth;
-        TestUser::$object = m::mock('object');
 
         $user = TestUser::current();
         $this->assertTrue($user->isCurrent());
@@ -92,8 +90,6 @@ class TestUserModelTest extends TestCase
 
     public function testIsAuthorized()
     {
-        TestUser::$object = m::mock('object');
-
         $GLOBALS['USER'] = new BxUserWithAuth;
         $user = TestUser::current();
         $this->assertTrue($user->isAuthorized());
@@ -181,7 +177,6 @@ class TestUserModelTest extends TestCase
 
     public function testFill()
     {
-        TestUser::$object = m::mock('object');
         $user = new TestUser(1);
 
         $fields = ['ID' => 2, 'NAME' => 'John Doe','GROUP_ID' => [1,2]];
@@ -206,7 +201,6 @@ class TestUserModelTest extends TestCase
 
     public function testFillGroups()
     {
-        TestUser::$object = m::mock('object');
         $user = new TestUser(1);
 
         $user->fillGroups([1,2]);

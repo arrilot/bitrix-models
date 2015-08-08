@@ -2,7 +2,7 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
-use Arrilot\BitrixModels\Models\BaseModel;
+use BadMethodCallException;
 
 abstract class BaseQuery
 {
@@ -21,32 +21,39 @@ abstract class BaseQuery
     protected $modelName;
 
     /**
+     * Model that calls the query
+     *
+     * @var object
+     */
+    protected $model;
+
+    /**
      * Query sort.
      *
      * @var array
      */
-    protected $sort = [];
+    public $sort = [];
 
     /**
      * Query filter.
      *
      * @var array
      */
-    protected $filter = [];
+    public $filter = [];
 
     /**
      * Query navigation.
      *
      * @var array|bool
      */
-    protected $navigation = false;
+    public $navigation = false;
 
     /**
      * Query select.
      *
      * @var array
      */
-    protected $select = ['FIELDS', 'PROPS'];
+    public $select = ['FIELDS', 'PROPS'];
 
     /**
      * The key to list items in array of results.
@@ -54,7 +61,7 @@ abstract class BaseQuery
      *
      * @var string|bool
      */
-    protected $keyBy = 'ID';
+    public $keyBy = 'ID';
 
     /**
      * Get count of users that match $filter.
@@ -80,6 +87,7 @@ abstract class BaseQuery
     {
         $this->object = $object;
         $this->modelName = $modelName;
+        $this->model = new $modelName;
     }
 
     /**
@@ -87,7 +95,7 @@ abstract class BaseQuery
      *
      * @param int $id
      *
-     * @return BaseModel|false
+     * @return mixed
      */
     public function getById($id)
     {
@@ -159,6 +167,15 @@ abstract class BaseQuery
 
         return $this;
     }
+    /**
+     * Getter for select.
+     *
+     * @return array
+     */
+    public function getSelect()
+    {
+        return $this->filter;
+    }
 
     /**
      * Setter for keyBy.
@@ -182,7 +199,7 @@ abstract class BaseQuery
      *
      * @return array
      */
-    protected function addUsingKeyBy(&$results, &$item)
+    protected function addItemToResultsUsingKeyBy(&$results, $item)
     {
         $keyByValue = ($this->keyBy && isset($item[$this->keyBy])) ? $item[$this->keyBy] : false;
 
@@ -216,14 +233,41 @@ abstract class BaseQuery
     }
 
     /**
-     * Remove extra fields from $this->select before sending it to bitrix's getList.
+     * Set $array[$new] as $array[$old] and delete $array[$old].
      *
-     * @return array
+     * @param array $array
+     * @param $old
+     * @param $new
+     *
+     * return null
      */
-    protected function prepareSelectForGetList()
+    protected function substituteField(&$array, $old, $new)
     {
-        $strip = ['FIELDS', 'PROPS', 'PROPERTIES', 'PROPERTY_VALUES', 'GROUPS', 'GROUP_ID'];
+        if (isset($array[$old]) && !isset($array[$new])) {
+            $array[$new] = $array[$old];
+        }
 
-        return array_diff($this->select, $strip);
+        unset($array[$old]);
+    }
+
+    /**
+     * Handle dynamic method calls into the method.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return $this
+     *
+     * @throws BadMethodCallException
+     */
+    public function __call($method, $parameters)
+    {
+        if (method_exists($this->model, 'scope'.$method)) {
+            array_unshift($parameters, $this);
+            return call_user_func_array([$this->model, 'scope'.$method], $parameters);
+        }
+
+        $className = get_class($this);
+
+        throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
     }
 }
