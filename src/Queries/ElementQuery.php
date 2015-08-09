@@ -3,12 +3,21 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Models\ElementModel;
+use CIBlock;
+use Exception;
 
 /**
  * @method UserQuery active()
  */
 class ElementQuery extends BaseQuery
 {
+    /**
+     * CIblock object or test double.
+     *
+     * @var object.
+     */
+    public static $cIblockObject;
+
     /**
      * Query sort.
      *
@@ -31,17 +40,87 @@ class ElementQuery extends BaseQuery
     protected $iblockId;
 
     /**
+     * List of standard element fields.
+     *
+     * @var array
+     */
+    protected $standardFields = [
+        "ID",
+        "TIMESTAMP_X",
+        "TIMESTAMP_X_UNIX",
+        "MODIFIED_BY",
+        "DATE_CREATE",
+        "DATE_CREATE_UNIX",
+        "CREATED_BY",
+        "IBLOCK_ID",
+        "IBLOCK_SECTION_ID",
+        "ACTIVE",
+        "ACTIVE_FROM",
+        "ACTIVE_TO",
+        "SORT",
+        "NAME",
+        "PREVIEW_PICTURE",
+        "PREVIEW_TEXT",
+        "PREVIEW_TEXT_TYPE",
+        "DETAIL_PICTURE",
+        "DETAIL_TEXT",
+        "DETAIL_TEXT_TYPE",
+        "SEARCHABLE_CONTENT",
+        "IN_SECTIONS",
+        "SHOW_COUNTER",
+        "SHOW_COUNTER_START",
+        "CODE",
+        "TAGS",
+        "XML_ID",
+        "EXTERNAL_ID",
+        "TMP_ID",
+        "CREATED_USER_NAME",
+        "DETAIL_PAGE_URL",
+        "LIST_PAGE_URL",
+        "CREATED_DATE",
+    ];
+
+    /**
+     * Method that is used to fetch getList results.
+     * Available values: 'getNext' or 'getNextElement'.
+     *
+     * @var string
+     */
+    protected $fetchUsing = 'getNextElement';
+
+    /**
      * Constructor.
      *
      * @param object $object
      * @param string $modelName
-     * @param int $iblockId
      */
-    public function __construct($object, $modelName, $iblockId)
+    public function __construct($object, $modelName)
     {
+        static::instantiateCIblockObject();
+
         parent::__construct($object, $modelName);
 
-        $this->iblockId = $iblockId;
+        $this->iblockId = $modelName::iblockId();
+        $this->fetchUsing = $modelName::$fetchUsing;
+    }
+
+    /**
+     * Instantiate bitrix entity object.
+     *
+     * @return object
+     * @throws Exception
+     */
+    public static function instantiateCIblockObject()
+    {
+        if (static::$cIblockObject) {
+            return static::$cIblockObject;
+        }
+
+        if (class_exists('CIblock')) {
+            return static::$cIblockObject = new CIblock;
+        }
+
+        throw new Exception('CIblock object initialization failed');
     }
 
     /**
@@ -74,6 +153,20 @@ class ElementQuery extends BaseQuery
     }
 
     /**
+     * Setter for fetchUsing.
+     *
+     * @param string $fetchUsing
+     *
+     * @return $this
+     */
+    public function fetchUsing($fetchUsing)
+    {
+        $this->fetchUsing = $fetchUsing;
+
+        return $this;
+    }
+
+    /**
      * Get list of items.
      *
      * @return ElementModel[]
@@ -81,6 +174,7 @@ class ElementQuery extends BaseQuery
     public function getList()
     {
         $items = [];
+
         $rsItems = $this->object->getList(
             $this->sort,
             $this->normalizeFilter(),
@@ -88,14 +182,22 @@ class ElementQuery extends BaseQuery
             $this->navigation,
             $this->normalizeSelect()
         );
-        while($obItem = $rsItems->getNextElement()) {
-            $arItem = $obItem->getFields();
-            if ($this->propsMustBeSelected()) {
-                $arItem['PROPERTIES'] = $obItem->getProperties();
-                $this->setPropertyValues($arItem);
-            }
 
-            $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
+        if ($this->shouldBeFetchedUsingGetNext()) {
+            while($arItem = $rsItems->getNext()) {
+                $this->setPropertyValues($arItem);
+                $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
+            }
+        } else {
+            while($obItem = $rsItems->getNextElement()) {
+                $arItem = $obItem->getFields();
+                if ($this->propsMustBeSelected()) {
+                    $arItem['PROPERTIES'] = $obItem->getProperties();
+                    $this->setPropertyValues($arItem);
+                }
+
+                $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
+            }
         }
 
         return $items;
@@ -120,15 +222,37 @@ class ElementQuery extends BaseQuery
      */
     protected function setPropertyValues(&$fields)
     {
-        if (empty($fields) || empty($fields['PROPERTIES'])) {
+        if (!empty($fields['PROPERTIES'])) {
+            foreach ($fields['PROPERTIES'] as $code => $prop) {
+                $fields['PROPERTY_VALUES'][$code] = $prop['VALUE'];
+            }
+
             return;
         }
 
-        foreach ($fields['PROPERTIES'] as $code => $prop) {
-            $fields['PROPERTY_VALUES'][$code] = $prop['VALUE'];
+        $propertyValues = [];
+        foreach ($fields as $code => $value) {
+            if (preg_match('/^PROPERTY_(.*)_VALUE$/', $code, $matches) && !empty($matches[1])) {
+                $propertyValues[$matches[1]] = $value;
+                $garbagePropertyFields = [
+                    'PROPERTY_'.$matches[1].'_VALUE',
+                    '~PROPERTY_'.$matches[1].'_VALUE',
+                    'PROPERTY_'.$matches[1].'_VALUE_ID',
+                    '~PROPERTY_'.$matches[1].'_VALUE_ID',
+                    'PROPERTY_'.$matches[1].'_PROPERTY_VALUE_ID',
+                    '~PROPERTY_'.$matches[1].'_PROPERTY_VALUE_ID',
+                    'PROPERTY_'.$matches[1].'_DESCRIPTION',
+                    '~PROPERTY_'.$matches[1].'_DESCRIPTION',
+                ];
+                foreach ($garbagePropertyFields as $key) {
+                    unset($fields[$key]);
+                }
+            }
         }
 
-        return;
+        if (!empty($propertyValues)) {
+            $fields['PROPERTY_VALUES'] = $propertyValues;
+        }
     }
 
     /**
@@ -153,11 +277,51 @@ class ElementQuery extends BaseQuery
     protected function normalizeSelect()
     {
         if ($this->fieldsMustBeSelected()) {
-            return [];
+            $this->select = $this->select + $this->standardFields;
         }
 
+        if ($this->propsMustBeSelected() && $this->shouldBeFetchedUsingGetNext()) {
+            $this->addAllPropsToSelect();
+        }
+
+        return $this->clearSelectArray();
+    }
+
+    /**
+     * Add all iblock property codes to select.
+     *
+     * return null
+     */
+    protected function addAllPropsToSelect()
+    {
+        $this->select[] = 'ID';
+        $this->select[] = 'IBLOCK_ID';
+
+        $rsProps = static::$cIblockObject->getProperties($this->iblockId);
+        while ($prop = $rsProps->fetch()) {
+            $this->select[] = 'PROPERTY_'.$prop['CODE'];
+        }
+    }
+
+    /**
+     * Clear select array from duplication and aditional fields.
+     *
+     * @return array
+     */
+    protected function clearSelectArray()
+    {
         $strip = ['FIELDS', 'PROPS', 'PROPERTIES', 'PROPERTY_VALUES'];
 
-        return array_diff($this->select, $strip);
+        return array_values(array_diff(array_unique($this->select), $strip));
+    }
+
+    /**
+     * Determine if we should fetch using GetNext() method.
+     *
+     * @return bool
+     */
+    protected function shouldBeFetchedUsingGetNext()
+    {
+        return $this->fetchUsing === 'getNext' || $this->fetchUsing === 'GetNext';
     }
 }

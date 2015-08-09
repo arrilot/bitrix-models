@@ -2,6 +2,7 @@
 
 namespace Arrilot\Tests\BitrixModels;
 
+use Arrilot\BitrixModels\Queries\ElementQuery;
 use Arrilot\Tests\BitrixModels\Stubs\TestElement;
 
 use Mockery as m;
@@ -11,6 +12,7 @@ class ElementsModelTest extends TestCase
     public function setUp()
     {
         TestElement::$object = m::mock('object');
+        ElementQuery::$cIblockObject = m::mock('cIblockObject');
     }
 
     public function tearDown()

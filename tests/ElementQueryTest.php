@@ -23,7 +23,7 @@ class ElementsQueryTest extends TestCase
      */
     protected function createQuery($object)
     {
-        return new ElementQuery($object, 'Arrilot\Tests\BitrixModels\Stubs\TestElement', 1);
+        return new ElementQuery($object, 'Arrilot\Tests\BitrixModels\Stubs\TestElement');
     }
 
     public function testCount()
@@ -139,5 +139,52 @@ class ElementsQueryTest extends TestCase
 
         $this->assertSame(['ID' => 1, 'NAME' => 2], $query->getById(1));
         $this->assertSame(false, $query->getById(0));
+    }
+
+    public function testGetListWithFetchUsing()
+    {
+        $object = m::mock('object');
+        $object->shouldReceive('getList')
+            ->with(["SORT" => "ASC"], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME', 'PROPERTY_GUID'])
+            ->once()
+            ->andReturn(m::self());
+        $object->shouldReceive('getNext')->andReturn(
+            ['ID' => 1, 'NAME' =>'foo', 'PROPERTY_GUID_VALUE' => 'foo'],
+            ['ID' => 2, 'NAME' =>'bar', 'PROPERTY_GUID_VALUE' => ''],
+            false
+        );
+
+        TestElement::$object = $object;
+        $query = $this->createQuery($object);
+        $items = $query->filter(['ACTIVE'=>'N'])->select('ID', 'NAME', 'PROPERTY_GUID')->fetchUsing('getNext')->getList();
+
+
+        $expected = [
+            1 => ['ID' => 1, 'NAME' =>'foo', 'PROPERTY_VALUES' => ['GUID' => 'foo']],
+            2 => ['ID' => 2, 'NAME' =>'bar', 'PROPERTY_VALUES' => ['GUID' => '']],
+        ];
+        foreach ($items as $k => $item) {
+            $this->assertSame($expected[$k], $item->fields);
+        }
+    }
+
+    public function testGetListWithFetchUsingAndNoProps()
+    {
+        $object = m::mock('object');
+        $object->shouldReceive('getList')->with(["SORT" => "ASC"], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME'])->once()->andReturn(m::self());
+        $object->shouldReceive('getNext')->andReturn(['ID' => 1, 'NAME' =>'foo'], ['ID' => 2, 'NAME' =>'bar'], false);
+
+        TestElement::$object = $object;
+        $query = $this->createQuery($object);
+        $items = $query->filter(['ACTIVE'=>'N'])->select('ID', 'NAME')->fetchUsing('getNext')->getList();
+
+
+        $expected = [
+            1 => ['ID' => 1, 'NAME' =>'foo'],
+            2 => ['ID' => 2, 'NAME' =>'bar'],
+        ];
+        foreach ($items as $k => $item) {
+            $this->assertSame($expected[$k], $item->fields);
+        }
     }
 }

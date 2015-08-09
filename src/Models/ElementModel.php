@@ -33,6 +33,7 @@ class ElementModel extends BaseModel
         'navigation',
         'select',
         'keyBy',
+        'fetchUsing'
     ];
 
     /**
@@ -41,6 +42,14 @@ class ElementModel extends BaseModel
      * @var bool
      */
     protected $propsAreFetched = false;
+
+    /**
+     * Method that is used to fetch getList results.
+     * Available values: 'getNext' or 'getNextElement'.
+     *
+     * @var string
+     */
+    public static $fetchUsing = 'getNextElement';
 
     /**
      * Corresponding iblock id.
@@ -61,7 +70,7 @@ class ElementModel extends BaseModel
      */
     public static function query()
     {
-        return new ElementQuery(static::instantiateObject(), get_called_class(), static::iblockId());
+        return new ElementQuery(static::instantiateObject(), get_called_class());
     }
 
     /**
