@@ -244,7 +244,7 @@ class UserModel extends BaseModel
     }
 
     /**
-     * Scope to get only active items.
+     * Scope to get users only from specific group.
      *
      * @param UserQuery $query
      * @param int|array $groupId

@@ -20,7 +20,7 @@ class TestElement extends ElementModel
 
     public function getAccessorTwoField()
     {
-        return 'Respond from accessor for not existing field';
+        return $this['ID'].':'.$this['NAME'];
     }
 
     public function getAccessorThreeField()

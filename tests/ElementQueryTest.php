@@ -72,12 +72,12 @@ class ElementsQueryTest extends TestCase
     public function testGetListWithKeyBy()
     {
         $object = m::mock('object');
-        $object->shouldReceive('getList')->with(["SORT" => "ASC"], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, false)->once()->andReturn(m::self());
+        $object->shouldReceive('getList')->with(["SORT" => "ASC"], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID','NAME'])->once()->andReturn(m::self());
         $object->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
         $object->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' =>'foo'], ['ID' => 2, 'NAME' =>'bar']);
 
         $query = $this->createQuery($object);
-        $items = $query->filter(['ACTIVE'=>'N'])->keyBy(false)->select('FIELDS')->getList();
+        $items = $query->filter(['ACTIVE'=>'N'])->keyBy(false)->select('ID','NAME')->getList();
 
         $expected = [
             0 => ['ID' => 1, 'NAME' =>'foo'],

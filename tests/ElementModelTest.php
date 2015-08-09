@@ -307,12 +307,12 @@ class ElementsModelTest extends TestCase
     public function testAccessors()
     {
         $element = new TestElement(1);
-        $element->fill(['ID' => 2, 'NAME' => 'John Doe', 'ACCESSOR_ONE' => 'foo']);
+        $element->fill(['ID' => 2, 'NAME' => 'John', 'ACCESSOR_ONE' => 'foo']);
 
         $this->assertSame('!foo!', $element['ACCESSOR_ONE']);
         $this->assertTrue(isset($element['ACCESSOR_ONE']));
         $this->assertTrue(!empty($element['ACCESSOR_ONE']));
-        $this->assertSame('Respond from accessor for not existing field', $element['ACCESSOR_TWO']);
+        $this->assertSame('2:John', $element['ACCESSOR_TWO']);
         $this->assertTrue(isset($element['ACCESSOR_TWO']));
         $this->assertTrue(!empty($element['ACCESSOR_TWO']));
         $this->assertSame([], $element['ACCESSOR_THREE']);
