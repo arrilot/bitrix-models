@@ -186,7 +186,11 @@ $products = Product::query()
 
 ...
 
-$products = Product::query()->filter(['SECTION_ID' => $secId])->active()->navigation(['nTopCount'=>100])->keyBy('CODE')->getList();
+$products = Product::query()
+                    ->filter(['SECTION_ID' => $secId])
+                    ->active()
+                    ->navigation(['nTopCount'=>100])
+                    ->getList();
 ```
 
 В "query scopes" можно также передавать дополнительные параметры.
@@ -208,7 +212,7 @@ $products = Product::query()->filter(['SECTION_ID' => $secId])->active()->naviga
     }
 
 ...
-$users = $query->sort(["ID" => "ASC"])->filter(['NAME'=>'John'])->active()->fromGroup(7)->getList();
+$users = $query->sort(["ID" => "ASC"])->filter(['NAME'=>'John'])->fromGroup(7)->getList();
 ```
 
 ### Accessors
