@@ -217,7 +217,7 @@ abstract class BaseQuery
      */
     protected function fieldsMustBeSelected()
     {
-        return !$this->select && in_array('FIELDS', $this->select);
+        return in_array('FIELDS', $this->select);
     }
 
     /**
