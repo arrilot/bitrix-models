@@ -51,15 +51,6 @@ class Product extends ElementModel
 
 Рассмотрим примеры работы API моделей.
 
-1) Инстанцирование модели без получения информации из базы.
-```php
-$product = new Product($productId);
-//теперь есть возможно работать с моделью, допустим
-$product->deactivate();
-//или
-$product->delete();
-```
-
 1) Получение элемента инфоблока из базы.
 ```php
 $product = Product::getById($productId);
