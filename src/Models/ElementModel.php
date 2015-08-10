@@ -53,7 +53,7 @@ class ElementModel extends BaseModel
 
     /**
      * Corresponding iblock id.
-     * MUST be overriden.
+     * MUST be overridden.
      *
      * @throws Exception
      *
@@ -61,7 +61,20 @@ class ElementModel extends BaseModel
      */
     public static function iblockId()
     {
-        throw new Exception('public static function iblockId() MUST be overriden');
+        throw new Exception('public static function iblockId() MUST be overridden');
+    }
+
+    /**
+     * Corresponding section model full qualified class name.
+     * MUST be overridden if you are going to use section model for this iblock.
+     *
+     * @throws Exception
+     *
+     * @return string
+     */
+    public static function sectionModel()
+    {
+        throw new Exception('public static function sectionModel() MUST be overridden');
     }
 
     /**
@@ -239,4 +252,22 @@ class ElementModel extends BaseModel
 
         return $fields;
     }
+
+    /**
+     * Get element direct section.
+     *
+     * @param bool $withProps
+     *
+     * @return false|int
+     */
+    public function getSection($withProps = false)
+    {
+        $fields = $this->getFields();
+
+        /** @var SectionModel $sectionModel */
+        $sectionModel = static::sectionModel();
+
+        return $withProps ? $sectionModel::getById($fields['IBLOCK_SECTION_ID']) : $fields['IBLOCK_SECTION_ID'];
+    }
+
 }

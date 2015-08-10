@@ -40,7 +40,7 @@ class ElementQuery extends BaseQuery
     protected $iblockId;
 
     /**
-     * List of standard element fields.
+     * List of standard entity fields.
      *
      * @var array
      */
@@ -302,18 +302,6 @@ class ElementQuery extends BaseQuery
         while ($prop = $rsProps->fetch()) {
             $this->select[] = 'PROPERTY_'.$prop['CODE'];
         }
-    }
-
-    /**
-     * Clear select array from duplication and aditional fields.
-     *
-     * @return array
-     */
-    protected function clearSelectArray()
-    {
-        $strip = ['FIELDS', 'PROPS', 'PROPERTIES', 'PROPERTY_VALUES'];
-
-        return array_values(array_diff(array_unique($this->select), $strip));
     }
 
     /**

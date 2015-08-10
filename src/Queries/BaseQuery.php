@@ -167,15 +167,6 @@ abstract class BaseQuery
 
         return $this;
     }
-    /**
-     * Getter for select.
-     *
-     * @return array
-     */
-    public function getSelect()
-    {
-        return $this->filter;
-    }
 
     /**
      * Setter for keyBy.
@@ -248,6 +239,18 @@ abstract class BaseQuery
         }
 
         unset($array[$old]);
+    }
+
+    /**
+     * Clear select array from duplication and additional fields.
+     *
+     * @return array
+     */
+    protected function clearSelectArray()
+    {
+        $strip = ['FIELDS', 'PROPS', 'PROPERTIES', 'PROPERTY_VALUES', 'GROUPS', 'GROUP_ID', 'GROUPS_ID'];
+
+        return array_values(array_diff(array_unique($this->select), $strip));
     }
 
     /**

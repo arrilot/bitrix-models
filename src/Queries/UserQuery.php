@@ -18,6 +18,73 @@ class UserQuery extends BaseQuery
     public $sort = ['last_name' => 'asc'];
 
     /**
+     * List of standard entity fields.
+     *
+     * @var array
+     */
+    protected $standardFields = [
+        'ID',
+        'PERSONAL_WWW',
+        'PERSONAL_ZIP',
+        'IS_ONLINE',
+        'ACTIVE',
+        'PERSONAL_ICQ',
+        'PERSONAL_COUNTRY',
+        'WORK_CITY',
+        'LAST_LOGIN',
+        'PERSONAL_GENDER',
+        'PERSONAL_NOTES',
+        'WORK_STATE',
+        'LOGIN',
+        'PERSONAL_PHOTO',
+        'WORK_COMPANY',
+        'WORK_ZIP',
+        'EMAIL',
+        'PERSONAL_PHONE',
+        'WORK_DEPARTMENT',
+        'WORK_COUNTRY',
+        'NAME',
+        'PERSONAL_FAX',
+        'WORK_POSITION',
+        'WORK_PROFILE',
+        'LAST_NAME',
+        'PERSONAL_MOBILE',
+        'WORK_WWW',
+        'WORK_NOTES',
+        'SECOND_NAME',
+        'PERSONAL_PAGER',
+        'WORK_PHONE',
+        'ADMIN_NOTES',
+        'TIMESTAMP_X',
+        'PERSONAL',
+        'STREET',
+        'WORK_FAX',
+        'XML_ID',
+        'PERSONAL_BIRTHDAY',
+        'PERSONAL_MAILBOX',
+        'WORK_PAGER',
+        'LAST_NAME',
+        'DATE_REGISTER',
+        'PERSONAL_CITY',
+        'WORK_STREET',
+        'SECOND_NAME',
+        'PERSONAL_PROFESSION',
+        'PERSONAL_STATE',
+        'WORK_MAILBOX',
+        'STORED_HASH',
+        'CHECKWORD_TIME',
+        'EXTERNAL_AUTH_ID',
+        'CONFIRM_CODE',
+        'LOGIN_ATTEMPTS',
+        'LAST_ACTIVITY_DATE',
+        'AUTO_TIME_ZONE',
+        'TIME_ZONE',
+        'PASSWORD',
+        'CHECKWORD',
+        'LID'
+    ];
+
+    /**
      * CUser::getList substitution.
      *
      * @return UserModel[]
@@ -64,7 +131,7 @@ class UserQuery extends BaseQuery
      */
     protected function groupsMustBeSelected()
     {
-        return in_array('GROUPS', $this->select) || in_array('GROUP_ID', $this->select);
+        return in_array('GROUPS', $this->select) || in_array('GROUP_ID', $this->select)|| in_array('GROUPS_ID', $this->select);
     }
 
     /**
@@ -89,8 +156,10 @@ class UserQuery extends BaseQuery
      */
     protected function normalizeSelect()
     {
-        $strip = ['FIELDS', 'PROPS', 'GROUPS', 'GROUP_ID'];
+        if ($this->fieldsMustBeSelected()) {
+            $this->select = $this->select + $this->standardFields;
+        }
 
-        return array_diff($this->select, $strip);
+        return $this->clearSelectArray();
     }
 }
