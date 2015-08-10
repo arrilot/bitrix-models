@@ -45,39 +45,39 @@ class ElementQuery extends BaseQuery
      * @var array
      */
     protected $standardFields = [
-        "ID",
-        "TIMESTAMP_X",
-        "TIMESTAMP_X_UNIX",
-        "MODIFIED_BY",
-        "DATE_CREATE",
-        "DATE_CREATE_UNIX",
-        "CREATED_BY",
-        "IBLOCK_ID",
-        "IBLOCK_SECTION_ID",
-        "ACTIVE",
-        "ACTIVE_FROM",
-        "ACTIVE_TO",
-        "SORT",
-        "NAME",
-        "PREVIEW_PICTURE",
-        "PREVIEW_TEXT",
-        "PREVIEW_TEXT_TYPE",
-        "DETAIL_PICTURE",
-        "DETAIL_TEXT",
-        "DETAIL_TEXT_TYPE",
-        "SEARCHABLE_CONTENT",
-        "IN_SECTIONS",
-        "SHOW_COUNTER",
-        "SHOW_COUNTER_START",
-        "CODE",
-        "TAGS",
-        "XML_ID",
-        "EXTERNAL_ID",
-        "TMP_ID",
-        "CREATED_USER_NAME",
-        "DETAIL_PAGE_URL",
-        "LIST_PAGE_URL",
-        "CREATED_DATE",
+        'ID',
+        'TIMESTAMP_X',
+        'TIMESTAMP_X_UNIX',
+        'MODIFIED_BY',
+        'DATE_CREATE',
+        'DATE_CREATE_UNIX',
+        'CREATED_BY',
+        'IBLOCK_ID',
+        'IBLOCK_SECTION_ID',
+        'ACTIVE',
+        'ACTIVE_FROM',
+        'ACTIVE_TO',
+        'SORT',
+        'NAME',
+        'PREVIEW_PICTURE',
+        'PREVIEW_TEXT',
+        'PREVIEW_TEXT_TYPE',
+        'DETAIL_PICTURE',
+        'DETAIL_TEXT',
+        'DETAIL_TEXT_TYPE',
+        'SEARCHABLE_CONTENT',
+        'IN_SECTIONS',
+        'SHOW_COUNTER',
+        'SHOW_COUNTER_START',
+        'CODE',
+        'TAGS',
+        'XML_ID',
+        'EXTERNAL_ID',
+        'TMP_ID',
+        'CREATED_USER_NAME',
+        'DETAIL_PAGE_URL',
+        'LIST_PAGE_URL',
+        'CREATED_DATE',
     ];
 
     /**
@@ -107,8 +107,9 @@ class ElementQuery extends BaseQuery
     /**
      * Instantiate bitrix entity object.
      *
-     * @return object
      * @throws Exception
+     *
+     * @return object
      */
     public static function instantiateCIblockObject()
     {
@@ -117,7 +118,7 @@ class ElementQuery extends BaseQuery
         }
 
         if (class_exists('CIblock')) {
-            return static::$cIblockObject = new CIblock;
+            return static::$cIblockObject = new CIblock();
         }
 
         throw new Exception('CIblock object initialization failed');
@@ -184,12 +185,12 @@ class ElementQuery extends BaseQuery
         );
 
         if ($this->shouldBeFetchedUsingGetNext()) {
-            while($arItem = $rsItems->getNext()) {
+            while ($arItem = $rsItems->getNext()) {
                 $this->setPropertyValues($arItem);
                 $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
             }
         } else {
-            while($obItem = $rsItems->getNextElement()) {
+            while ($obItem = $rsItems->getNextElement()) {
                 $arItem = $obItem->getFields();
                 if ($this->propsMustBeSelected()) {
                     $arItem['PROPERTIES'] = $obItem->getProperties();

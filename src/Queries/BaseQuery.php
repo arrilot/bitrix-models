@@ -21,7 +21,7 @@ abstract class BaseQuery
     protected $modelName;
 
     /**
-     * Model that calls the query
+     * Model that calls the query.
      *
      * @var object
      */
@@ -87,7 +87,7 @@ abstract class BaseQuery
     {
         $this->object = $object;
         $this->modelName = $modelName;
-        $this->model = new $modelName;
+        $this->model = new $modelName();
     }
 
     /**
@@ -192,7 +192,7 @@ abstract class BaseQuery
     }
 
     /**
-     * Adds $item to $results using keyBy value
+     * Adds $item to $results using keyBy value.
      *
      * @param $results
      * @param $item
@@ -253,16 +253,18 @@ abstract class BaseQuery
     /**
      * Handle dynamic method calls into the method.
      *
-     * @param  string  $method
-     * @param  array   $parameters
-     * @return $this
+     * @param string $method
+     * @param array  $parameters
      *
      * @throws BadMethodCallException
+     *
+     * @return $this
      */
     public function __call($method, $parameters)
     {
         if (method_exists($this->model, 'scope'.$method)) {
             array_unshift($parameters, $this);
+
             return call_user_func_array([$this->model, 'scope'.$method], $parameters);
         }
 

@@ -33,7 +33,7 @@ class ElementModel extends BaseModel
         'navigation',
         'select',
         'keyBy',
-        'fetchUsing'
+        'fetchUsing',
     ];
 
     /**
@@ -55,8 +55,9 @@ class ElementModel extends BaseModel
      * Corresponding iblock id.
      * MUST be overriden.
      *
-     * @return int
      * @throws Exception
+     *
+     * @return int
      */
     public static function iblockId()
     {
@@ -213,7 +214,7 @@ class ElementModel extends BaseModel
         $blacklisted = [
             'ID',
             'IBLOCK_ID',
-            'PROPERTIES'
+            'PROPERTIES',
         ];
 
         $fields = [];

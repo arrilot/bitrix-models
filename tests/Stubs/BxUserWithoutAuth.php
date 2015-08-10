@@ -6,7 +6,7 @@ class BxUserWithoutAuth
 {
     public function getId()
     {
-        return null;
+        return;
     }
 
     public function getUserGroupArray()
