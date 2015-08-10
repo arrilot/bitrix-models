@@ -133,7 +133,7 @@ $product = Product::create($fields);
 $count = Product::count(['ACTIVE'=>'Y']);
 ```
 
-8) Получения списка элементов.
+8) Получения списка элементов
 ```php
 $products = Product::getList([
     'filter' => ['ACTIVE'=>'N'],
@@ -157,7 +157,7 @@ foreach ($products as $id => $product) {
 $count = Product::query()->filter(['ACTIVE'=>'Y'])->count();
 ```
 
-10) GetList
+10) Получения списка элементов (7) через query
 ```php
 $products = Product::query()
                     ->filter($filter)
