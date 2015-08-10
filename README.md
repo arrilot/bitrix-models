@@ -236,7 +236,7 @@ $products = Product::query()
     }
 
 ...
-$users = $query->sort(["ID" => "ASC"])->filter(['NAME'=>'John'])->fromGroup(7)->getList();
+$users = User::query()->sort(["ID" => "ASC"])->filter(['NAME'=>'John'])->fromGroup(7)->getList();
 ```
 
 ### Accessors
