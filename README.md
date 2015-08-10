@@ -274,6 +274,6 @@ $users = $query->sort(["ID" => "ASC"])->filter(['NAME'=>'John'])->fromGroup(7)->
 
 Для того чтобы такие аксессоры отображались в toArray() и toJson() их указать в поле $appends модели.
 ```php
-    protected $appends = ['ACCESSOR_THREE'];
+    protected $appends = ['FULL_NAME'];
 ```
 
