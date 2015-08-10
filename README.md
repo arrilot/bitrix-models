@@ -157,7 +157,7 @@ foreach ($products as $id => $product) {
 $count = Product::query()->filter(['ACTIVE'=>'Y'])->count();
 ```
 
-10) Получения списка элементов (7) через query
+10) Получения списка элементов (8) через query
 ```php
 $products = Product::query()
                     ->filter($filter)
