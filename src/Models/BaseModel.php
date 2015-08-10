@@ -144,8 +144,9 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      *
      * @param $fields
      *
-     * @return static
      * @throws Exception
+     *
+     * @return static
      */
     public static function create($fields)
     {
@@ -263,7 +264,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
     }
 
     /**
-     * Exists method for ArrayIterator
+     * Exists method for ArrayIterator.
      *
      * @param $offset
      *
@@ -275,7 +276,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
     }
 
     /**
-     * Unset method for ArrayIterator
+     * Unset method for ArrayIterator.
      *
      * @param $offset
      *
@@ -347,6 +348,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      * Convert model to json.
      *
      * @param int $options
+     *
      * @return string
      */
     public function toJson($options = 0)
@@ -357,8 +359,9 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
     /**
      * Instantiate bitrix entity object.
      *
-     * @return object
      * @throws Exception
+     *
+     * @return object
      */
     public static function instantiateObject()
     {
@@ -367,7 +370,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
         }
 
         if (class_exists(static::$objectClass)) {
-            return static::$object = new static::$objectClass;
+            return static::$object = new static::$objectClass();
         }
 
         throw new Exception('Object initialization failed');
@@ -386,8 +389,9 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
     /**
      * Instantiate a query object for the model.
      *
-     * @return BaseQuery
      * @throws Exception
+     *
+     * @return BaseQuery
      */
     public static function query()
     {

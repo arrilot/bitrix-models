@@ -6,5 +6,4 @@ use Arrilot\BitrixModels\Models\UserModel;
 
 class TestUser extends UserModel
 {
-
 }

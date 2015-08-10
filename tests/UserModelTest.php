@@ -5,10 +5,9 @@ namespace Arrilot\Tests\BitrixModels;
 use Arrilot\Tests\BitrixModels\Stubs\BxUserWithAuth;
 use Arrilot\Tests\BitrixModels\Stubs\BxUserWithoutAuth;
 use Arrilot\Tests\BitrixModels\Stubs\TestUser;
-
 use Mockery as m;
 
-class TestUserModelTest extends TestCase
+class UserModelTest extends TestCase
 {
     public function setUp()
     {
@@ -37,7 +36,7 @@ class TestUserModelTest extends TestCase
 
     public function testInitializationWithCurrent()
     {
-        $GLOBALS['USER'] = new BxUserWithAuth;
+        $GLOBALS['USER'] = new BxUserWithAuth();
         global $USER;
 
         $user = TestUser::current();
@@ -53,7 +52,7 @@ class TestUserModelTest extends TestCase
 
     public function testInitializationWithCurrentNotAuth()
     {
-        $GLOBALS['USER'] = new BxUserWithoutAuth;
+        $GLOBALS['USER'] = new BxUserWithoutAuth();
 
         $user = TestUser::current();
         $this->assertSame(null, $user->id);
@@ -62,7 +61,7 @@ class TestUserModelTest extends TestCase
 
     public function testHasRoleWithId()
     {
-        $GLOBALS['USER'] = new BxUserWithoutAuth;
+        $GLOBALS['USER'] = new BxUserWithoutAuth();
 
         $user = TestUser::current();
         $this->assertFalse($user->hasGroupWithId(1));
@@ -76,7 +75,7 @@ class TestUserModelTest extends TestCase
 
     public function testIsCurrent()
     {
-        $GLOBALS['USER'] = new BxUserWithAuth;
+        $GLOBALS['USER'] = new BxUserWithAuth();
 
         $user = TestUser::current();
         $this->assertTrue($user->isCurrent());
@@ -90,11 +89,11 @@ class TestUserModelTest extends TestCase
 
     public function testIsAuthorized()
     {
-        $GLOBALS['USER'] = new BxUserWithAuth;
+        $GLOBALS['USER'] = new BxUserWithAuth();
         $user = TestUser::current();
         $this->assertTrue($user->isAuthorized());
 
-        $GLOBALS['USER'] = new BxUserWithoutAuth;
+        $GLOBALS['USER'] = new BxUserWithoutAuth();
         $user = TestUser::current();
         $this->assertFalse($user->isAuthorized());
     }
@@ -113,7 +112,7 @@ class TestUserModelTest extends TestCase
     public function testActivate()
     {
         $object = m::mock('object');
-        $object->shouldReceive('update')->with(1, ['ACTIVE'=>'Y'])->once()->andReturn(true);
+        $object->shouldReceive('update')->with(1, ['ACTIVE' => 'Y'])->once()->andReturn(true);
 
         TestUser::$object = $object;
         $user = new TestUser(1);
@@ -124,7 +123,7 @@ class TestUserModelTest extends TestCase
     public function testDeactivate()
     {
         $object = m::mock('object');
-        $object->shouldReceive('update')->with(1, ['ACTIVE'=>'N'])->once()->andReturn(true);
+        $object->shouldReceive('update')->with(1, ['ACTIVE' => 'N'])->once()->andReturn(true);
 
         TestUser::$object = $object;
         $user = new TestUser(1);
@@ -144,17 +143,17 @@ class TestUserModelTest extends TestCase
         $this->assertSame(3, $newTestUser->id);
         $this->assertSame([
             'NAME' => 'John Doe',
-            'ID' => 3,
+            'ID'   => 3,
         ], $newTestUser->fields);
     }
 
     public function testCount()
     {
         $object = m::mock('object');
-        $object->shouldReceive('getList')->with("ID", "ASC", ['ACTIVE'=>'Y'],[
+        $object->shouldReceive('getList')->with('ID', 'ASC', ['ACTIVE' => 'Y'], [
             'NAV_PARAMS' => [
-                "nTopCount" => 0
-            ]
+                'nTopCount' => 0,
+            ],
         ])->once()->andReturn(m::self());
         $object->NavRecordCount = 2;
 
@@ -163,10 +162,10 @@ class TestUserModelTest extends TestCase
         $this->assertSame(2, TestUser::count(['ACTIVE' => 'Y']));
 
         $object = m::mock('object');
-        $object->shouldReceive('getList')->with("ID", "ASC", [],[
+        $object->shouldReceive('getList')->with('ID', 'ASC', [], [
             'NAV_PARAMS' => [
-                "nTopCount" => 0
-            ]
+                'nTopCount' => 0,
+            ],
         ])->once()->andReturn(m::self());
         $object->NavRecordCount = 3;
 

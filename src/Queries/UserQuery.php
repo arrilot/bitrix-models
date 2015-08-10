@@ -25,15 +25,14 @@ class UserQuery extends BaseQuery
     public function getList()
     {
         $params = [
-            'SELECT' => $this->propsMustBeSelected() ? ['UF_*'] : false,
+            'SELECT'     => $this->propsMustBeSelected() ? ['UF_*'] : false,
             'NAV_PARAMS' => $this->navigation,
-            'FIELDS' => $this->normalizeSelect(),
+            'FIELDS'     => $this->normalizeSelect(),
         ];
 
         $users = [];
         $rsUsers = $this->object->getList($this->sort, $sortOrder = false, $this->normalizeFilter(), $params);
         while ($arUser = $rsUsers->fetch()) {
-
             if ($this->groupsMustBeSelected()) {
                 $arUser['GROUP_ID'] = $this->object->getUserGroup($arUser['ID']);
             }
@@ -53,8 +52,8 @@ class UserQuery extends BaseQuery
     {
         return $this->object->getList($order = 'ID', $by = 'ASC', $this->normalizeFilter(), [
             'NAV_PARAMS' => [
-                'nTopCount' => 0
-            ]
+                'nTopCount' => 0,
+            ],
         ])->NavRecordCount;
     }
 
@@ -67,7 +66,6 @@ class UserQuery extends BaseQuery
     {
         return in_array('GROUPS', $this->select) || in_array('GROUP_ID', $this->select);
     }
-
 
     /**
      * Normalize filter before sending it to getList.

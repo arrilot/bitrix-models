@@ -4,10 +4,9 @@ namespace Arrilot\Tests\BitrixModels;
 
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use Arrilot\Tests\BitrixModels\Stubs\TestElement;
-
 use Mockery as m;
 
-class ElementsModelTest extends TestCase
+class ElementModelTest extends TestCase
 {
     public function setUp()
     {
@@ -27,7 +26,7 @@ class ElementsModelTest extends TestCase
         $this->assertSame(1, $element->id);
 
         $fields = [
-            'NAME' => 'John',
+            'NAME'      => 'John',
             'LAST_NAME' => 'Doe',
         ];
         $element = new TestElement(1, $fields);
@@ -49,7 +48,7 @@ class ElementsModelTest extends TestCase
     public function testActivate()
     {
         $object = m::mock('object');
-        $object->shouldReceive('update')->with(1, ['ACTIVE'=>'Y'])->once()->andReturn(true);
+        $object->shouldReceive('update')->with(1, ['ACTIVE' => 'Y'])->once()->andReturn(true);
 
         TestElement::$object = $object;
         $element = new TestElement(1);
@@ -60,7 +59,7 @@ class ElementsModelTest extends TestCase
     public function testDeactivate()
     {
         $object = m::mock('object');
-        $object->shouldReceive('update')->with(1, ['ACTIVE'=>'N'])->once()->andReturn(true);
+        $object->shouldReceive('update')->with(1, ['ACTIVE' => 'N'])->once()->andReturn(true);
 
         TestElement::$object = $object;
         $element = new TestElement(1);
@@ -74,23 +73,23 @@ class ElementsModelTest extends TestCase
         $object->shouldReceive('getByID')->with(1)->once()->andReturn(m::self());
         $object->shouldReceive('getNextElement')->once()->andReturn(m::self());
         $object->shouldReceive('getFields')->once()->andReturn([
-            'NAME' => 'John Doe'
+            'NAME' => 'John Doe',
         ]);
         $object->shouldReceive('getProperties')->once()->andReturn([
             'FOO_PROPERTY' => [
-                'VALUE' => 'bar',
+                'VALUE'       => 'bar',
                 'DESCRIPTION' => 'baz',
-            ]
+            ],
         ]);
 
         TestElement::$object = $object;
         $element = new TestElement(1);
 
         $expected = [
-            'NAME' => 'John Doe',
+            'NAME'       => 'John Doe',
             'PROPERTIES' => [
                 'FOO_PROPERTY' => [
-                    'VALUE' => 'bar',
+                    'VALUE'       => 'bar',
                     'DESCRIPTION' => 'baz',
                 ],
             ],
@@ -113,23 +112,23 @@ class ElementsModelTest extends TestCase
         $object->shouldReceive('getByID')->with(1)->twice()->andReturn(m::self());
         $object->shouldReceive('getNextElement')->twice()->andReturn(m::self());
         $object->shouldReceive('getFields')->twice()->andReturn([
-            'NAME' => 'John Doe'
+            'NAME' => 'John Doe',
         ]);
         $object->shouldReceive('getProperties')->twice()->andReturn([
             'FOO_PROPERTY' => [
-                'VALUE' => 'bar',
+                'VALUE'       => 'bar',
                 'DESCRIPTION' => 'baz',
-            ]
+            ],
         ]);
 
         TestElement::$object = $object;
         $element = new TestElement(1);
 
         $expected = [
-            'NAME' => 'John Doe',
+            'NAME'       => 'John Doe',
             'PROPERTIES' => [
                 'FOO_PROPERTY' => [
-                    'VALUE' => 'bar',
+                    'VALUE'       => 'bar',
                     'DESCRIPTION' => 'baz',
                 ],
             ],
@@ -152,10 +151,10 @@ class ElementsModelTest extends TestCase
         $object = m::mock('object');
 
         TestElement::$object = $object;
-        $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get]',[1]);
+        $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get]', [1]);
         $fields = [
-            'ID' => 1,
-            'IBLOCK_ID' => 1,
+            'ID'              => 1,
+            'IBLOCK_ID'       => 1,
             'NAME'            => 'John Doe',
             'PROPERTIES'      => [
                 'FOO_PROPERTY' => [
@@ -171,7 +170,7 @@ class ElementsModelTest extends TestCase
         $element->fields = $fields;
 
         $expected1 = [
-            'NAME' => 'John Doe',
+            'NAME'            => 'John Doe',
             'PROPERTY_VALUES' => [
                 'FOO_PROPERTY' => 'bar',
             ],
@@ -188,10 +187,10 @@ class ElementsModelTest extends TestCase
 
     public function testUpdate()
     {
-        $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[save]',[1]);
+        $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[save]', [1]);
         $element->shouldReceive('save')->with(['NAME'])->andReturn(true);
 
-        $this->assertTrue($element->update(['NAME'=>'John Doe']));
+        $this->assertTrue($element->update(['NAME' => 'John Doe']));
         $this->assertSame('John Doe', $element->fields['NAME']);
     }
 
@@ -211,15 +210,15 @@ class ElementsModelTest extends TestCase
     public function testGetList()
     {
         $object = m::mock('object');
-        $object->shouldReceive('getList')->with(["SORT" => "ASC"], ['ACTIVE' => 'Y', 'IBLOCK_ID' => 1], false, false, ['ID', 'IBLOCK_ID'])->once()->andReturn(m::self());
+        $object->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'Y', 'IBLOCK_ID' => 1], false, false, ['ID', 'IBLOCK_ID'])->once()->andReturn(m::self());
         $object->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
         $object->shouldReceive('getFields')->andReturn(['ID' => 1], ['ID' => 2]);
 
         TestElement::$object = $object;
         $elements = TestElement::getlist([
-            'select' => ['ID', 'IBLOCK_ID'],
-            'filter' => ['ACTIVE' => 'Y'],
-            'withoutProps' => true
+            'select'       => ['ID', 'IBLOCK_ID'],
+            'filter'       => ['ACTIVE' => 'Y'],
+            'withoutProps' => true,
         ]);
 
         $expected = [
@@ -273,11 +272,11 @@ class ElementsModelTest extends TestCase
 
         $element = new TestElement(1);
         $fields = [
-            'ID' => 2,
-            'NAME' =>'John Doe',
+            'ID'              => 2,
+            'NAME'            => 'John Doe',
             'PROPERTY_VALUES' => [
-                'GUID' =>'foo'
-            ]
+                'GUID' => 'foo',
+            ],
         ];
         $element->fill($fields);
 
