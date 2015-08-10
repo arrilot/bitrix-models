@@ -44,6 +44,13 @@ class ElementModel extends BaseModel
     protected $propsAreFetched = false;
 
     /**
+     * Have sections been already fetched from DB?
+     *
+     * @var bool
+     */
+    protected $sectionsAreFetched = false;
+
+    /**
      * Method that is used to fetch getList results.
      * Available values: 'getNext' or 'getNextElement'.
      *
@@ -138,7 +145,7 @@ class ElementModel extends BaseModel
     }
 
     /**
-     * Get elements props from cache or database.
+     * Get element's props from cache or database.
      *
      * @return array
      */
@@ -152,6 +159,20 @@ class ElementModel extends BaseModel
     }
 
     /**
+     * Get element's sections from cache or database.
+     *
+     * @return array
+     */
+    public function getSections()
+    {
+        if ($this->sectionsAreFetched) {
+            return $this->fields['IBLOCK_SECTION'];
+        }
+
+        return $this->refreshSections();
+    }
+
+    /**
      * Refresh model from database and place data to $this->fields.
      *
      * @return array
@@ -162,7 +183,7 @@ class ElementModel extends BaseModel
     }
 
     /**
-     * Refresh element fields and save them to a class field.
+     * Refresh element's fields and save them to a class field.
      *
      * @return array
      */
@@ -172,10 +193,16 @@ class ElementModel extends BaseModel
             return  $this->fields = [];
         }
 
+        $sectionsBackup = isset($this->fields['IBLOCK_SECTION']) ? $this->fields['IBLOCK_SECTION'] : null;
+
         $obElement = static::$object->getByID($this->id)->getNextElement();
         $this->fields = $obElement->getFields();
         $this->fields['PROPERTIES'] = $obElement->getProperties();
         $this->setPropertyValuesFromProperties();
+
+        if (!empty($sectionsBackup)) {
+            $this->fields['IBLOCK_SECTION'] = $sectionsBackup;
+        }
 
         $this->fieldsAreFetched = true;
         $this->propsAreFetched = true;
@@ -184,7 +211,7 @@ class ElementModel extends BaseModel
     }
 
     /**
-     * Refresh element fields and save them to a class field.
+     * Refresh element's fields and save them to a class field.
      *
      * @return array
      */
@@ -195,6 +222,23 @@ class ElementModel extends BaseModel
         $this->refreshFields();
 
         return $this->fields['PROPERTY_VALUES'];
+    }
+
+    /**
+     * Refresh element's sections and save them to a class field.
+     *
+     * @return array
+     */
+    public function refreshSections()
+    {
+        if ($this->id === null) {
+            return [];
+        }
+
+        $this->fields['IBLOCK_SECTION'] = static::$object->getElementGroups($this->id, true);
+        $this->sectionsAreFetched = true;
+
+        return $this->fields['IBLOCK_SECTION'];
     }
 
     /**
@@ -254,7 +298,7 @@ class ElementModel extends BaseModel
     }
 
     /**
-     * Get element direct section.
+     * Get element direct section as ID or array of fields.
      *
      * @param bool $withProps
      *
@@ -263,11 +307,35 @@ class ElementModel extends BaseModel
     public function getSection($withProps = false)
     {
         $fields = $this->getFields();
+        if (!$withProps) {
+            return $fields['IBLOCK_SECTION_ID'];
+        }
+
+        /** @var SectionModel $sectionModel */
+        $sectionModel = static::sectionModel();
+        if (!$fields['IBLOCK_SECTION_ID']) {
+            return false;
+        }
+
+        return $sectionModel::getById($fields['IBLOCK_SECTION_ID'])->toArray();
+    }
+
+    /**
+     * Get element direct section as model object.
+     *
+     * @param bool $withProps
+     *
+     * @return false|SectionModel
+     */
+    public function section($withProps = false)
+    {
+        $fields = $this->getFields();
 
         /** @var SectionModel $sectionModel */
         $sectionModel = static::sectionModel();
 
-        return $withProps ? $sectionModel::getById($fields['IBLOCK_SECTION_ID']) : $fields['IBLOCK_SECTION_ID'];
+        return $withProps
+            ? $sectionModel::getById($fields['IBLOCK_SECTION_ID'])
+            : new $sectionModel($fields['IBLOCK_SECTION_ID']);
     }
-
 }
