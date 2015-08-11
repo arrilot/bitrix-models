@@ -188,10 +188,12 @@ class ElementModelTest extends TestCase
     public function testUpdate()
     {
         $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[save]', [1]);
-        $element->shouldReceive('save')->with(['NAME'])->andReturn(true);
+        $element->shouldReceive('save')->with(['NAME', 'PROPS.FOO', 'PROPS.FOO2'])->andReturn(true);
 
-        $this->assertTrue($element->update(['NAME' => 'John Doe']));
+        $this->assertTrue($element->update(['NAME' => 'John Doe', 'PROPS.FOO' => 'bar', 'PROPS.FOO2' => 'baz']));
         $this->assertSame('John Doe', $element->fields['NAME']);
+        $this->assertSame('bar', $element->fields['PROPS']['FOO']);
+        $this->assertSame('baz', $element->fields['PROPS']['FOO2']);
     }
 
     public function testCreate()

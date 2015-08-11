@@ -230,20 +230,6 @@ class UserModel extends BaseModel
     }
 
     /**
-     * Save model to database.
-     *
-     * @param array $selectedFields save only these fields instead of all.
-     *
-     * @return bool
-     */
-    public function save(array $selectedFields = [])
-    {
-        $fields = $this->collectFieldsForSave($selectedFields);
-
-        return static::$object->update($this->id, $fields);
-    }
-
-    /**
      * Scope to get users only from specific group.
      *
      * @param UserQuery $query
@@ -256,46 +242,5 @@ class UserModel extends BaseModel
         $query->filter['GROUPS_ID'] = $groupId;
 
         return $query;
-    }
-
-    /**
-     * Create an array of fields that will be saved to database.
-     *
-     * @param $selectedFields
-     *
-     * @return array
-     */
-    protected function collectFieldsForSave($selectedFields)
-    {
-        $fields = [];
-        if ($this->fields === null) {
-            return $fields;
-        }
-
-        $blacklistedFields = [
-            'ID',
-            'GROUPS',
-        ];
-
-        foreach ($this->fields as $field => $value) {
-            // skip if it is not in selected fields
-            if ($selectedFields && !in_array($field, $selectedFields)) {
-                continue;
-            }
-
-            // skip blacklisted fields
-            if (in_array($field, $blacklistedFields)) {
-                continue;
-            }
-
-            // skip trash fields
-            if (substr($field, 0, 1) === '~') {
-                continue;
-            }
-
-            $fields[$field] = $value;
-        }
-
-        return $fields;
     }
 }

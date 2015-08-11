@@ -22,7 +22,7 @@ class SectionQuery extends BaseQuery
      *
      * @var array|false
      */
-    public $includeElementCount = false;
+    public $countElements = false;
 
     /**
      * Iblock id.
@@ -85,7 +85,7 @@ class SectionQuery extends BaseQuery
         $rsSections = $this->object->getList(
             $this->sort,
             $this->normalizeFilter(),
-            $this->includeElementCount,
+            $this->countElements,
             $this->normalizeSelect(),
             $this->navigation
         );
@@ -107,15 +107,15 @@ class SectionQuery extends BaseQuery
     }
 
     /**
-     * Setter for includeElementCount.
+     * Setter for countElements.
      *
      * @param $value
      *
      * @return $this
      */
-    public function includeElementCount($value)
+    public function countElements($value)
     {
-        $this->includeElementCount = $value;
+        $this->countElements = $value;
 
         return $this;
     }

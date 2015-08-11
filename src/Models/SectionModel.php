@@ -31,7 +31,7 @@ class SectionModel extends BaseModel
         'filter',
         'navigation',
         'select',
-        'includeElementCount',
+        'countElements',
         'keyBy',
     ];
 
@@ -57,7 +57,6 @@ class SectionModel extends BaseModel
     {
         return new SectionQuery(static::instantiateObject(), get_called_class());
     }
-
 
     /**
      * Get all model attributes from cache or database.
@@ -99,59 +98,5 @@ class SectionModel extends BaseModel
         $this->fieldsAreFetched = true;
 
         return $this->fields;
-    }
-
-    /**
-     * Save model to database.
-     *
-     * @param array $selectedFields save only these fields instead of all.
-     *
-     * @return bool
-     */
-    public function save(array $selectedFields = [])
-    {
-        $fields = $this->collectFieldsForSave($selectedFields);
-
-        return static::$object->update($this->id, $fields);
-    }
-
-    /**
-     * Create an array of fields that will be saved to database.
-     *
-     * @param $selectedFields
-     *
-     * @return array
-     */
-    protected function collectFieldsForSave($selectedFields)
-    {
-        $fields = [];
-        if ($this->fields === null) {
-            return $fields;
-        }
-
-        $blacklistedFields = [
-            'ID',
-        ];
-
-        foreach ($this->fields as $field => $value) {
-            // skip if it is not in selected fields
-            if ($selectedFields && !in_array($field, $selectedFields)) {
-                continue;
-            }
-
-            // skip blacklisted fields
-            if (in_array($field, $blacklistedFields)) {
-                continue;
-            }
-
-            // skip trash fields
-            if (substr($field, 0, 1) === '~') {
-                continue;
-            }
-
-            $fields[$field] = $value;
-        }
-
-        return $fields;
     }
 }

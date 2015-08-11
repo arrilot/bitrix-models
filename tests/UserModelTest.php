@@ -174,6 +174,16 @@ class UserModelTest extends TestCase
         $this->assertSame(3, TestUser::count());
     }
 
+    public function testUpdate()
+    {
+        $user = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestUser[save]', [1]);
+        $user->shouldReceive('save')->with(['NAME','UF_FOO'])->andReturn(true);
+
+        $this->assertTrue($user->update(['NAME' => 'John', 'UF_FOO' => 'bar']));
+        $this->assertSame('John', $user->fields['NAME']);
+        $this->assertSame('bar', $user->fields['UF_FOO']);
+    }
+
     public function testFill()
     {
         $user = new TestUser(1);

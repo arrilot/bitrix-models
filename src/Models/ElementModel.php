@@ -242,62 +242,6 @@ class ElementModel extends BaseModel
     }
 
     /**
-     * Save model to database.
-     *
-     * @param array $selectedFields save only these fields instead of all.
-     *
-     * @return bool
-     */
-    public function save(array $selectedFields = [])
-    {
-        $fields = $this->collectFieldsForSave($selectedFields);
-
-        return static::$object->update($this->id, $fields);
-    }
-
-    /**
-     * Create an array of fields that will be saved to database.
-     *
-     * @param $selectedFields
-     *
-     * @return array
-     */
-    protected function collectFieldsForSave($selectedFields)
-    {
-        if (empty($this->fields)) {
-            return [];
-        }
-
-        $blacklisted = [
-            'ID',
-            'IBLOCK_ID',
-            'PROPERTIES',
-        ];
-
-        $fields = [];
-        foreach ($this->fields as $field => $value) {
-            // skip if is not in selected fields
-            if ($selectedFields && !in_array($field, $selectedFields)) {
-                continue;
-            }
-
-            // skip blacklisted fields
-            if (in_array($field, $blacklisted)) {
-                continue;
-            }
-
-            // skip trash fields
-            if ($value === '' || substr($field, 0, 1) === '~') {
-                continue;
-            }
-
-            $fields[$field] = $value;
-        }
-
-        return $fields;
-    }
-
-    /**
      * Get element direct section as ID or array of fields.
      *
      * @param bool $withProps
