@@ -11,7 +11,7 @@ class UserModelTest extends TestCase
 {
     public function setUp()
     {
-        TestUser::$object = m::mock('object');
+        TestUser::$bxObject = m::mock('object');
     }
 
     public function tearDown()
@@ -100,10 +100,10 @@ class UserModelTest extends TestCase
 
     public function testDelete()
     {
-        $object = m::mock('object');
-        $object->shouldReceive('delete')->once()->andReturn(true);
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('delete')->once()->andReturn(true);
 
-        TestUser::$object = $object;
+        TestUser::$bxObject = $bxObject;
         $user = new TestUser(1);
 
         $this->assertTrue($user->delete());
@@ -111,10 +111,10 @@ class UserModelTest extends TestCase
 
     public function testActivate()
     {
-        $object = m::mock('object');
-        $object->shouldReceive('update')->with(1, ['ACTIVE' => 'Y'])->once()->andReturn(true);
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'Y'])->once()->andReturn(true);
 
-        TestUser::$object = $object;
+        TestUser::$bxObject = $bxObject;
         $user = new TestUser(1);
 
         $this->assertTrue($user->activate());
@@ -122,10 +122,10 @@ class UserModelTest extends TestCase
 
     public function testDeactivate()
     {
-        $object = m::mock('object');
-        $object->shouldReceive('update')->with(1, ['ACTIVE' => 'N'])->once()->andReturn(true);
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'N'])->once()->andReturn(true);
 
-        TestUser::$object = $object;
+        TestUser::$bxObject = $bxObject;
         $user = new TestUser(1);
 
         $this->assertTrue($user->deactivate());
@@ -133,10 +133,10 @@ class UserModelTest extends TestCase
 
     public function testCreate()
     {
-        $object = m::mock('object');
-        $object->shouldReceive('add')->with(['NAME' => 'John Doe'])->once()->andReturn(3);
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('add')->with(['NAME' => 'John Doe'])->once()->andReturn(3);
 
-        TestUser::$object = $object;
+        TestUser::$bxObject = $bxObject;
 
         $newTestUser = TestUser::create(['NAME' => 'John Doe']);
 
@@ -149,27 +149,27 @@ class UserModelTest extends TestCase
 
     public function testCount()
     {
-        $object = m::mock('object');
-        $object->shouldReceive('getList')->with('ID', 'ASC', ['ACTIVE' => 'Y'], [
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('getList')->with('ID', 'ASC', ['ACTIVE' => 'Y'], [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,
             ],
         ])->once()->andReturn(m::self());
-        $object->NavRecordCount = 2;
+        $bxObject->NavRecordCount = 2;
 
-        TestUser::$object = $object;
+        TestUser::$bxObject = $bxObject;
 
         $this->assertSame(2, TestUser::count(['ACTIVE' => 'Y']));
 
-        $object = m::mock('object');
-        $object->shouldReceive('getList')->with('ID', 'ASC', [], [
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('getList')->with('ID', 'ASC', [], [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,
             ],
         ])->once()->andReturn(m::self());
-        $object->NavRecordCount = 3;
+        $bxObject->NavRecordCount = 3;
 
-        TestUser::$object = $object;
+        TestUser::$bxObject = $bxObject;
 
         $this->assertSame(3, TestUser::count());
     }
@@ -195,9 +195,9 @@ class UserModelTest extends TestCase
         $this->assertSame($fields, $user->fields);
         $this->assertSame($fields, $user->get());
 
-        $object = m::mock('object');
-        $object->shouldReceive('getUserGroup')->once()->andReturn([1]);
-        TestUser::$object = $object;
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('getUserGroup')->once()->andReturn([1]);
+        TestUser::$bxObject = $bxObject;
         $user = new TestUser(1);
 
         $fields = ['ID' => 2, 'NAME' => 'John Doe'];

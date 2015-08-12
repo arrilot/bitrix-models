@@ -150,11 +150,11 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      */
     public static function create($fields)
     {
-        $object = static::instantiateObject();
-        $id = $object->add($fields);
+        $bxObject = static::instantiateObject();
+        $id = $bxObject->add($fields);
 
         if (!$id) {
-            throw new Exception($object->LAST_ERROR);
+            throw new Exception($bxObject->LAST_ERROR);
         }
 
         $fields['ID'] = $id;
@@ -234,7 +234,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      */
     public function delete()
     {
-        return static::$object->delete($this->id);
+        return static::$bxObject->delete($this->id);
     }
 
     /**
@@ -268,7 +268,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
 
         $fields = $this->normalizeFieldsForSave($selectedFields);
 
-        return !empty($fields) ? static::$object->update($this->id, $fields) : true;
+        return !empty($fields) ? static::$bxObject->update($this->id, $fields) : true;
     }
 
     /**
@@ -434,12 +434,12 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      */
     public static function instantiateObject()
     {
-        if (static::$object) {
-            return static::$object;
+        if (static::$bxObject) {
+            return static::$bxObject;
         }
 
         if (class_exists(static::$objectClass)) {
-            return static::$object = new static::$objectClass();
+            return static::$bxObject = new static::$objectClass();
         }
 
         throw new Exception('Object initialization failed');
@@ -452,7 +452,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      */
     public static function destroyObject()
     {
-        static::$object = null;
+        static::$bxObject = null;
     }
 
     /**

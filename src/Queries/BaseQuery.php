@@ -11,7 +11,7 @@ abstract class BaseQuery
      *
      * @var object
      */
-    protected $object;
+    protected $bxObject;
 
     /**
      * Name of the model that calls the query.
@@ -80,12 +80,12 @@ abstract class BaseQuery
     /**
      * Constructor.
      *
-     * @param object $object
+     * @param object $bxObject
      * @param string $modelName
      */
-    public function __construct($object, $modelName)
+    public function __construct($bxObject, $modelName)
     {
-        $this->object = $object;
+        $this->object = $bxObject;
         $this->modelName = $modelName;
         $this->model = new $modelName();
     }

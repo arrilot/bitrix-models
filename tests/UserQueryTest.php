@@ -16,41 +16,41 @@ class UserQueryTest extends TestCase
     /**
      * Create testing object.
      *
-     * @param $object
+     * @param $bxObject
      *
      * @return UserQuery
      */
-    protected function createQuery($object)
+    protected function createQuery($bxObject)
     {
-        TestUser::$object = m::mock('object');
+        TestUser::$bxObject = m::mock('object');
 
-        return new UserQuery($object, 'Arrilot\Tests\BitrixModels\Stubs\TestUser');
+        return new UserQuery($bxObject, 'Arrilot\Tests\BitrixModels\Stubs\TestUser');
     }
 
     public function testCount()
     {
-        $object = m::mock('object');
-        $object->shouldReceive('getList')->with('ID', 'ASC', [], [
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('getList')->with('ID', 'ASC', [], [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,
             ],
         ])->once()->andReturn(m::self());
-        $object->NavRecordCount = 6;
+        $bxObject->NavRecordCount = 6;
 
-        $query = $this->createQuery($object);
+        $query = $this->createQuery($bxObject);
         $count = $query->count();
 
         $this->assertSame(6, $count);
 
-        $object = m::mock('object');
-        $object->shouldReceive('getList')->with('ID', 'ASC', ['ACTIVE' => 'Y'], [
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('getList')->with('ID', 'ASC', ['ACTIVE' => 'Y'], [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,
             ],
         ])->once()->andReturn(m::self());
-        $object->NavRecordCount = 3;
+        $bxObject->NavRecordCount = 3;
 
-        $query = $this->createQuery($object);
+        $query = $this->createQuery($bxObject);
         $count = $query->filter(['ACTIVE' => 'Y'])->count();
 
         $this->assertSame(3, $count);
@@ -58,9 +58,9 @@ class UserQueryTest extends TestCase
 
     public function testGetListWithScopes()
     {
-        $object = m::mock('object');
-        TestUser::$object = $object;
-        $object->shouldReceive('getList')->with(
+        $bxObject = m::mock('object');
+        TestUser::$bxObject = $bxObject;
+        $bxObject->shouldReceive('getList')->with(
             ['SORT' => 'ASC'],
             false,
             ['NAME' => 'John', 'ACTIVE' => 'Y'],
@@ -70,9 +70,9 @@ class UserQueryTest extends TestCase
                 'FIELDS'     => ['ID', 'NAME'],
             ]
         )->once()->andReturn(m::self());
-        $object->shouldReceive('fetch')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar'], false);
+        $bxObject->shouldReceive('fetch')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar'], false);
 
-        $query = $this->createQuery($object);
+        $query = $this->createQuery($bxObject);
         $items = $query->sort(['SORT' => 'ASC'])->filter(['NAME' => 'John'])->active()->select('ID', 'NAME')->getList();
 
         $expected = [

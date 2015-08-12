@@ -12,7 +12,7 @@ class SectionModel extends BaseModel
      *
      * @var object
      */
-    public static $object;
+    public static $bxObject;
 
     /**
      * Corresponding object class name.
@@ -88,7 +88,7 @@ class SectionModel extends BaseModel
             return  $this->fields = [];
         }
 
-        $this->fields = static::$object->getByID($this->id)->fetch();
+        $this->fields = static::$bxObject->getByID($this->id)->fetch();
 
         $this->fieldsAreFetched = true;
 

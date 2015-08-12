@@ -12,7 +12,7 @@ class ElementModel extends BaseModel
      *
      * @var object
      */
-    public static $object;
+    public static $bxObject;
 
     /**
      * Corresponding object class name.
@@ -190,7 +190,7 @@ class ElementModel extends BaseModel
 
         $sectionsBackup = isset($this->fields['IBLOCK_SECTION']) ? $this->fields['IBLOCK_SECTION'] : null;
 
-        $obElement = static::$object->getByID($this->id)->getNextElement();
+        $obElement = static::$bxObject->getByID($this->id)->getNextElement();
         $this->fields = $obElement->getFields();
         $this->fields['PROPERTIES'] = $obElement->getProperties();
         $this->setPropertyValuesFromProperties();
@@ -230,7 +230,7 @@ class ElementModel extends BaseModel
             return [];
         }
 
-        $this->fields['IBLOCK_SECTION'] = static::$object->getElementGroups($this->id, true);
+        $this->fields['IBLOCK_SECTION'] = static::$bxObject->getElementGroups($this->id, true);
         $this->sectionsAreFetched = true;
 
         return $this->fields['IBLOCK_SECTION'];
@@ -294,7 +294,7 @@ class ElementModel extends BaseModel
 
         $fields = $this->normalizeFieldsForSave($selectedFields);
 
-        return !empty($fields) ? static::$object->update($this->id, $fields) : true;
+        return !empty($fields) ? static::$bxObject->update($this->id, $fields) : true;
     }
 
     /**
@@ -308,7 +308,7 @@ class ElementModel extends BaseModel
     protected function saveProps($fields)
     {
         if (empty($fields)) {
-            static::$object->setPropertyValues(
+            static::$bxObject->setPropertyValues(
                 $this->id,
                 static::iblockId(),
                 $this->fields['PROPERTY_VALUES']
@@ -320,7 +320,7 @@ class ElementModel extends BaseModel
             return;
         }
 
-        static::$object->setPropertyValuesEx(
+        static::$bxObject->setPropertyValuesEx(
             $this->id,
             static::iblockId(),
             array_intersect_key($this->fields['PROPERTY_VALUES'], $fields['PROPERTY_VALUES'])

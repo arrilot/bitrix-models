@@ -91,14 +91,14 @@ class ElementQuery extends BaseQuery
     /**
      * Constructor.
      *
-     * @param object $object
+     * @param object $bxObject
      * @param string $modelName
      */
-    public function __construct($object, $modelName)
+    public function __construct($bxObject, $modelName)
     {
         static::instantiateCIblockObject();
 
-        parent::__construct($object, $modelName);
+        parent::__construct($bxObject, $modelName);
 
         $this->iblockId = $modelName::iblockId();
         $this->fetchUsing = $modelName::$fetchUsing;

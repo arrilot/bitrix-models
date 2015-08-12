@@ -11,7 +11,7 @@ class UserModel extends BaseModel
      *
      * @var object
      */
-    public static $object;
+    public static $bxObject;
 
     /**
      * Corresponding object class name.
@@ -141,7 +141,7 @@ class UserModel extends BaseModel
 
         $groupBackup = isset($this->fields['GROUP_ID']) ? $this->fields['GROUP_ID'] : null;
 
-        $this->fields = static::$object->getByID($this->id)->fetch();
+        $this->fields = static::$bxObject->getByID($this->id)->fetch();
 
         if ($groupBackup) {
             $this->fields['GROUP_ID'] = $groupBackup;
@@ -167,7 +167,7 @@ class UserModel extends BaseModel
 
         $this->fields['GROUP_ID'] = $this->isCurrent()
             ? $USER->getUserGroupArray()
-            : static::$object->getUserGroup($this->id);
+            : static::$bxObject->getUserGroup($this->id);
 
         $this->groupsAreFetched = true;
 
