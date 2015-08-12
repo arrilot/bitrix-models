@@ -61,7 +61,7 @@ abstract class BaseQuery
      *
      * @var string|bool
      */
-    public $keyBy = 'ID';
+    public $keyBy = false;
 
     /**
      * Get count of users that match $filter.
