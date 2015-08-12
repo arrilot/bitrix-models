@@ -183,6 +183,30 @@ abstract class BaseQuery
     }
 
     /**
+     * Set the "limit" value of the query.
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function limit($value)
+    {
+        $this->navigation['nPageSize'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Alias for "limit".
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function take($value)
+    {
+        return $this->limit($value);
+    }
+
+    /**
      * Adds $item to $results using keyBy value.
      *
      * @param $results

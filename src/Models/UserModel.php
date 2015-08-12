@@ -228,19 +228,4 @@ class UserModel extends BaseModel
 
         return ($USER->getId() == $this->id) && $USER->isAuthorized();
     }
-
-    /**
-     * Scope to get users only from specific group.
-     *
-     * @param UserQuery $query
-     * @param int|array $groupId
-     *
-     * @return UserQuery
-     */
-    public function scopeFromGroup($query, $groupId)
-    {
-        $query->filter['GROUPS_ID'] = $groupId;
-
-        return $query;
-    }
 }

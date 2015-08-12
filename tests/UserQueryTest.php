@@ -63,7 +63,7 @@ class UserQueryTest extends TestCase
         $object->shouldReceive('getList')->with(
             ['SORT' => 'ASC'],
             false,
-            ['NAME' => 'John', 'ACTIVE' => 'Y', 'GROUPS_ID' => 1],
+            ['NAME' => 'John', 'ACTIVE' => 'Y'],
             [
                 'SELECT'     => false,
                 'NAV_PARAMS' => false,
@@ -73,7 +73,7 @@ class UserQueryTest extends TestCase
         $object->shouldReceive('fetch')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar'], false);
 
         $query = $this->createQuery($object);
-        $items = $query->sort(['SORT' => 'ASC'])->filter(['NAME' => 'John'])->active()->fromGroup(1)->select('ID', 'NAME')->getList();
+        $items = $query->sort(['SORT' => 'ASC'])->filter(['NAME' => 'John'])->active()->select('ID', 'NAME')->getList();
 
         $expected = [
             1 => ['ID' => 1, 'NAME' => 'foo'],

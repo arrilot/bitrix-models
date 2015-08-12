@@ -180,4 +180,24 @@ class ElementQueryTest extends TestCase
             $this->assertSame($expected[$k], $item->fields);
         }
     }
+
+    public function testLimit()
+    {
+        $object = m::mock('object');
+        TestElement::$object = $object;
+        $object->shouldReceive('getList')->with(['SORT' => 'ASC'], ['NAME' => 'John','IBLOCK_ID' => 1], false, ['nPageSize' => 2], ['ID', 'NAME'])->once()->andReturn(m::self());
+        $object->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
+        $object->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar']);
+
+        $query = $this->createQuery($object);
+        $items = $query->filter(['NAME' => 'John'])->limit(2)->select('ID', 'NAME')->getList();
+
+        $expected = [
+            1 => ['ID' => 1, 'NAME' => 'foo'],
+            2 => ['ID' => 2, 'NAME' => 'bar'],
+        ];
+        foreach ($items as $k => $item) {
+            $this->assertSame($expected[$k], $item->fields);
+        }
+    }
 }
