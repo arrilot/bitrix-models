@@ -257,7 +257,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
     {
         $selectedFields = is_array($selectedFields) ? $selectedFields : func_get_args();
 
-        $fields = $this->collectFieldsForSave($selectedFields);
+        $fields = $this->normalizeFieldsForSave($selectedFields);
 
         return static::$object->update($this->id, $fields);
     }

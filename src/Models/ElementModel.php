@@ -246,7 +246,7 @@ class ElementModel extends BaseModel
      *
      * @param bool $withProps
      *
-     * @return false|int
+     * @return false|int|array
      */
     public function getSection($withProps = false)
     {
