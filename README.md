@@ -212,17 +212,15 @@ $products = Product::query()
 ```php
 
     /**
-     * Scope to get users only from specific group.
+     * @param ElementQuery $query
+     * @param string|array $category
      *
-     * @param UserQuery $query
-     * @param int|array $groupId
-     *
-     * @return UserQuery
+     * @return ElementQuery
      */
-    public function scopeFromGroup($query, $groupId)
+    public function scopeFromCategory($query, $category)
     {
-        $query->filter['GROUPS_ID'] = $groupId;
-    
+        $query->filter['SECTION_CODE'] = $category;
+
         return $query;
     }
 

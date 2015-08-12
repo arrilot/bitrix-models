@@ -22,17 +22,12 @@ class ElementModel extends BaseModel
     protected static $objectClass = 'CIBlockElement';
 
     /**
-     * List of params that can modify query.
+     * List of additional params that can modify query.
      *
      * @var array
      */
-    protected static $queryModifiers = [
-        'sort',
-        'filter',
+    protected static $additionalQueryModifiers = [
         'groupBy',
-        'navigation',
-        'select',
-        'keyBy',
         'fetchUsing',
     ];
 

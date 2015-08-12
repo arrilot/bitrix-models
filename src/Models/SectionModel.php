@@ -26,13 +26,8 @@ class SectionModel extends BaseModel
      *
      * @var array
      */
-    protected static $queryModifiers = [
-        'sort',
-        'filter',
-        'navigation',
-        'select',
+    protected static $additionalQueryModifiers = [
         'countElements',
-        'keyBy',
     ];
 
     /**

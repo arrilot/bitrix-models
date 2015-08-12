@@ -39,11 +39,11 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
     protected $fieldsAreFetched = false;
 
     /**
-     * List of params that can modify query.
+     * List of additional params that can modify query.
      *
      * @var array
      */
-    protected static $queryModifiers = [];
+    protected static $additionalQueryModifiers = [];
 
     /**
      * Constructor.
@@ -208,8 +208,17 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
     public static function getList($params = [])
     {
         $query = static::query();
+        $modifiers = array_merge(static::$additionalQueryModifiers, [
+            'sort',
+            'filter',
+            'navigation',
+            'select',
+            'keyBy',
+            'limit',
+            'take',
+        ]);
 
-        foreach (static::$queryModifiers as $modifier) {
+        foreach ($modifiers as $modifier) {
             if (isset($params[$modifier])) {
                 $query = $query->{$modifier}($params[$modifier]);
             }

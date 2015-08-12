@@ -21,19 +21,6 @@ class UserModel extends BaseModel
     protected static $objectClass = 'CUser';
 
     /**
-     * List of params that can modify query.
-     *
-     * @var array
-     */
-    protected static $queryModifiers = [
-        'sort',
-        'filter',
-        'navigation',
-        'select',
-        'keyBy',
-    ];
-
-    /**
      * Have groups been already fetched from DB?
      *
      * @var bool
