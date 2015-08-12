@@ -70,9 +70,10 @@ class ElementModelTest extends TestCase
     public function testGet()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getByID')->with(1)->once()->andReturn(m::self());
-        $bxObject->shouldReceive('getNextElement')->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getList')->withAnyArgs()->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getNextElement')->twice()->andReturn(m::self(), false);
         $bxObject->shouldReceive('getFields')->once()->andReturn([
+            'ID' => 1,
             'NAME' => 'John Doe',
         ]);
         $bxObject->shouldReceive('getProperties')->once()->andReturn([
@@ -86,6 +87,7 @@ class ElementModelTest extends TestCase
         $element = new TestElement(1);
 
         $expected = [
+            'ID' => 1,
             'NAME'       => 'John Doe',
             'PROPERTIES' => [
                 'FOO_PROPERTY' => [
@@ -97,7 +99,6 @@ class ElementModelTest extends TestCase
                 'FOO_PROPERTY' => 'bar',
             ],
         ];
-
         $this->assertEquals($expected, $element->get());
         $this->assertEquals($expected, $element->fields);
 
@@ -109,9 +110,10 @@ class ElementModelTest extends TestCase
     public function testRefresh()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getByID')->with(1)->twice()->andReturn(m::self());
-        $bxObject->shouldReceive('getNextElement')->twice()->andReturn(m::self());
+        $bxObject->shouldReceive('getList')->withAnyArgs()->twice()->andReturn(m::self());
+        $bxObject->shouldReceive('getNextElement')->times(4)->andReturn(m::self(), false, m::self(), false);
         $bxObject->shouldReceive('getFields')->twice()->andReturn([
+            'ID' => 1,
             'NAME' => 'John Doe',
         ]);
         $bxObject->shouldReceive('getProperties')->twice()->andReturn([
@@ -125,6 +127,7 @@ class ElementModelTest extends TestCase
         $element = new TestElement(1);
 
         $expected = [
+            'ID' => 1,
             'NAME'       => 'John Doe',
             'PROPERTIES' => [
                 'FOO_PROPERTY' => [

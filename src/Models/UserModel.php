@@ -141,7 +141,7 @@ class UserModel extends BaseModel
 
         $groupBackup = isset($this->fields['GROUP_ID']) ? $this->fields['GROUP_ID'] : null;
 
-        $this->fields = static::$bxObject->getByID($this->id)->fetch();
+        $this->fields = static::query()->getById($this->id)->fields;
 
         if ($groupBackup) {
             $this->fields['GROUP_ID'] = $groupBackup;

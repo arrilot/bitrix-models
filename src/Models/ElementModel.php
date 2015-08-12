@@ -98,16 +98,6 @@ class ElementModel extends BaseModel
      */
     protected function afterFill($fields)
     {
-        $this->setPropertyValuesFromProperties();
-    }
-
-    /**
-     * Set $this->fields['PROPERTY_VALUES'] from $this->fields['PROPERTIES'].
-     *
-     * @return void
-     */
-    protected function setPropertyValuesFromProperties()
-    {
         if (isset($this->fields['PROPERTY_VALUES'])) {
             $this->propsAreFetched = true;
 
@@ -190,10 +180,7 @@ class ElementModel extends BaseModel
 
         $sectionsBackup = isset($this->fields['IBLOCK_SECTION']) ? $this->fields['IBLOCK_SECTION'] : null;
 
-        $obElement = static::$bxObject->getByID($this->id)->getNextElement();
-        $this->fields = $obElement->getFields();
-        $this->fields['PROPERTIES'] = $obElement->getProperties();
-        $this->setPropertyValuesFromProperties();
+        $this->fields = static::query()->getById($this->id)->fields;
 
         if (!empty($sectionsBackup)) {
             $this->fields['IBLOCK_SECTION'] = $sectionsBackup;

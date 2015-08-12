@@ -88,7 +88,7 @@ class SectionModel extends BaseModel
             return  $this->fields = [];
         }
 
-        $this->fields = static::$bxObject->getByID($this->id)->fetch();
+        $this->fields = static::query()->getById($this->id)->fields;
 
         $this->fieldsAreFetched = true;
 
