@@ -85,7 +85,7 @@ abstract class BaseQuery
      */
     public function __construct($bxObject, $modelName)
     {
-        $this->object = $bxObject;
+        $this->bxObject = $bxObject;
         $this->modelName = $modelName;
         $this->model = new $modelName();
     }

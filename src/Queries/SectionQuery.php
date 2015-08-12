@@ -82,7 +82,7 @@ class SectionQuery extends BaseQuery
     public function getList()
     {
         $sections = [];
-        $rsSections = $this->object->getList(
+        $rsSections = $this->bxObject->getList(
             $this->sort,
             $this->normalizeFilter(),
             $this->countElements,
@@ -103,7 +103,7 @@ class SectionQuery extends BaseQuery
      */
     public function count()
     {
-        return $this->object->getCount($this->normalizeFilter());
+        return $this->bxObject->getCount($this->normalizeFilter());
     }
 
     /**

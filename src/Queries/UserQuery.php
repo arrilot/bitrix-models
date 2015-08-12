@@ -98,10 +98,10 @@ class UserQuery extends BaseQuery
         ];
 
         $users = [];
-        $rsUsers = $this->object->getList($this->sort, $sortOrder = false, $this->normalizeFilter(), $params);
+        $rsUsers = $this->bxObject->getList($this->sort, $sortOrder = false, $this->normalizeFilter(), $params);
         while ($arUser = $rsUsers->fetch()) {
             if ($this->groupsMustBeSelected()) {
-                $arUser['GROUP_ID'] = $this->object->getUserGroup($arUser['ID']);
+                $arUser['GROUP_ID'] = $this->bxObject->getUserGroup($arUser['ID']);
             }
 
             $this->addItemToResultsUsingKeyBy($users, new $this->modelName($arUser['ID'], $arUser));
@@ -117,7 +117,7 @@ class UserQuery extends BaseQuery
      */
     public function count()
     {
-        return $this->object->getList($order = 'ID', $by = 'ASC', $this->normalizeFilter(), [
+        return $this->bxObject->getList($order = 'ID', $by = 'ASC', $this->normalizeFilter(), [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,
             ],

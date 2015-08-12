@@ -176,7 +176,7 @@ class ElementQuery extends BaseQuery
     {
         $items = [];
 
-        $rsItems = $this->object->getList(
+        $rsItems = $this->bxObject->getList(
             $this->sort,
             $this->normalizeFilter(),
             $this->groupBy,
@@ -211,7 +211,7 @@ class ElementQuery extends BaseQuery
      */
     public function count()
     {
-        return $this->object->getList(false, $this->normalizeFilter(), []);
+        return $this->bxObject->getList(false, $this->normalizeFilter(), []);
     }
 
     /**
