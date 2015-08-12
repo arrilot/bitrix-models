@@ -299,7 +299,7 @@ class ElementModel extends BaseModel
 
         $fields = $this->normalizeFieldsForSave($selectedFields);
 
-        return static::$object->update($this->id, $fields);
+        return !empty($fields) ? static::$object->update($this->id, $fields) : true;
     }
 
     /**

@@ -169,20 +169,21 @@ class ElementModelTest extends TestCase
         $element->shouldReceive('get')->andReturn($fields);
         $element->fields = $fields;
 
-        $expected1 = [
-            'NAME'            => 'John Doe',
-            'PROPERTY_VALUES' => [
-                'FOO_PROPERTY' => 'bar',
-            ],
-        ];
-        $expected2 = [
-            'NAME' => 'John Doe',
-        ];
-        $object->shouldReceive('update')->with(1, $expected1)->once()->andReturn(true);
-        $object->shouldReceive('update')->with(1, $expected2)->once()->andReturn(true);
-
-        $this->assertTrue($element->save());
+        $object->shouldReceive('update')->with(1, ['NAME' => 'John Doe'])->once()->andReturn(true);
         $this->assertTrue($element->save(['NAME']));
+
+        $object->shouldReceive('setPropertyValues')
+            ->with(1, TestElement::iblockId(), ['FOO_PROPERTY' => 'bar'])
+            ->once()
+            ->andReturn(true);
+        $object->shouldReceive('update')->with(1, ['NAME' => 'John Doe'])->once()->andReturn(true);
+        $this->assertTrue($element->save());
+
+        $object->shouldReceive('setPropertyValuesEx')
+            ->with(1, TestElement::iblockId(), ['FOO_PROPERTY' => 'bar'])
+            ->once()
+            ->andReturn(true);
+        $this->assertTrue($element->save(['PROPERTY_VALUES.FOO_PROPERTY']));
     }
 
     public function testUpdate()
