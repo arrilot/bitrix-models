@@ -181,16 +181,16 @@ class ElementQueryTest extends TestCase
         }
     }
 
-    public function testLimit()
+    public function testLimitAndPage()
     {
         $bxObject = m::mock('object');
         TestElement::$bxObject = $bxObject;
-        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['NAME' => 'John','IBLOCK_ID' => 1], false, ['nPageSize' => 2], ['ID', 'NAME'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['NAME' => 'John','IBLOCK_ID' => 1], false, ['iNumPage' => 3,'nPageSize' => 2], ['ID', 'NAME'])->once()->andReturn(m::self());
         $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
         $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar']);
 
         $query = $this->createQuery($bxObject);
-        $items = $query->filter(['NAME' => 'John'])->limit(2)->select('ID', 'NAME')->getList();
+        $items = $query->filter(['NAME' => 'John'])->page(3)->limit(2)->select('ID', 'NAME')->getList();
 
         $expected = [
             ['ID' => 1, 'NAME' => 'foo'],

@@ -196,6 +196,19 @@ abstract class BaseQuery
     }
 
     /**
+     * Set the "page number" value of the query.
+     *
+     * @param  int  $num
+     * @return $this
+     */
+    public function page($num)
+    {
+        $this->navigation['iNumPage'] = $num;
+
+        return $this;
+    }
+
+    /**
      * Alias for "limit".
      *
      * @param  int  $value
