@@ -282,4 +282,75 @@ class ElementModel extends BaseModel
             ? $sectionModel::getById($fields['IBLOCK_SECTION_ID'])
             : new $sectionModel($fields['IBLOCK_SECTION_ID']);
     }
+
+    /**
+     * Save model to database.
+     *
+     * @param array $selectedFields save only these fields instead of all.
+     *
+     * @return bool
+     */
+    public function save($selectedFields = [])
+    {
+        $selectedFields = is_array($selectedFields) ? $selectedFields : func_get_args();
+
+        $selectedFields = $this->expandFieldsForSave($selectedFields);
+        $this->saveProps($selectedFields);
+
+        $fields = $this->normalizeFieldsForSave($selectedFields);
+
+        return static::$object->update($this->id, $fields);
+    }
+
+    /**
+     * Save selected props to database.
+     * If no $fields are set, save all props.
+     *
+     * @param $fields
+     *
+     * @return void
+     */
+    protected function saveProps($fields)
+    {
+        if (empty($fields)) {
+            static::$object->setPropertyValues(
+                $this->id,
+                static::iblockId(),
+                $this->fields['PROPERTY_VALUES']
+            );
+            return;
+        }
+
+        if (empty($fields['PROPERTY_VALUES'])) {
+            return;
+        }
+
+        static::$object->setPropertyValuesEx(
+            $this->id,
+            static::iblockId(),
+            array_intersect_key($this->fields['PROPERTY_VALUES'], $fields['PROPERTY_VALUES'])
+        );
+    }
+
+    /**
+     * Modify array from dot notation to real array.
+     *
+     * @param $selectedFields
+     *
+     * @return array
+     */
+    protected function expandFieldsForSave($selectedFields)
+    {
+        $saveOnly = [];
+        foreach ($selectedFields as $field) {
+            $explodedField = explode('.', $field);
+            if (isset($explodedField[1])) {
+                $saveOnly[$explodedField[0]][$explodedField[1]] = $explodedField[1];
+            } else {
+                $saveOnly[$field] = $field;
+            }
+        }
+
+        return $saveOnly;
+    }
 }

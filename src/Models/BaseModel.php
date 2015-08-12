@@ -253,8 +253,10 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      *
      * @return bool
      */
-    public function save(array $selectedFields = [])
+    public function save($selectedFields = [])
     {
+        $selectedFields = is_array($selectedFields) ? $selectedFields : func_get_args();
+
         $fields = $this->collectFieldsForSave($selectedFields);
 
         return static::$object->update($this->id, $fields);
@@ -267,7 +269,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
      *
      * @return array
      */
-    protected function collectFieldsForSave($selectedFields)
+    protected function normalizeFieldsForSave($selectedFields)
     {
         $fields = [];
         if ($this->fields === null) {
@@ -279,6 +281,7 @@ abstract class BaseModel implements ArrayAccess, IteratorAggregate
             'IBLOCK_ID',
             'PROPERTIES',
             'GROUPS',
+            'PROPERTY_VALUES'
         ];
 
         foreach ($this->fields as $field => $value) {
