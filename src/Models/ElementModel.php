@@ -222,7 +222,6 @@ class ElementModel extends BaseModel
     {
         $selectedFields = is_array($selectedFields) ? $selectedFields : func_get_args();
 
-        $selectedFields = $this->expandFieldsForSave($selectedFields);
         $this->saveProps($selectedFields);
 
         $fields = $this->normalizeFieldsForSave($selectedFields);
@@ -231,55 +230,26 @@ class ElementModel extends BaseModel
     }
 
     /**
-     * Save selected props to database.
-     * If no $fields are set, save all props.
+     * Save props to database.
+     * If selected is not empty then only props from it are saved.
      *
-     * @param $fields
+     * @param array $selected
      *
-     * @return void
+     * @return null
      */
-    protected function saveProps($fields)
+    public function saveProps($selected = [])
     {
-        if (empty($fields)) {
-            static::$bxObject->setPropertyValues(
-                $this->id,
-                static::iblockId(),
-                $this->fields['PROPERTY_VALUES']
-            );
+        $propertyValues = $this->constructPropertyValuesForSave($selected);
+        if (empty($propertyValues)) {
             return;
         }
 
-        if (empty($fields['PROPERTY_VALUES'])) {
-            return;
-        }
-
-        static::$bxObject->setPropertyValuesEx(
+        $bxMethod = empty($selected) ? "setPropertyValues" : "setPropertyValuesEx";
+        static::$bxObject->$bxMethod(
             $this->id,
             static::iblockId(),
-            array_intersect_key($this->fields['PROPERTY_VALUES'], $fields['PROPERTY_VALUES'])
+            $propertyValues
         );
-    }
-
-    /**
-     * Modify array from dot notation to real array.
-     *
-     * @param $selectedFields
-     *
-     * @return array
-     */
-    protected function expandFieldsForSave($selectedFields)
-    {
-        $saveOnly = [];
-        foreach ($selectedFields as $field) {
-            $explodedField = explode('.', $field);
-            if (isset($explodedField[1])) {
-                $saveOnly[$explodedField[0]][$explodedField[1]] = $explodedField[1];
-            } else {
-                $saveOnly[$field] = $field;
-            }
-        }
-
-        return $saveOnly;
     }
 
     /**
@@ -300,5 +270,31 @@ class ElementModel extends BaseModel
             $this->fields['~PROPERTY_'.$code.'_DESCRIPTION'] = $prop['~DESCRIPTION'];
             $this->fields['PROPERTY_'.$code.'_VALUE_ID'] = $prop['PROPERTY_VALUE_ID'];
         }
+    }
+
+    /**
+     * Construct 'PROPERTY_VALUES' => [...] from flat fields array.
+     * This is used in save.
+     * If $selectedFields are specified only those are saved.
+     *
+     * @param $selectedFields
+     *
+     * @return array
+     */
+    protected function constructPropertyValuesForSave($selectedFields = [])
+    {
+        $propertyValues = [];
+        $saveOnlySelected = !empty($selectedFields);
+        foreach ($this->fields as $code => $value) {
+            if ($saveOnlySelected && !in_array($code, $selectedFields)) {
+                continue;
+            }
+
+            if (preg_match('/^PROPERTY_(.*)_VALUE$/', $code, $matches) && !empty($matches[1])) {
+                $propertyValues[$matches[1]] = $value;
+            }
+        }
+
+        return $propertyValues;
     }
 }

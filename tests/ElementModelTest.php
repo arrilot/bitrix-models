@@ -172,48 +172,47 @@ class ElementModelTest extends TestCase
         TestElement::$bxObject = $bxObject;
         $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get]', [1]);
         $fields = [
-            'ID'              => 1,
-            'IBLOCK_ID'       => 1,
-            'NAME'            => 'John Doe',
-            'PROPERTIES'      => [
-                'FOO_PROPERTY' => [
-                    'VALUE'       => 'bar',
-                    'DESCRIPTION' => 'baz',
-                ],
-            ],
-            'PROPERTY_VALUES' => [
-                'FOO_PROPERTY' => 'bar',
-            ],
+            'ID'                        => 1,
+            'IBLOCK_ID'                 => 1,
+            'NAME'                      => 'John Doe',
+            'PROPERTY_FOO_VALUE'        => 'bar',
+            '~PROPERTY_FOO_VALUE'       => '~bar',
+            'PROPERTY_FOO_DESCRIPTION'  => 'baz',
+            '~PROPERTY_FOO_DESCRIPTION' => '~baz',
+            'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
         ];
         $element->shouldReceive('get')->andReturn($fields);
         $element->fields = $fields;
 
+        // 1
         $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'])->once()->andReturn(true);
         $this->assertTrue($element->save(['NAME']));
 
         $bxObject->shouldReceive('setPropertyValues')
-            ->with(1, TestElement::iblockId(), ['FOO_PROPERTY' => 'bar'])
+            ->with(1, TestElement::iblockId(), ['FOO' => 'bar'])
             ->once()
             ->andReturn(true);
+
         $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'])->once()->andReturn(true);
         $this->assertTrue($element->save());
 
+        // 2
         $bxObject->shouldReceive('setPropertyValuesEx')
-            ->with(1, TestElement::iblockId(), ['FOO_PROPERTY' => 'bar'])
+            ->with(1, TestElement::iblockId(), ['FOO' => 'bar'])
             ->once()
             ->andReturn(true);
-        $this->assertTrue($element->save(['PROPERTY_VALUES.FOO_PROPERTY']));
+        $this->assertTrue($element->save(['PROPERTY_FOO_VALUE']));
     }
 
     public function testUpdate()
     {
         $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[save]', [1]);
-        $element->shouldReceive('save')->with(['NAME', 'PROPS.FOO', 'PROPS.FOO2'])->andReturn(true);
+        $element->shouldReceive('save')->with(['NAME', 'PROPERTY_FOO_VALUE', 'PROPERTY_FOO2_VALUE'])->andReturn(true);
 
-        $this->assertTrue($element->update(['NAME' => 'John Doe', 'PROPS.FOO' => 'bar', 'PROPS.FOO2' => 'baz']));
+        $this->assertTrue($element->update(['NAME' => 'John Doe', 'PROPERTY_FOO_VALUE' => 'bar', 'PROPERTY_FOO2_VALUE' => 'baz']));
         $this->assertSame('John Doe', $element->fields['NAME']);
-        $this->assertSame('bar', $element->fields['PROPS']['FOO']);
-        $this->assertSame('baz', $element->fields['PROPS']['FOO2']);
+        $this->assertSame('bar', $element->fields['PROPERTY_FOO_VALUE']);
+        $this->assertSame('baz', $element->fields['PROPERTY_FOO2_VALUE']);
     }
 
     public function testCreate()
@@ -240,7 +239,6 @@ class ElementModelTest extends TestCase
         $elements = TestElement::getlist([
             'select'       => ['ID', 'IBLOCK_ID'],
             'filter'       => ['ACTIVE' => 'Y'],
-            'withoutProps' => true,
         ]);
 
         $expected = [

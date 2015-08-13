@@ -311,6 +311,11 @@ abstract class BaseModel implements ArrayAccess, Arrayable, Jsonable, IteratorAg
                 continue;
             }
 
+            // skip props
+            if (substr($field, 0, 9) === 'PROPERTY_') {
+                continue;
+            }
+
             $fields[$field] = $value;
         }
 
