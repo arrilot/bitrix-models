@@ -292,7 +292,7 @@ abstract class BaseModel implements ArrayAccess, Arrayable, Jsonable, IteratorAg
             'IBLOCK_ID',
             'PROPERTIES',
             'GROUPS',
-            'PROPERTY_VALUES'
+            'PROPERTY_VALUES',
         ];
 
         foreach ($this->fields as $field => $value) {

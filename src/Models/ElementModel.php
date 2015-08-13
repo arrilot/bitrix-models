@@ -244,7 +244,7 @@ class ElementModel extends BaseModel
             return;
         }
 
-        $bxMethod = empty($selected) ? "setPropertyValues" : "setPropertyValuesEx";
+        $bxMethod = empty($selected) ? 'setPropertyValues' : 'setPropertyValuesEx';
         static::$bxObject->$bxMethod(
             $this->id,
             static::iblockId(),

@@ -81,7 +81,7 @@ class UserQuery extends BaseQuery
         'TIME_ZONE',
         'PASSWORD',
         'CHECKWORD',
-        'LID'
+        'LID',
     ];
 
     /**
@@ -131,7 +131,7 @@ class UserQuery extends BaseQuery
      */
     protected function groupsMustBeSelected()
     {
-        return in_array('GROUPS', $this->select) || in_array('GROUP_ID', $this->select)|| in_array('GROUPS_ID', $this->select);
+        return in_array('GROUPS', $this->select) || in_array('GROUP_ID', $this->select) || in_array('GROUPS_ID', $this->select);
     }
 
     /**

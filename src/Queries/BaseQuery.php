@@ -147,7 +147,6 @@ abstract class BaseQuery
      * @param $filters
      *
      * @return $this
-     *
      */
     public function addFilter($filters)
     {
@@ -203,7 +202,8 @@ abstract class BaseQuery
     /**
      * Set the "limit" value of the query.
      *
-     * @param  int  $value
+     * @param int $value
+     *
      * @return $this
      */
     public function limit($value)
@@ -216,7 +216,8 @@ abstract class BaseQuery
     /**
      * Set the "page number" value of the query.
      *
-     * @param  int  $num
+     * @param int $num
+     *
      * @return $this
      */
     public function page($num)
@@ -229,7 +230,8 @@ abstract class BaseQuery
     /**
      * Alias for "limit".
      *
-     * @param  int  $value
+     * @param int $value
+     *
      * @return $this
      */
     public function take($value)
