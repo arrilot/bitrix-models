@@ -139,6 +139,12 @@ foreach ($products as $id => $product) {
 }
 ```
 
+`getList` возвращает инстанс `Illuminate\Support\Collection` с котором как видно можно во многом обращатся как с массивом
+```php
+$products->toArray()
+```
+преобразует коллекцию в обычный массив. При этом для каждого элемента коллекции будет тоже вызван `->toArray()`
+
 ### "Fluent API" для запросов.
 
 Для `getById`, `getList` и `count` можно также использовать fluent API.

@@ -5,6 +5,7 @@ namespace Arrilot\BitrixModels\Queries;
 use Arrilot\BitrixModels\Models\ElementModel;
 use CIBlock;
 use Exception;
+use Illuminate\Support\Collection;
 
 /**
  * @method UserQuery active()
@@ -170,7 +171,7 @@ class ElementQuery extends BaseQuery
     /**
      * Get list of items.
      *
-     * @return ElementModel[]
+     * @return Collection
      */
     public function getList()
     {
@@ -201,7 +202,7 @@ class ElementQuery extends BaseQuery
             }
         }
 
-        return $items;
+        return new Collection($items);
     }
 
     /**

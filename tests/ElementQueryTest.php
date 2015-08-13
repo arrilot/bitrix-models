@@ -77,12 +77,12 @@ class ElementQueryTest extends TestCase
         $items = $query->filter(['ACTIVE' => 'N'])->keyBy(false)->select('ID', 'NAME')->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo'],
-            ['ID' => 2, 'NAME' => 'bar'],
+            ['ID' => 1, 'NAME' => 'foo', 'ACCESSOR_THREE' => []],
+            ['ID' => 2, 'NAME' => 'bar', 'ACCESSOR_THREE' => []],
         ];
-        foreach ($items as $k => $item) {
-            $this->assertSame($expected[$k], $item->fields);
-        }
+
+        $this->assertSame($expected, $items->toArray());
+        $this->assertSame(json_encode($expected), $items->toJson());
 
         $bxObject = m::mock('object');
         $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME'])->once()->andReturn(m::self());

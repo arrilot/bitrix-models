@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Models\SectionModel;
+use Illuminate\Support\Collection;
 
 /**
  * @method SectionQuery active()
@@ -77,7 +78,7 @@ class SectionQuery extends BaseQuery
     /**
      * CIBlockSection::getList substitution.
      *
-     * @return SectionModel[]
+     * @return Collection
      */
     public function getList()
     {
@@ -93,7 +94,7 @@ class SectionQuery extends BaseQuery
             $this->addItemToResultsUsingKeyBy($sections, new $this->modelName($arSection['ID'], $arSection));
         }
 
-        return $sections;
+        return new Collection($sections);
     }
 
     /**

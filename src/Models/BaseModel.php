@@ -6,9 +6,11 @@ use ArrayAccess;
 use ArrayIterator;
 use Arrilot\BitrixModels\Queries\BaseQuery;
 use Exception;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use IteratorAggregate;
 
-abstract class BaseModel implements ArrayAccess, IteratorAggregate
+abstract class BaseModel implements ArrayAccess, Arrayable, Jsonable, IteratorAggregate
 {
     /**
      * ID of the model.

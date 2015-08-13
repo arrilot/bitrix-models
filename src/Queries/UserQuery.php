@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Models\UserModel;
+use Illuminate\Support\Collection;
 
 /**
  * @method UserQuery fromGroup($groupId)
@@ -87,7 +88,7 @@ class UserQuery extends BaseQuery
     /**
      * CUser::getList substitution.
      *
-     * @return UserModel[]
+     * @return Collection
      */
     public function getList()
     {
@@ -107,7 +108,7 @@ class UserQuery extends BaseQuery
             $this->addItemToResultsUsingKeyBy($users, new $this->modelName($arUser['ID'], $arUser));
         }
 
-        return $users;
+        return new Collection($users);
     }
 
     /**
