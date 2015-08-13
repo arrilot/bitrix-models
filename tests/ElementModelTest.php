@@ -73,15 +73,15 @@ class ElementModelTest extends TestCase
         $bxObject->shouldReceive('getList')->withAnyArgs()->once()->andReturn(m::self());
         $bxObject->shouldReceive('getNextElement')->twice()->andReturn(m::self(), false);
         $bxObject->shouldReceive('getFields')->once()->andReturn([
-            'ID' => 1,
+            'ID'   => 1,
             'NAME' => 'John Doe',
         ]);
         $bxObject->shouldReceive('getProperties')->once()->andReturn([
             'FOO' => [
-                'VALUE'       => 'bar',
-                '~VALUE'      => '~bar',
-                'DESCRIPTION' => 'baz',
-                '~DESCRIPTION' => '~baz',
+                'VALUE'             => 'bar',
+                '~VALUE'            => '~bar',
+                'DESCRIPTION'       => 'baz',
+                '~DESCRIPTION'      => '~baz',
                 'PROPERTY_VALUE_ID' => 'bar_id',
             ],
         ]);
@@ -90,14 +90,14 @@ class ElementModelTest extends TestCase
         $element = new TestElement(1);
 
         $expected = [
-            'ID' => 1,
+            'ID'         => 1,
             'NAME'       => 'John Doe',
             'PROPERTIES' => [
                 'FOO' => [
-                    'VALUE'       => 'bar',
-                    '~VALUE'      => '~bar',
-                    'DESCRIPTION' => 'baz',
-                    '~DESCRIPTION' => '~baz',
+                    'VALUE'             => 'bar',
+                    '~VALUE'            => '~bar',
+                    'DESCRIPTION'       => 'baz',
+                    '~DESCRIPTION'      => '~baz',
                     'PROPERTY_VALUE_ID' => 'bar_id',
                 ],
             ],
@@ -121,15 +121,15 @@ class ElementModelTest extends TestCase
         $bxObject->shouldReceive('getList')->withAnyArgs()->twice()->andReturn(m::self());
         $bxObject->shouldReceive('getNextElement')->times(4)->andReturn(m::self(), false, m::self(), false);
         $bxObject->shouldReceive('getFields')->twice()->andReturn([
-            'ID' => 1,
+            'ID'   => 1,
             'NAME' => 'John Doe',
         ]);
         $bxObject->shouldReceive('getProperties')->twice()->andReturn([
             'FOO' => [
-                'VALUE'       => 'bar',
-                '~VALUE'      => '~bar',
-                'DESCRIPTION' => 'baz',
-                '~DESCRIPTION' => '~baz',
+                'VALUE'             => 'bar',
+                '~VALUE'            => '~bar',
+                'DESCRIPTION'       => 'baz',
+                '~DESCRIPTION'      => '~baz',
                 'PROPERTY_VALUE_ID' => 'bar_id',
             ],
         ]);
@@ -138,14 +138,14 @@ class ElementModelTest extends TestCase
         $element = new TestElement(1);
 
         $expected = [
-            'ID' => 1,
+            'ID'         => 1,
             'NAME'       => 'John Doe',
             'PROPERTIES' => [
                 'FOO' => [
-                    'VALUE'       => 'bar',
-                    '~VALUE'      => '~bar',
-                    'DESCRIPTION' => 'baz',
-                    '~DESCRIPTION' => '~baz',
+                    'VALUE'             => 'bar',
+                    '~VALUE'            => '~bar',
+                    'DESCRIPTION'       => 'baz',
+                    '~DESCRIPTION'      => '~baz',
                     'PROPERTY_VALUE_ID' => 'bar_id',
                 ],
             ],
