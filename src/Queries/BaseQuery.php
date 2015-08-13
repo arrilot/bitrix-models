@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use BadMethodCallException;
+use Illuminate\Support\Collection;
 
 abstract class BaseQuery
 {
@@ -73,7 +74,7 @@ abstract class BaseQuery
     /**
      * Get list of items.
      *
-     * @return array
+     * @return Collection
      */
     abstract public function getList();
 
@@ -133,9 +134,26 @@ abstract class BaseQuery
      *
      * @return $this
      */
-    public function filter(array $filter = [])
+    public function filter($filter)
     {
         $this->filter = $filter;
+
+        return $this;
+    }
+
+    /**
+     * Add another to filter to filters array.
+     *
+     * @param $filters
+     *
+     * @return $this
+     *
+     */
+    public function addFilter($filters)
+    {
+        foreach ($filters as $field => $value) {
+            $this->filter[$field] = $value;
+        }
 
         return $this;
     }

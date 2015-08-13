@@ -50,12 +50,12 @@ class ElementQueryTest extends TestCase
     {
         $bxObject = m::mock('object');
         TestElement::$bxObject = $bxObject;
-        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', '!CODE' => false, 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME'])->once()->andReturn(m::self());
         $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
         $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar']);
 
         $query = $this->createQuery($bxObject);
-        $items = $query->filter(['ACTIVE' => 'N'])->select('ID', 'NAME')->getList();
+        $items = $query->filter(['ACTIVE' => 'N'])->addFilter(['!CODE' => false])->select('ID', 'NAME')->getList();
 
         $expected = [
             ['ID' => 1, 'NAME' => 'foo'],

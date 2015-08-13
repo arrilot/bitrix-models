@@ -2,7 +2,6 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
-use Arrilot\BitrixModels\Models\UserModel;
 use Illuminate\Support\Collection;
 
 /**
