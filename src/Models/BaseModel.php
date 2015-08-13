@@ -318,8 +318,8 @@ abstract class BaseModel implements ArrayAccess, Arrayable, Jsonable, IteratorAg
      * Determine whether the field should be stopped from passing to "update".
      *
      * @param string $field
-     * @param mixed $value
-     * @param array $selectedFields
+     * @param mixed  $value
+     * @param array  $selectedFields
      *
      * @return bool
      */
