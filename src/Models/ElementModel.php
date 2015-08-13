@@ -212,24 +212,6 @@ class ElementModel extends BaseModel
     }
 
     /**
-     * Save model to database.
-     *
-     * @param array $selectedFields save only these fields instead of all.
-     *
-     * @return bool
-     */
-    public function save($selectedFields = [])
-    {
-        $selectedFields = is_array($selectedFields) ? $selectedFields : func_get_args();
-
-        $this->saveProps($selectedFields);
-
-        $fields = $this->normalizeFieldsForSave($selectedFields);
-
-        return !empty($fields) ? static::$bxObject->update($this->id, $fields) : true;
-    }
-
-    /**
      * Save props to database.
      * If selected is not empty then only props from it are saved.
      *

@@ -48,6 +48,20 @@ abstract class BaseModel implements ArrayAccess, Arrayable, Jsonable, IteratorAg
     protected static $additionalQueryModifiers = [];
 
     /**
+     * Refresh model from database and place data to $this->fields.
+     *
+     * @return array
+     */
+    abstract public function refresh();
+
+    /**
+     * Refresh model fields from database and place them to $this->fields.
+     *
+     * @return array
+     */
+    abstract public function refreshFields();
+
+    /**
      * Constructor.
      *
      * @param $id
@@ -268,6 +282,10 @@ abstract class BaseModel implements ArrayAccess, Arrayable, Jsonable, IteratorAg
     {
         $selectedFields = is_array($selectedFields) ? $selectedFields : func_get_args();
 
+        if (method_exists($this, 'saveProps')) {
+            $this->saveProps($selectedFields);
+        }
+
         $fields = $this->normalizeFieldsForSave($selectedFields);
 
         return !empty($fields) ? static::$bxObject->update($this->id, $fields) : true;
@@ -287,6 +305,26 @@ abstract class BaseModel implements ArrayAccess, Arrayable, Jsonable, IteratorAg
             return $fields;
         }
 
+        foreach ($this->fields as $field => $value) {
+            if (!$this->fieldShouldNotBeSaved($field, $value, $selectedFields)) {
+                $fields[$field] = $value;
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Determine whether the field should be stopped from passing to "update".
+     *
+     * @param string $field
+     * @param mixed $value
+     * @param array $selectedFields
+     *
+     * @return bool
+     */
+    protected function fieldShouldNotBeSaved($field, $value, $selectedFields)
+    {
         $blacklistedFields = [
             'ID',
             'IBLOCK_ID',
@@ -295,31 +333,10 @@ abstract class BaseModel implements ArrayAccess, Arrayable, Jsonable, IteratorAg
             'PROPERTY_VALUES',
         ];
 
-        foreach ($this->fields as $field => $value) {
-            // skip if it is not in selected fields
-            if ($selectedFields && !in_array($field, $selectedFields)) {
-                continue;
-            }
-
-            // skip blacklisted fields
-            if (in_array($field, $blacklistedFields)) {
-                continue;
-            }
-
-            // skip trash fields
-            if (substr($field, 0, 1) === '~') {
-                continue;
-            }
-
-            // skip props
-            if (substr($field, 0, 9) === 'PROPERTY_') {
-                continue;
-            }
-
-            $fields[$field] = $value;
-        }
-
-        return $fields;
+        return ($selectedFields && !in_array($field, $selectedFields))
+            || in_array($field, $blacklistedFields)
+            || (substr($field, 0, 1) === '~')
+            || (substr($field, 0, 9) === 'PROPERTY_');
     }
 
     /**
@@ -487,18 +504,4 @@ abstract class BaseModel implements ArrayAccess, Arrayable, Jsonable, IteratorAg
 
         return $query;
     }
-
-    /**
-     * Refresh model from database and place data to $this->fields.
-     *
-     * @return array
-     */
-    abstract public function refresh();
-
-    /**
-     * Refresh model fields from database and place them to $this->fields.
-     *
-     * @return array
-     */
-    abstract public function refreshFields();
 }
