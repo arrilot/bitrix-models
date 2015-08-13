@@ -154,8 +154,8 @@ class ElementQueryTest extends TestCase
         $items = $query->filter(['ACTIVE' => 'N'])->select('ID', 'NAME', 'PROPERTY_GUID')->fetchUsing('getNext')->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo', 'PROPERTY_VALUES' => ['GUID' => 'foo']],
-            ['ID' => 2, 'NAME' => 'bar', 'PROPERTY_VALUES' => ['GUID' => '']],
+            ['ID' => 1, 'NAME' => 'foo', 'PROPERTY_GUID_VALUE' => 'foo'],
+            ['ID' => 2, 'NAME' => 'bar', 'PROPERTY_GUID_VALUE' => ''],
         ];
         foreach ($items as $k => $item) {
             $this->assertSame($expected[$k], $item->fields);

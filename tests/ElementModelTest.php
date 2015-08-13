@@ -77,9 +77,12 @@ class ElementModelTest extends TestCase
             'NAME' => 'John Doe',
         ]);
         $bxObject->shouldReceive('getProperties')->once()->andReturn([
-            'FOO_PROPERTY' => [
+            'FOO' => [
                 'VALUE'       => 'bar',
+                '~VALUE'      => '~bar',
                 'DESCRIPTION' => 'baz',
+                '~DESCRIPTION' => '~baz',
+                'PROPERTY_VALUE_ID' => 'bar_id',
             ],
         ]);
 
@@ -90,14 +93,19 @@ class ElementModelTest extends TestCase
             'ID' => 1,
             'NAME'       => 'John Doe',
             'PROPERTIES' => [
-                'FOO_PROPERTY' => [
+                'FOO' => [
                     'VALUE'       => 'bar',
+                    '~VALUE'      => '~bar',
                     'DESCRIPTION' => 'baz',
+                    '~DESCRIPTION' => '~baz',
+                    'PROPERTY_VALUE_ID' => 'bar_id',
                 ],
             ],
-            'PROPERTY_VALUES' => [
-                'FOO_PROPERTY' => 'bar',
-            ],
+            'PROPERTY_FOO_VALUE'        => 'bar',
+            '~PROPERTY_FOO_VALUE'       => '~bar',
+            'PROPERTY_FOO_DESCRIPTION'  => 'baz',
+            '~PROPERTY_FOO_DESCRIPTION' => '~baz',
+            'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
         ];
         $this->assertEquals($expected, $element->get());
         $this->assertEquals($expected, $element->fields);
@@ -117,9 +125,12 @@ class ElementModelTest extends TestCase
             'NAME' => 'John Doe',
         ]);
         $bxObject->shouldReceive('getProperties')->twice()->andReturn([
-            'FOO_PROPERTY' => [
+            'FOO' => [
                 'VALUE'       => 'bar',
+                '~VALUE'      => '~bar',
                 'DESCRIPTION' => 'baz',
+                '~DESCRIPTION' => '~baz',
+                'PROPERTY_VALUE_ID' => 'bar_id',
             ],
         ]);
 
@@ -130,14 +141,19 @@ class ElementModelTest extends TestCase
             'ID' => 1,
             'NAME'       => 'John Doe',
             'PROPERTIES' => [
-                'FOO_PROPERTY' => [
+                'FOO' => [
                     'VALUE'       => 'bar',
+                    '~VALUE'      => '~bar',
                     'DESCRIPTION' => 'baz',
+                    '~DESCRIPTION' => '~baz',
+                    'PROPERTY_VALUE_ID' => 'bar_id',
                 ],
             ],
-            'PROPERTY_VALUES' => [
-                'FOO_PROPERTY' => 'bar',
-            ],
+            'PROPERTY_FOO_VALUE'        => 'bar',
+            '~PROPERTY_FOO_VALUE'       => '~bar',
+            'PROPERTY_FOO_DESCRIPTION'  => 'baz',
+            '~PROPERTY_FOO_DESCRIPTION' => '~baz',
+            'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
         ];
 
         $element->refresh();

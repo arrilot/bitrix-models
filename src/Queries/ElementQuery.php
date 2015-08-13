@@ -171,7 +171,6 @@ class ElementQuery extends BaseQuery
 
         if ($this->shouldBeFetchedUsingGetNext()) {
             while ($arItem = $rsItems->getNext()) {
-                $this->setPropertyValues($arItem);
                 $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
             }
         } else {
@@ -179,7 +178,7 @@ class ElementQuery extends BaseQuery
                 $arItem = $obItem->getFields();
                 if ($this->propsMustBeSelected()) {
                     $arItem['PROPERTIES'] = $obItem->getProperties();
-                    $this->setPropertyValues($arItem);
+                    $this->normalizePropertyResultFormat($arItem);
                 }
 
                 $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
@@ -200,44 +199,24 @@ class ElementQuery extends BaseQuery
     }
 
     /**
-     * Set $field['PROPERTY_VALUES'] from $field['PROPERTIES'].
+     * Normalize properties's format converting it to 'PROPERTY_"CODE"_VALUE'.
      *
      * @param array $fields
      *
      * @return null
      */
-    protected function setPropertyValues(&$fields)
+    protected function normalizePropertyResultFormat(&$fields)
     {
-        if (!empty($fields['PROPERTIES'])) {
-            foreach ($fields['PROPERTIES'] as $code => $prop) {
-                $fields['PROPERTY_VALUES'][$code] = $prop['VALUE'];
-            }
-
+        if (empty($fields['PROPERTIES'])) {
             return;
         }
 
-        $propertyValues = [];
-        foreach ($fields as $code => $value) {
-            if (preg_match('/^PROPERTY_(.*)_VALUE$/', $code, $matches) && !empty($matches[1])) {
-                $propertyValues[$matches[1]] = $value;
-                $garbagePropertyFields = [
-                    'PROPERTY_'.$matches[1].'_VALUE',
-                    '~PROPERTY_'.$matches[1].'_VALUE',
-                    'PROPERTY_'.$matches[1].'_VALUE_ID',
-                    '~PROPERTY_'.$matches[1].'_VALUE_ID',
-                    'PROPERTY_'.$matches[1].'_PROPERTY_VALUE_ID',
-                    '~PROPERTY_'.$matches[1].'_PROPERTY_VALUE_ID',
-                    'PROPERTY_'.$matches[1].'_DESCRIPTION',
-                    '~PROPERTY_'.$matches[1].'_DESCRIPTION',
-                ];
-                foreach ($garbagePropertyFields as $key) {
-                    unset($fields[$key]);
-                }
-            }
-        }
-
-        if (!empty($propertyValues)) {
-            $fields['PROPERTY_VALUES'] = $propertyValues;
+        foreach ($fields['PROPERTIES'] as $code => $prop) {
+            $fields['PROPERTY_'.$code.'_VALUE'] = $prop['VALUE'];
+            $fields['~PROPERTY_'.$code.'_VALUE'] = $prop['~VALUE'];
+            $fields['PROPERTY_'.$code.'_DESCRIPTION'] = $prop['DESCRIPTION'];
+            $fields['~PROPERTY_'.$code.'_DESCRIPTION'] = $prop['~DESCRIPTION'];
+            $fields['PROPERTY_'.$code.'_VALUE_ID'] = $prop['PROPERTY_VALUE_ID'];
         }
     }
 

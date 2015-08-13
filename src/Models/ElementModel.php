@@ -32,13 +32,6 @@ class ElementModel extends BaseModel
     ];
 
     /**
-     * Have props been already fetched from DB?
-     *
-     * @var bool
-     */
-    protected $propsAreFetched = false;
-
-    /**
      * Have sections been already fetched from DB?
      *
      * @var bool
@@ -92,27 +85,11 @@ class ElementModel extends BaseModel
     /**
      * Fill extra fields when $this->field is called.
      *
-     * @param $fields
-     *
      * @return null
      */
-    protected function afterFill($fields)
+    protected function afterFill()
     {
-        if (isset($this->fields['PROPERTY_VALUES'])) {
-            $this->propsAreFetched = true;
-
-            return;
-        }
-
-        if (empty($this->fields) || empty($this->fields['PROPERTIES'])) {
-            return;
-        }
-
-        foreach ($this->fields['PROPERTIES'] as $code => $prop) {
-            $this->fields['PROPERTY_VALUES'][$code] = $prop['VALUE'];
-        }
-
-        $this->propsAreFetched = true;
+        $this->normalizePropertyFormat();
     }
 
     /**
@@ -124,23 +101,7 @@ class ElementModel extends BaseModel
     {
         $this->getFields();
 
-        $this->getProps();
-
         return $this->fields;
-    }
-
-    /**
-     * Get element's props from cache or database.
-     *
-     * @return array
-     */
-    public function getProps()
-    {
-        if ($this->propsAreFetched) {
-            return $this->fields['PROPERTY_VALUES'];
-        }
-
-        return $this->refreshProps();
     }
 
     /**
@@ -187,23 +148,8 @@ class ElementModel extends BaseModel
         }
 
         $this->fieldsAreFetched = true;
-        $this->propsAreFetched = true;
 
         return $this->fields;
-    }
-
-    /**
-     * Refresh element's fields and save them to a class field.
-     *
-     * @return array
-     */
-    public function refreshProps()
-    {
-        // Refresh fields as long as we can't actually refresh props
-        // without refreshing the fields
-        $this->refreshFields();
-
-        return $this->fields['PROPERTY_VALUES'];
     }
 
     /**
@@ -334,5 +280,25 @@ class ElementModel extends BaseModel
         }
 
         return $saveOnly;
+    }
+
+    /**
+     * Normalize properties's format converting it to 'PROPERTY_"CODE"_VALUE'.
+     *
+     * @return null
+     */
+    protected function normalizePropertyFormat()
+    {
+        if (empty($this->fields['PROPERTIES'])) {
+            return;
+        }
+
+        foreach ($this->fields['PROPERTIES'] as $code => $prop) {
+            $this->fields['PROPERTY_'.$code.'_VALUE'] = $prop['VALUE'];
+            $this->fields['~PROPERTY_'.$code.'_VALUE'] = $prop['~VALUE'];
+            $this->fields['PROPERTY_'.$code.'_DESCRIPTION'] = $prop['DESCRIPTION'];
+            $this->fields['~PROPERTY_'.$code.'_DESCRIPTION'] = $prop['~DESCRIPTION'];
+            $this->fields['PROPERTY_'.$code.'_VALUE_ID'] = $prop['PROPERTY_VALUE_ID'];
+        }
     }
 }

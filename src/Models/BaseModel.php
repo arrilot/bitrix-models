@@ -113,7 +113,7 @@ abstract class BaseModel implements ArrayAccess, Arrayable, Jsonable, IteratorAg
         $this->fieldsAreFetched = true;
 
         if (method_exists($this, 'afterFill')) {
-            $this->afterFill($fields);
+            $this->afterFill();
         }
     }
 

@@ -60,13 +60,11 @@ class UserModel extends BaseModel
     /**
      * Fill extra fields when $this->field is called.
      *
-     * @param $fields
-     *
      * @return null
      */
-    protected function afterFill($fields)
+    protected function afterFill()
     {
-        if (isset($fields['GROUP_ID']) && is_array(['GROUP_ID'])) {
+        if (isset($this->fields['GROUP_ID']) && is_array(['GROUP_ID'])) {
             $this->groupsAreFetched = true;
         }
     }
