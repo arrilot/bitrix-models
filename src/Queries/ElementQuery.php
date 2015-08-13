@@ -139,21 +139,6 @@ class ElementQuery extends BaseQuery
     }
 
     /**
-     * Setter for filter.
-     *
-     * @param array $filter
-     *
-     * @return $this
-     */
-    public function filter(array $filter = [])
-    {
-        $this->filter = $filter;
-        $this->filter['IBLOCK_ID'] = $this->iblockId;
-
-        return $this;
-    }
-
-    /**
      * Setter for fetchUsing.
      *
      * @param string $fetchUsing
