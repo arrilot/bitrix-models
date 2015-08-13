@@ -11,6 +11,13 @@ use IteratorAggregate;
 abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, IteratorAggregate
 {
     /**
+     * ID of the model.
+     *
+     * @var null|int
+     */
+    public $id;
+
+    /**
      * Array of model fields.
      *
      * @var null|array
