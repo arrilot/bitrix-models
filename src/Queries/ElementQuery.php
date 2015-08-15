@@ -4,10 +4,11 @@ namespace Arrilot\BitrixModels\Queries;
 
 use CIBlock;
 use Exception;
-use Illuminate\Support\Collection;
+use Arrilot\BitrixModels\Collection;
 
 /**
- * @method UserQuery active()
+ * @method ElementQuery active()
+ * @method ElementQuery sortByDate(string $sort = 'desc')
  */
 class ElementQuery extends BaseQuery
 {

@@ -83,6 +83,19 @@ class ElementModel extends BaseModel
     }
 
     /**
+     * Scope to sort by date.
+     *
+     * @param ElementQuery $query
+     * @param string       $sort
+     *
+     * @return ElementQuery
+     */
+    public function scopeSortByDate($query, $sort = 'DESC')
+    {
+        return $query->sort(['ACTIVE_FROM' => $sort]);
+    }
+
+    /**
      * Fill extra fields when $this->field is called.
      *
      * @return null

@@ -2,7 +2,7 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
-use Illuminate\Support\Collection;
+use Arrilot\BitrixModels\Collection;
 
 /**
  * @method SectionQuery active()
