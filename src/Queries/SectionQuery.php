@@ -142,7 +142,7 @@ class SectionQuery extends BaseQuery
     protected function normalizeSelect()
     {
         if ($this->fieldsMustBeSelected()) {
-            $this->select = $this->select + $this->standardFields;
+            $this->select = array_merge($this->standardFields, $this->select);
         }
 
         if ($this->propsMustBeSelected()) {
