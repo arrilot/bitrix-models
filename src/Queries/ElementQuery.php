@@ -218,6 +218,9 @@ class ElementQuery extends BaseQuery
             $fields['PROPERTY_'.$code.'_DESCRIPTION'] = $prop['DESCRIPTION'];
             $fields['~PROPERTY_'.$code.'_DESCRIPTION'] = $prop['~DESCRIPTION'];
             $fields['PROPERTY_'.$code.'_VALUE_ID'] = $prop['PROPERTY_VALUE_ID'];
+            if (isset($prop['VALUE_ENUM_ID'])) {
+                $fields['PROPERTY_'.$code.'_ENUM_ID'] = $prop['VALUE_ENUM_ID'];
+            }
         }
     }
 
@@ -249,6 +252,9 @@ class ElementQuery extends BaseQuery
         if ($this->propsMustBeSelected() && $this->shouldBeFetchedUsingGetNext()) {
             $this->addAllPropsToSelect();
         }
+
+        $this->select[] = 'ID';
+        $this->select[] = 'IBLOCK_ID';
 
         return $this->clearSelectArray();
     }

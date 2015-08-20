@@ -50,7 +50,7 @@ class ElementQueryTest extends TestCase
     {
         $bxObject = m::mock('object');
         TestElement::$bxObject = $bxObject;
-        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', '!CODE' => false, 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', '!CODE' => false, 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME', 'IBLOCK_ID'])->once()->andReturn(m::self());
         $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
         $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar']);
 
@@ -69,7 +69,7 @@ class ElementQueryTest extends TestCase
     public function testGetListWithKeyBy()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID','NAME'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID','NAME','IBLOCK_ID'])->once()->andReturn(m::self());
         $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
         $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar']);
 
@@ -85,7 +85,7 @@ class ElementQueryTest extends TestCase
         $this->assertSame(json_encode($expected), $items->toJson());
 
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME','IBLOCK_ID'])->once()->andReturn(m::self());
         $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
         $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar']);
 
@@ -105,7 +105,7 @@ class ElementQueryTest extends TestCase
     {
         $bxObject = m::mock('object');
         TestElement::$bxObject = $bxObject;
-        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['NAME' => 'John', 'ACTIVE' => 'Y', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['NAME' => 'John', 'ACTIVE' => 'Y', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME', 'IBLOCK_ID'])->once()->andReturn(m::self());
         $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
         $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar']);
 
@@ -140,7 +140,7 @@ class ElementQueryTest extends TestCase
     {
         $bxObject = m::mock('object');
         $bxObject->shouldReceive('getList')
-            ->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME', 'PROPERTY_GUID'])
+            ->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME', 'PROPERTY_GUID', 'IBLOCK_ID'])
             ->once()
             ->andReturn(m::self());
         $bxObject->shouldReceive('getNext')->andReturn(
@@ -165,7 +165,7 @@ class ElementQueryTest extends TestCase
     public function testGetListWithFetchUsingAndNoProps()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getList')->with(['SORT'    => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getList')->with(['SORT'    => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME', 'IBLOCK_ID'])->once()->andReturn(m::self());
         $bxObject->shouldReceive('getNext')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar'], false);
 
         TestElement::$bxObject = $bxObject;
@@ -185,7 +185,7 @@ class ElementQueryTest extends TestCase
     {
         $bxObject = m::mock('object');
         TestElement::$bxObject = $bxObject;
-        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['NAME' => 'John','IBLOCK_ID' => 1], false, ['iNumPage' => 3,'nPageSize' => 2], ['ID', 'NAME'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['NAME' => 'John','IBLOCK_ID' => 1], false, ['iNumPage' => 3,'nPageSize' => 2], ['ID', 'NAME', 'IBLOCK_ID'])->once()->andReturn(m::self());
         $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
         $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar']);
 
