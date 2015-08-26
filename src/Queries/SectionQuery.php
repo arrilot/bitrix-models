@@ -103,7 +103,7 @@ class SectionQuery extends BaseQuery
      */
     public function count()
     {
-        return $this->bxObject->getCount($this->normalizeFilter());
+        return (int) $this->bxObject->getCount($this->normalizeFilter());
     }
 
     /**

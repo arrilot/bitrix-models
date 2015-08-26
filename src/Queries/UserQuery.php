@@ -117,7 +117,7 @@ class UserQuery extends BaseQuery
      */
     public function count()
     {
-        return $this->bxObject->getList($order = 'ID', $by = 'ASC', $this->normalizeFilter(), [
+        return (int) $this->bxObject->getList($order = 'ID', $by = 'ASC', $this->normalizeFilter(), [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,
             ],

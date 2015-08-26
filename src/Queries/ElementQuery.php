@@ -196,7 +196,7 @@ class ElementQuery extends BaseQuery
      */
     public function count()
     {
-        return $this->bxObject->getList(false, $this->normalizeFilter(), []);
+        return (int) $this->bxObject->getList(false, $this->normalizeFilter(), []);
     }
 
     /**
