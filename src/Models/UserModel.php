@@ -213,4 +213,16 @@ class UserModel extends BaseModel
 
         return ($USER->getId() == $this->id) && $USER->isAuthorized();
     }
+
+    /**
+     * Logout user.
+     *
+     * @return void
+     */
+    public function logout()
+    {
+        global $USER;
+
+        $USER->logout();
+    }
 }
