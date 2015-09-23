@@ -281,3 +281,50 @@ $users = User::query()->sort(["ID" => "ASC"])->filter(['NAME'=>'John'])->fromGro
     protected $appends = ['FULL_NAME'];
 ```
 
+### События моделей (Model Events)
+
+События позволяют вклиниваться в разлчичные точки жизненного цикла модели и выполнять в них произвольный код.
+Например - автоматически проставлять символьный код при создании элемента.
+Обработчик события задается переопределением соответсвующего метода в классе-модели.
+
+```php
+class News extends ElementModel
+{
+    /**
+     * Hook into before item create or update.
+     *
+     * @return mixed
+     */
+    protected function onBeforeSave()
+    {
+        $this['CODE'] = CUtil::translit($this['NAME'], "ru");
+    }
+
+    /**
+     * Hook into after item create or update.
+     *
+     * @param bool $result
+     *
+     * @return void
+     */
+    protected function onAfterSave($result)
+    {
+        //
+    }
+}
+```
+
+Сигнатуры обработчиков других событий совпадают с приведенными выше.
+
+Список доступных эвентов:
+
+1. `onBeforeCreate` - перед добавлением записи
+2. `onAfterCreate` - после добавления записи
+3. `onBeforeUpdate` - перед обновлением записи
+4. `onAfterUpdate` - после обновления записи
+5. `onBeforeSave` - перед добавлением или обновлением записи
+6. `onAfterSave` - после добавления или обновления записи
+7. `onBeforeDelete` - перед удалением записи
+8. `onAfterDelete` - после удаления записи
+
+Если сделать `return false;` из обработчика `onBefore...` то последующее действие будет отменено.
