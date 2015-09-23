@@ -230,13 +230,13 @@ class ElementModel extends BaseModel
      *
      * @param array $selected
      *
-     * @return null
+     * @return bool
      */
     public function saveProps($selected = [])
     {
         $propertyValues = $this->constructPropertyValuesForSave($selected);
         if (empty($propertyValues)) {
-            return;
+            return false;
         }
 
         $bxMethod = empty($selected) ? 'setPropertyValues' : 'setPropertyValuesEx';
@@ -245,6 +245,8 @@ class ElementModel extends BaseModel
             static::iblockId(),
             $propertyValues
         );
+
+        return true;
     }
 
     /**

@@ -36,13 +36,30 @@ class ElementModelTest extends TestCase
 
     public function testDelete()
     {
+        // normal
         $bxObject = m::mock('object');
         $bxObject->shouldReceive('delete')->once()->andReturn(true);
 
         TestElement::$bxObject = $bxObject;
-        $element = new TestElement(1);
+        $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[onAfterDelete, onBeforeDelete]', [1])
+            ->shouldAllowMockingProtectedMethods();
+        $element->shouldReceive('onBeforeDelete')->once()->andReturn(null);
+        $element->shouldReceive('onAfterDelete')->once()->with(true);
 
         $this->assertTrue($element->delete());
+
+
+        // cancelled
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('delete')->never();
+
+        TestElement::$bxObject = $bxObject;
+        $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[onAfterDelete, onBeforeDelete]', [1])
+            ->shouldAllowMockingProtectedMethods();
+        $element->shouldReceive('onBeforeDelete')->once()->andReturn(false);
+        $element->shouldReceive('onAfterDelete')->never();
+
+        $this->assertFalse($element->delete());
     }
 
     public function testActivate()
@@ -170,7 +187,14 @@ class ElementModelTest extends TestCase
         $bxObject = m::mock('object');
 
         TestElement::$bxObject = $bxObject;
-        $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get]', [1]);
+        $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get,onBeforeSave,onAfterSave,onBeforeUpdate,onAfterUpdate]', [1])
+            ->shouldAllowMockingProtectedMethods();
+
+        $element->shouldReceive('onBeforeSave')->times(3)->andReturn(true);
+        $element->shouldReceive('onAfterSave')->times(3);
+        $element->shouldReceive('onBeforeUpdate')->times(3)->andReturn(true);
+        $element->shouldReceive('onAfterUpdate')->times(3);
+
         $fields = [
             'ID'                        => 1,
             'IBLOCK_ID'                 => 1,
@@ -188,6 +212,7 @@ class ElementModelTest extends TestCase
         $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'])->once()->andReturn(true);
         $this->assertTrue($element->save(['NAME']));
 
+        // 2
         $bxObject->shouldReceive('setPropertyValues')
             ->with(1, TestElement::iblockId(), ['FOO' => 'bar'])
             ->once()
@@ -196,7 +221,7 @@ class ElementModelTest extends TestCase
         $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'])->once()->andReturn(true);
         $this->assertTrue($element->save());
 
-        // 2
+        // 3
         $bxObject->shouldReceive('setPropertyValuesEx')
             ->with(1, TestElement::iblockId(), ['FOO' => 'bar'])
             ->once()

@@ -2,11 +2,14 @@
 
 namespace Arrilot\BitrixModels\Models;
 
+use Arrilot\BitrixModels\ModelEventsTrait;
 use Arrilot\BitrixModels\Queries\BaseQuery;
 use Exception;
 
 abstract class BaseModel extends ArrayableModel
 {
+    use ModelEventsTrait;
+
     /**
      * Have fields been already fetched from DB?
      *
@@ -140,16 +143,26 @@ abstract class BaseModel extends ArrayableModel
      */
     public static function create($fields)
     {
+        $model = new static(null, $fields);
+
+        if ($model->onBeforeSave() === false || $model->onBeforeCreate() === false) {
+            return false;
+        }
+
         $bxObject = static::instantiateObject();
         $id = $bxObject->add($fields);
+        $model->setId($id);
 
-        if (!$id) {
+        $result = $id ? true : false;
+
+        $model->onAfterCreate($result);
+        $model->onAfterSave($result);
+
+        if (!$result) {
             throw new Exception($bxObject->LAST_ERROR);
         }
 
-        $fields['ID'] = $id;
-
-        return new static($id, $fields);
+        return $model;
     }
 
     /**
@@ -253,7 +266,15 @@ abstract class BaseModel extends ArrayableModel
      */
     public function delete()
     {
-        return static::$bxObject->delete($this->id);
+        if ($this->onBeforeDelete() === false) {
+            return false;
+        }
+
+        $result = static::$bxObject->delete($this->id);
+
+        $this->onAfterDelete($result);
+
+        return $result;
     }
 
     /**
@@ -285,13 +306,21 @@ abstract class BaseModel extends ArrayableModel
     {
         $selectedFields = is_array($selectedFields) ? $selectedFields : func_get_args();
 
-        if ($this instanceof ElementModel) {
-            $this->saveProps($selectedFields);
+        if ($this->onBeforeSave() === false || $this->onBeforeUpdate() === false) {
+            return false;
         }
 
         $fields = $this->normalizeFieldsForSave($selectedFields);
+        $result = !empty($fields) ? static::$bxObject->update($this->id, $fields) : false;
+        if ($this instanceof ElementModel) {
+            $savePropsResult = $this->saveProps($selectedFields);
+            $result = $result || $savePropsResult;
+        }
 
-        return !empty($fields) ? static::$bxObject->update($this->id, $fields) : true;
+        $this->onAfterUpdate($result);
+        $this->onAfterSave($result);
+
+        return $result;
     }
 
     /**
@@ -305,7 +334,7 @@ abstract class BaseModel extends ArrayableModel
     {
         $fields = [];
         if ($this->fields === null) {
-            return $fields;
+            return [];
         }
 
         foreach ($this->fields as $field => $value) {
@@ -396,5 +425,16 @@ abstract class BaseModel extends ArrayableModel
         $query->filter['ACTIVE'] = 'Y';
 
         return $query;
+    }
+
+    /**
+     * Set current model id.
+     *
+     * @param $id
+     */
+    protected function setId($id)
+    {
+        $this->id = $id;
+        $this->fields['ID'] = $id;
     }
 }
