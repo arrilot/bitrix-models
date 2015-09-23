@@ -142,16 +142,24 @@ $products->toArray()
 ```
 преобразует коллекцию в обычный массив. При этом для каждого элемента коллекции будет тоже вызван `->toArray()`
 
+9) Получение первого элемента удовлетворяющего параметрам запроса
+```php
+$product = Product::first([
+    'filter' => ['CODE'=>'30-2515'],
+    'select' => ['ID', 'NAME', 'CODE']
+]);
+```
+
 ### "Fluent API" для запросов.
 
-Для `getById`, `getList` и `count` можно также использовать fluent API.
+Для `getById`, `getList`, `first` и `count` можно также использовать fluent API.
 
-9) Пример 7 можно также реализовать и так:
+10) Пример 7 можно также реализовать и так:
 ```php
 $count = Product::query()->filter(['ACTIVE'=>'Y'])->count();
 ```
 
-10) Получения списка элементов через query
+11) Получения списка элементов через query
 ```php
 $products = Product::query()
                     ->filter($filter)

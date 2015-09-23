@@ -177,6 +177,36 @@ abstract class BaseModel extends ArrayableModel
     }
 
     /**
+     * Create a new query and apply modifiers according to $params.
+     *
+     * @param array $params
+     *
+     * @return BaseQuery
+     */
+    protected static function createQueryWithModifiers($params)
+    {
+        $query = static::query();
+
+        $modifiers = array_merge(static::$additionalQueryModifiers, [
+            'sort',
+            'filter',
+            'navigation',
+            'select',
+            'keyBy',
+            'limit',
+            'take',
+        ]);
+
+        foreach ($modifiers as $modifier) {
+            if (isset($params[$modifier])) {
+                $query = $query->{$modifier}($params[$modifier]);
+            }
+        }
+
+        return $query;
+    }
+
+    /**
      * Get item by its id.
      *
      * @param int $id
@@ -197,24 +227,23 @@ abstract class BaseModel extends ArrayableModel
      */
     public static function getList($params = [])
     {
-        $query = static::query();
-        $modifiers = array_merge(static::$additionalQueryModifiers, [
-            'sort',
-            'filter',
-            'navigation',
-            'select',
-            'keyBy',
-            'limit',
-            'take',
-        ]);
-
-        foreach ($modifiers as $modifier) {
-            if (isset($params[$modifier])) {
-                $query = $query->{$modifier}($params[$modifier]);
-            }
-        }
+        $query = static::createQueryWithModifiers($params);
 
         return $query->getList();
+    }
+
+    /**
+     * Get first item that match $params.
+     *
+     * @param array $params
+     *
+     * @return static
+     */
+    public static function first($params = [])
+    {
+        $query = static::createQueryWithModifiers($params);
+
+        return $query->first();
     }
 
     /**

@@ -92,6 +92,16 @@ abstract class BaseQuery
     }
 
     /**
+     * Get the first item that matches query params.
+     *
+     * @return mixed
+     */
+    public function first()
+    {
+        return $this->limit(1)->getList()->first(null, false);
+    }
+
+    /**
      * Get item by its id.
      *
      * @param int $id

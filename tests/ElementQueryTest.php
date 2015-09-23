@@ -200,4 +200,18 @@ class ElementQueryTest extends TestCase
             $this->assertSame($expected[$k], $item->fields);
         }
     }
+
+    public function testFirst()
+    {
+        $bxObject = m::mock('object');
+        TestElement::$bxObject = $bxObject;
+        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['NAME' => 'John','IBLOCK_ID' => 1], false, ['nPageSize' => 1], ['ID', 'NAME', 'IBLOCK_ID'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), false);
+        $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo']);
+
+        $query = $this->createQuery($bxObject);
+        $item = $query->filter(['NAME' => 'John'])->select('ID', 'NAME')->first();
+
+        $this->assertSame(['ID' => 1, 'NAME' => 'foo'], $item->fields);
+    }
 }
