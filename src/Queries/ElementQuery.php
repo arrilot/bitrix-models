@@ -2,9 +2,9 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
+use Arrilot\BitrixModels\Collection;
 use CIBlock;
 use Exception;
-use Arrilot\BitrixModels\Collection;
 
 /**
  * @method ElementQuery active()

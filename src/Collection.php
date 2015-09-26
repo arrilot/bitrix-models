@@ -29,8 +29,9 @@ class Collection extends BaseCollection
     /**
      * Create a new collection consisting of every n-th element.
      *
-     * @param  int  $step
-     * @param  int  $offset
+     * @param int $step
+     * @param int $offset
+     *
      * @return $this
      */
     public function every($step, $offset = 0)

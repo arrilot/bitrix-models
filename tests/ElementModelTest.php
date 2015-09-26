@@ -48,7 +48,6 @@ class ElementModelTest extends TestCase
 
         $this->assertTrue($element->delete());
 
-
         // cancelled
         $bxObject = m::mock('object');
         $bxObject->shouldReceive('delete')->never();

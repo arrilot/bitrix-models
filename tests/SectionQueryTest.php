@@ -33,7 +33,7 @@ class SectionQueryTest extends TestCase
         TestSection::$bxObject = $bxObject;
         $bxObject->shouldReceive('getList')->with(
             ['SORT' => 'ASC'],
-            ['NAME'=>'John', 'ACTIVE'=>'Y', 'IBLOCK_ID'=>1],
+            ['NAME' => 'John', 'ACTIVE' => 'Y', 'IBLOCK_ID' => 1],
             false,
             ['ID','NAME'],
             false

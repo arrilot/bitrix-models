@@ -3,7 +3,6 @@
 namespace Arrilot\Tests\BitrixModels;
 
 use Arrilot\BitrixModels\Collection;
-use Mockery as m;
 
 class CollectionTest extends TestCase
 {
