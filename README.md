@@ -243,6 +243,29 @@ $products = Product::query()
 $users = User::query()->sort(["ID" => "ASC"])->filter(['NAME'=>'John'])->fromGroup(7)->getList();
 ```
 
+#### Остановка действия
+
+Иногда требуется остановить выборку из базы из query scope. 
+Для этого достаточно вернуть false.
+Пример:
+```php
+    public function scopeFromCategory($query, $category)
+    {
+        if (!$category) {
+            return false;
+        }
+        
+        $query->filter['SECTION_CODE'] = $category;
+
+        return $query;
+    }
+...
+В результате запрос в базу не будет сделан - getList вернёт пустую коллекцию, getById - false, а count - 0.
+Того же самого эффекта можно добиться вызвав вручную метод `stopQuery()` 
+```php 
+$users = User::query()->stopQuery()->getList();
+```
+
 ### Accessors
 
 Временами возникает потребность как то модифицировать данные между выборкой их из базы и получением их из модели.

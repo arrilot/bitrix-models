@@ -65,6 +65,14 @@ abstract class BaseQuery
     public $keyBy = false;
 
     /**
+     * Indicates that the query should be stopped instead of touching the DB.
+     * Can be set in query scopes or manually.
+     *
+     * @var bool
+     */
+    protected $queryShouldBeStopped = false;
+
+    /**
      * Get count of users that match $filter.
      *
      * @return int
@@ -110,7 +118,7 @@ abstract class BaseQuery
      */
     public function getById($id)
     {
-        if (!$id) {
+        if (!$id || $this->queryShouldBeStopped) {
             return false;
         }
 
@@ -250,6 +258,18 @@ abstract class BaseQuery
     }
 
     /**
+     * Stop the query from touching DB.
+     *
+     * @return $this
+     */
+    public function stopQuery()
+    {
+        $this->queryShouldBeStopped = true;
+
+        return $this;
+    }
+
+    /**
      * Adds $item to $results using keyBy value.
      *
      * @param $results
@@ -335,7 +355,13 @@ abstract class BaseQuery
         if (method_exists($this->model, 'scope'.$method)) {
             array_unshift($parameters, $this);
 
-            return call_user_func_array([$this->model, 'scope'.$method], $parameters);
+            $query = call_user_func_array([$this->model, 'scope'.$method], $parameters);
+
+            if ($query === false) {
+                $this->stopQuery();
+            }
+
+            return $query instanceof static ? $query : $this;
         }
 
         $className = get_class($this);

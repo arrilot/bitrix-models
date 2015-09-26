@@ -81,6 +81,10 @@ class SectionQuery extends BaseQuery
      */
     public function getList()
     {
+        if ($this->queryShouldBeStopped) {
+            return new Collection();
+        }
+
         $sections = [];
         $rsSections = $this->bxObject->getList(
             $this->sort,
@@ -103,6 +107,10 @@ class SectionQuery extends BaseQuery
      */
     public function count()
     {
+        if ($this->queryShouldBeStopped) {
+            return 0;
+        }
+
         return (int) $this->bxObject->getCount($this->normalizeFilter());
     }
 

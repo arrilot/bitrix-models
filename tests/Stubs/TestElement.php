@@ -27,4 +27,9 @@ class TestElement extends ElementModel
     {
         return [];
     }
+
+    public function scopeStopActionScope($query)
+    {
+        return false;
+    }
 }

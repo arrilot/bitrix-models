@@ -2,6 +2,7 @@
 
 namespace Arrilot\Tests\BitrixModels;
 
+use Arrilot\BitrixModels\Collection;
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use Arrilot\Tests\BitrixModels\Stubs\TestElement;
 use Mockery as m;
@@ -213,5 +214,41 @@ class ElementQueryTest extends TestCase
         $item = $query->filter(['NAME' => 'John'])->select('ID', 'NAME')->first();
 
         $this->assertSame(['ID' => 1, 'NAME' => 'foo'], $item->fields);
+    }
+
+    public function testStopAction()
+    {
+        $bxObject = m::mock('object');
+        TestElement::$bxObject = $bxObject;
+
+        $query = $this->createQuery($bxObject);
+        $items = $query->filter(['NAME' => 'John'])->stopQuery()->getList();
+        $this->assertSame((new Collection())->all(), $items->all());
+
+        $query = $this->createQuery($bxObject);
+        $item = $query->filter(['NAME' => 'John'])->stopQuery()->getById(1);
+        $this->assertSame(false, $item);
+
+        $query = $this->createQuery($bxObject);
+        $count = $query->filter(['NAME' => 'John'])->stopQuery()->count();
+        $this->assertSame(0, $count);
+    }
+
+    public function testStopActionFromScope()
+    {
+        $bxObject = m::mock('object');
+        TestElement::$bxObject = $bxObject;
+
+        $query = $this->createQuery($bxObject);
+        $items = $query->filter(['NAME' => 'John'])->stopActionScope()->getList();
+        $this->assertSame((new Collection())->all(), $items->all());
+
+        $query = $this->createQuery($bxObject);
+        $item = $query->filter(['NAME' => 'John'])->stopActionScope()->getById(1);
+        $this->assertSame(false, $item);
+
+        $query = $this->createQuery($bxObject);
+        $count = $query->filter(['NAME' => 'John'])->stopActionScope()->count();
+        $this->assertSame(0, $count);
     }
 }

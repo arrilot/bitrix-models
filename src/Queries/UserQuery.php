@@ -91,6 +91,10 @@ class UserQuery extends BaseQuery
      */
     public function getList()
     {
+        if ($this->queryShouldBeStopped) {
+            return new Collection();
+        }
+
         $params = [
             'SELECT'     => $this->propsMustBeSelected() ? ['UF_*'] : false,
             'NAV_PARAMS' => $this->navigation,
@@ -117,6 +121,10 @@ class UserQuery extends BaseQuery
      */
     public function count()
     {
+        if ($this->queryShouldBeStopped) {
+            return 0;
+        }
+
         return (int) $this->bxObject->getList($order = 'ID', $by = 'ASC', $this->normalizeFilter(), [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,

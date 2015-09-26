@@ -160,6 +160,10 @@ class ElementQuery extends BaseQuery
      */
     public function getList()
     {
+        if ($this->queryShouldBeStopped) {
+            return new Collection();
+        }
+
         $items = [];
 
         $rsItems = $this->bxObject->getList(
@@ -196,6 +200,10 @@ class ElementQuery extends BaseQuery
      */
     public function count()
     {
+        if ($this->queryShouldBeStopped) {
+            return 0;
+        }
+
         return (int) $this->bxObject->getList(false, $this->normalizeFilter(), []);
     }
 
