@@ -5,10 +5,19 @@ namespace Arrilot\BitrixModels\Models;
 use Arrilot\BitrixModels\ModelEventsTrait;
 use Arrilot\BitrixModels\Queries\BaseQuery;
 use Exception;
+use InvalidArgumentException;
+use LogicException;
 
 abstract class BaseModel extends ArrayableModel
 {
     use ModelEventsTrait;
+
+    /**
+     * The loaded relationships for the model.
+     *
+     * @var array
+     */
+    protected $relations = [];
 
     /**
      * Have fields been already fetched from DB?
@@ -436,5 +445,55 @@ abstract class BaseModel extends ArrayableModel
     {
         $this->id = $id;
         $this->fields['ID'] = $id;
+    }
+
+    /**
+     * Determine if the given relation is loaded.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function relationIsLoaded($key)
+    {
+        return array_key_exists($key, $this->relations);
+    }
+
+    /**
+     * Get a relationship value from a method.
+     *
+     * @param  string  $method
+     * @return mixed
+     *
+     */
+    protected function getRelationshipFromMethod($method)
+    {
+        $relation = $this->$method();
+
+        if (!$relation instanceof BaseRelation) {
+            throw new LogicException('Relationship method must return an object of type Arrilot\BitrixModels\Relations\BaseRelation');
+        }
+
+        return $this->relations[$method] = $relation->fetch();
+    }
+
+    /**
+     * Dynamically retrieve fields on the model.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        if ($this->relationIsLoaded($key)) {
+            return $this->relations[$key];
+        }
+
+        if (method_exists($this, $key)) {
+            return $this->getRelationshipFromMethod($key);
+        }
+
+        $className = get_class($this);
+
+        throw new InvalidArgumentException("Invalid property {$className}::{$key}");
     }
 }
