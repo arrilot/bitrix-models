@@ -78,7 +78,7 @@ class SectionModelTest extends TestCase
     public function testUpdate()
     {
         $section = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestSection[save]', [1]);
-        $section->shouldReceive('save')->with(['NAME','UF_FOO'])->andReturn(true);
+        $section->shouldReceive('save')->with(['NAME', 'UF_FOO'])->andReturn(true);
 
         $this->assertTrue($section->update(['NAME' => 'Section 1', 'UF_FOO' => 'bar']));
         $this->assertSame('Section 1', $section->fields['NAME']);

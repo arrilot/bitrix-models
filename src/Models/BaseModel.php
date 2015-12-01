@@ -437,7 +437,8 @@ abstract class BaseModel extends ArrayableModel
     /**
      * Determine if the given relation is loaded.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function relationIsLoaded($key)
@@ -448,9 +449,9 @@ abstract class BaseModel extends ArrayableModel
     /**
      * Get a relationship value from a method.
      *
-     * @param  string  $method
-     * @return mixed
+     * @param string $method
      *
+     * @return mixed
      */
     protected function getRelationshipFromMethod($method)
     {
@@ -466,7 +467,8 @@ abstract class BaseModel extends ArrayableModel
     /**
      * Dynamically retrieve fields on the model.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key)

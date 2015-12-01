@@ -35,7 +35,7 @@ class SectionQueryTest extends TestCase
             ['SORT' => 'ASC'],
             ['NAME' => 'John', 'ACTIVE' => 'Y', 'IBLOCK_ID' => 1],
             false,
-            ['ID','NAME'],
+            ['ID', 'NAME'],
             false
         )->once()->andReturn(m::self());
         $bxObject->shouldReceive('fetch')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar'], false);

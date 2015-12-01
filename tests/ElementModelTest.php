@@ -277,11 +277,11 @@ class ElementModelTest extends TestCase
     public function testCount()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getList')->with(false, ['ACTIVE' => 'Y','IBLOCK_ID' => 1], [])->once()->andReturn(2);
+        $bxObject->shouldReceive('getList')->with(false, ['ACTIVE' => 'Y', 'IBLOCK_ID' => 1], [])->once()->andReturn(2);
 
         TestElement::$bxObject = $bxObject;
 
-        $this->assertEquals(2, TestElement::count(['ACTIVE' => 'Y','IBLOCK_ID' => 1]));
+        $this->assertEquals(2, TestElement::count(['ACTIVE' => 'Y', 'IBLOCK_ID' => 1]));
 
         $bxObject = m::mock('object');
         $bxObject->shouldReceive('getList')->with(false, ['IBLOCK_ID' => 1], [])->once()->andReturn(3);

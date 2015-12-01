@@ -43,11 +43,11 @@ class UserModelTest extends TestCase
         $this->assertSame($USER->getId(), $user->id);
         $this->assertSame(null, $user->fields);
 
-        $user = TestUser::current(['NAME' => 'John Doe', 'GROUP_ID' => [1,2]]);
+        $user = TestUser::current(['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]]);
         $this->assertSame($USER->getId(), $user->id);
-        $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1,2]], $user->fields);
-        $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1,2]], $user->get());
-        $this->assertSame([1,2], $user->getGroups());
+        $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]], $user->fields);
+        $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]], $user->get());
+        $this->assertSame([1, 2], $user->getGroups());
     }
 
     public function testInitializationWithCurrentNotAuth()
@@ -177,7 +177,7 @@ class UserModelTest extends TestCase
     public function testUpdate()
     {
         $user = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestUser[save]', [1]);
-        $user->shouldReceive('save')->with(['NAME','UF_FOO'])->andReturn(true);
+        $user->shouldReceive('save')->with(['NAME', 'UF_FOO'])->andReturn(true);
 
         $this->assertTrue($user->update(['NAME' => 'John', 'UF_FOO' => 'bar']));
         $this->assertSame('John', $user->fields['NAME']);
@@ -188,7 +188,7 @@ class UserModelTest extends TestCase
     {
         $user = new TestUser(1);
 
-        $fields = ['ID' => 2, 'NAME' => 'John Doe','GROUP_ID' => [1,2]];
+        $fields = ['ID' => 2, 'NAME' => 'John Doe', 'GROUP_ID' => [1, 2]];
         $user->fill($fields);
 
         $this->assertSame(2, $user->id);
@@ -212,10 +212,10 @@ class UserModelTest extends TestCase
     {
         $user = new TestUser(1);
 
-        $user->fillGroups([1,2]);
+        $user->fillGroups([1, 2]);
 
         $this->assertSame(1, $user->id);
-        $this->assertSame(['GROUP_ID' => [1,2]], $user->fields);
-        $this->assertSame([1,2], $user->getGroups());
+        $this->assertSame(['GROUP_ID' => [1, 2]], $user->fields);
+        $this->assertSame([1, 2], $user->getGroups());
     }
 }

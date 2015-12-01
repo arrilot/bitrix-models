@@ -134,14 +134,14 @@ abstract class BaseQuery
     /**
      * Setter for sort.
      *
-     * @param mixed $by
+     * @param mixed  $by
      * @param string $order
      *
      * @return $this
      */
     public function sort($by, $order = 'ASC')
     {
-        $this->sort = is_array($by) ? $by : [ $by => $order ];
+        $this->sort = is_array($by) ? $by : [$by => $order];
 
         return $this;
     }

@@ -11,7 +11,7 @@ class BxUserWithAuth
 
     public function getUserGroupArray()
     {
-        return [1,2,3];
+        return [1, 2, 3];
     }
 
     public function isAuthorized()
