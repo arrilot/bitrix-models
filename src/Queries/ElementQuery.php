@@ -7,7 +7,6 @@ use CIBlock;
 use Exception;
 
 /**
- * @method ElementQuery active()
  * @method ElementQuery sortByDate(string $sort = 'desc')
  */
 class ElementQuery extends BaseQuery
@@ -205,6 +204,34 @@ class ElementQuery extends BaseQuery
         }
 
         return (int) $this->bxObject->getList(false, $this->normalizeFilter(), []);
+    }
+
+    /**
+     * Scope to get only items from a given section.
+     *
+     * @param mixed $id
+     *
+     * @return $this
+     */
+    public function fromSectionWithId($id)
+    {
+        $this->filter['SECTION_ID'] = $id;
+
+        return $this;
+    }
+
+    /**
+     * Scope to get only items from a given section.
+     *
+     * @param mixed $id
+     *
+     * @return $this
+     */
+    public function fromSectionWithCode($id)
+    {
+        $this->filter['SECTION_CODE'] = $id;
+
+        return $this;
     }
 
     /**

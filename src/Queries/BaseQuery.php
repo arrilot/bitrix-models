@@ -134,13 +134,26 @@ abstract class BaseQuery
     /**
      * Setter for sort.
      *
-     * @param $value
+     * @param mixed $by
+     * @param string $order
      *
      * @return $this
      */
-    public function sort($value)
+    public function sort($by, $order = 'ASC')
     {
-        $this->sort = $value;
+        $this->sort = is_array($by) ? $by : [ $by => $order ];
+
+        return $this;
+    }
+
+    /**
+     * Scope to get only active items.
+     *
+     * @return $this
+     */
+    public function active()
+    {
+        $this->filter['ACTIVE'] = 'Y';
 
         return $this;
     }
@@ -154,13 +167,25 @@ abstract class BaseQuery
      */
     public function filter($filter)
     {
-        $this->filter = $filter;
+        $this->filter = array_merge($this->filter, $filter);
 
         return $this;
     }
 
     /**
-     * Add another to filter to filters array.
+     * Reset filter.
+     *
+     * @return $this
+     */
+    public function resetFilter()
+    {
+        $this->filter = [];
+
+        return $this;
+    }
+
+    /**
+     * Add another filter to filters array.
      *
      * @param $filters
      *

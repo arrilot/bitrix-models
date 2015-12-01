@@ -4,6 +4,7 @@ namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\ModelEventsTrait;
 use Arrilot\BitrixModels\Queries\BaseQuery;
+use Arrilot\BitrixModels\Relations\BaseRelation;
 use Exception;
 use InvalidArgumentException;
 use LogicException;
@@ -420,20 +421,6 @@ abstract class BaseModel extends ArrayableModel
     public static function query()
     {
         throw new Exception('public static function query() is not implemented');
-    }
-
-    /**
-     * Scope to get only active items.
-     *
-     * @param BaseQuery $query
-     *
-     * @return BaseQuery
-     */
-    public function scopeActive($query)
-    {
-        $query->filter['ACTIVE'] = 'Y';
-
-        return $query;
     }
 
     /**
