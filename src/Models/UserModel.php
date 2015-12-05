@@ -215,6 +215,16 @@ class UserModel extends BaseModel
     }
 
     /**
+     * Check if user is guest.
+     *
+     * @return bool
+     */
+    public function isGuest()
+    {
+        return ! $this->isAuthorized();
+    }
+
+    /**
      * Logout user.
      *
      * @return void

@@ -98,6 +98,17 @@ class UserModelTest extends TestCase
         $this->assertFalse($user->isAuthorized());
     }
 
+    public function testIsGuest()
+    {
+        $GLOBALS['USER'] = new BxUserWithAuth();
+        $user = TestUser::current();
+        $this->assertFalse($user->isGuest());
+
+        $GLOBALS['USER'] = new BxUserWithoutAuth();
+        $user = TestUser::current();
+        $this->assertTrue($user->isGuest());
+    }
+
     public function testDelete()
     {
         $bxObject = m::mock('object');

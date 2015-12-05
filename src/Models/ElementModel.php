@@ -95,7 +95,6 @@ class ElementModel extends BaseModel
         return $query->sort(['ACTIVE_FROM' => $sort]);
     }
 
-
     /**
      * Scope to get only items from a given section.
      *
