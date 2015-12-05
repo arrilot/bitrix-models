@@ -5,6 +5,9 @@ namespace Arrilot\BitrixModels\Queries;
 use BadMethodCallException;
 use Illuminate\Support\Collection;
 
+/**
+ * @method ElementQuery active()
+ */
 abstract class BaseQuery
 {
     /**
@@ -142,18 +145,6 @@ abstract class BaseQuery
     public function sort($by, $order = 'ASC')
     {
         $this->sort = is_array($by) ? $by : [$by => $order];
-
-        return $this;
-    }
-
-    /**
-     * Scope to get only active items.
-     *
-     * @return $this
-     */
-    public function active()
-    {
-        $this->filter['ACTIVE'] = 'Y';
 
         return $this;
     }

@@ -225,4 +225,19 @@ class UserModel extends BaseModel
 
         $USER->logout();
     }
+
+    /**
+     * Scope to get only users from a given group / groups.
+     *
+     * @param UserQuery $query
+     * @param int|array $id
+     *
+     * @return UserQuery
+     */
+    public function scopeFromGroup($query, $id)
+    {
+        $query->filter['GROUPS_ID'] = $id;
+
+        return $query;
+    }
 }

@@ -207,34 +207,6 @@ class ElementQuery extends BaseQuery
     }
 
     /**
-     * Scope to get only items from a given section.
-     *
-     * @param mixed $id
-     *
-     * @return $this
-     */
-    public function fromSectionWithId($id)
-    {
-        $this->filter['SECTION_ID'] = $id;
-
-        return $this;
-    }
-
-    /**
-     * Scope to get only items from a given section.
-     *
-     * @param mixed $id
-     *
-     * @return $this
-     */
-    public function fromSectionWithCode($id)
-    {
-        $this->filter['SECTION_CODE'] = $id;
-
-        return $this;
-    }
-
-    /**
      * Normalize properties's format converting it to 'PROPERTY_"CODE"_VALUE'.
      *
      * @param array $fields

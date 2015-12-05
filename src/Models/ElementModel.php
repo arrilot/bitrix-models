@@ -95,6 +95,37 @@ class ElementModel extends BaseModel
         return $query->sort(['ACTIVE_FROM' => $sort]);
     }
 
+
+    /**
+     * Scope to get only items from a given section.
+     *
+     * @param ElementQuery $query
+     * @param mixed        $id
+     *
+     * @return ElementQuery
+     */
+    public function scopeFromSectionWithId($query, $id)
+    {
+        $query->filter['SECTION_ID'] = $id;
+
+        return $query;
+    }
+
+    /**
+     * Scope to get only items from a given section.
+     *
+     * @param ElementQuery $query
+     * @param string       $code
+     *
+     * @return ElementQuery
+     */
+    public function scopeFromSectionWithCode($query, $code)
+    {
+        $query->filter['SECTION_CODE'] = $code;
+
+        return $query;
+    }
+
     /**
      * Fill extra fields when $this->field is called.
      *

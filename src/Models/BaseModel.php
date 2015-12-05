@@ -334,6 +334,20 @@ abstract class BaseModel extends ArrayableModel
     }
 
     /**
+     * Scope to get only active items.
+     *
+     * @param BaseQuery $query
+     *
+     * @return BaseQuery
+     */
+    public function scopeActive($query)
+    {
+        $query->filter['ACTIVE'] = 'Y';
+
+        return $query;
+    }
+
+    /**
      * Create an array of fields that will be saved to database.
      *
      * @param $selectedFields
