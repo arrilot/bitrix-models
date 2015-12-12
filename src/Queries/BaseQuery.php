@@ -103,6 +103,26 @@ abstract class BaseQuery
     }
 
     /**
+     * Paginate the given query into a paginator.
+     *
+     * @param  int  $perPage
+     * @param  array  $columns
+     * @param  string  $pageName
+     * @param  int|null  $page
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function paginate($perPage = 15, $pageName = 'page', $page = null)
+    {
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
+        $total = $this->getCountForPagination($columns);
+        $results = $this->forPage($page, $perPage)->get($columns);
+        return new LengthAwarePaginator($results, $total, $perPage, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
+    }
+
+    /**
      * Get the first item that matches query params.
      *
      * @return mixed
