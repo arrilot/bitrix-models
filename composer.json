@@ -13,7 +13,6 @@
   ],
   "homepage": "https://github.com/arrilot/bitrix-models",
   "require": {
-  "require": {
     "php": ">=5.4.0",
     "illuminate/support": "5.*",
     "illuminate/pagination": "5.*"

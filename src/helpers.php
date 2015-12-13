@@ -9,7 +9,7 @@ if (! function_exists('collect')) {
      * @param  mixed  $value
      * @return \Arrilot\BitrixModels\Collection
      */
-    function collect($value = null)
+    function collect2($value = null)
     {
         return new Collection($value);
     }
