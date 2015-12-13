@@ -320,4 +320,30 @@ class ElementQueryTest extends TestCase
         $count = $query->filter(['NAME' => 'John'])->stopActionScope()->count();
         $this->assertSame(0, $count);
     }
+
+    public function testPaginate()
+    {
+        $query = m::mock('Arrilot\BitrixModels\Queries\ElementQuery[getList, count]', [null, 'Arrilot\Tests\BitrixModels\Stubs\TestElement'])
+            ->shouldAllowMockingProtectedMethods();
+
+        $query->shouldReceive('count')->once()->andReturn(100);
+        $query->shouldReceive('getList')->once()->andReturn(collect(range(1, 15)));
+
+        $items = $query->paginate();
+
+        $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $items);
+    }
+
+    public function testSimplePaginate()
+    {
+        $query = m::mock('Arrilot\BitrixModels\Queries\ElementQuery[getList, count]', [null, 'Arrilot\Tests\BitrixModels\Stubs\TestElement'])
+            ->shouldAllowMockingProtectedMethods();
+
+        $query->shouldReceive('count')->never();
+        $query->shouldReceive('getList')->once()->andReturn(collect(range(1, 15)));
+
+        $items = $query->simplePaginate();
+
+        $this->assertInstanceOf('Illuminate\Pagination\Paginator', $items);
+    }
 }

@@ -232,7 +232,7 @@ class ElementModel extends BaseModel
             return false;
         }
 
-        return $sectionModel::getById($fields['IBLOCK_SECTION_ID'])->toArray();
+        return $sectionModel::query()->getById($fields['IBLOCK_SECTION_ID'])->toArray();
     }
 
     /**
@@ -250,7 +250,7 @@ class ElementModel extends BaseModel
         $sectionModel = static::sectionModel();
 
         return $withProps
-            ? $sectionModel::getById($fields['IBLOCK_SECTION_ID'])
+            ? $sectionModel::query()->getById($fields['IBLOCK_SECTION_ID'])
             : new $sectionModel($fields['IBLOCK_SECTION_ID']);
     }
 

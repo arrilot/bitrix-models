@@ -176,6 +176,8 @@ abstract class BaseModel extends ArrayableModel
     }
 
     /**
+     * @deprecated in favour of `static::query()->count()`
+     *
      * Get count of items that match $filter.
      *
      * @param array $filter
@@ -230,6 +232,8 @@ abstract class BaseModel extends ArrayableModel
     }
 
     /**
+     * @deprecated in favour of `static::query()->getById()`
+     *
      * Get item by its id.
      *
      * @param int $id
@@ -242,6 +246,8 @@ abstract class BaseModel extends ArrayableModel
     }
 
     /**
+     * @deprecated in favour of `static::query()->getList()`
+     *
      * Get list of items.
      *
      * @param array $params
@@ -256,6 +262,8 @@ abstract class BaseModel extends ArrayableModel
     }
 
     /**
+     * @deprecated in favour of `static::query()->first()`
+     *
      * Get first item that match $params.
      *
      * @param array $params

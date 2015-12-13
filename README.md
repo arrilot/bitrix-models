@@ -11,20 +11,21 @@
 
 1)```composer require arrilot/bitrix-models```
 
-2) подключаем composer к Битриксу.
+2) Подключаем composer к Битриксу.
 
-Теперь можно создавать свои модели, наследуя их либо от 
+3) Регистрируем пакет в `init.php` - `Arrilot\BitrixModels\ServiceProvider::register();`
+
+Теперь можно создавать свои модели, наследуя их либо от одного из перечисленных классов. 
 ```php
 Arrilot\BitrixModels\Models\ElementModel
-``` 
-либо от
-```php
+Arrilot\BitrixModels\Models\SectionModel
 Arrilot\BitrixModels\Models\UserModel
 ```
 
 ## Использование
 
-Везде будем рассматривать модель для элемента инфоблока. Для пользователей отличия минимальны.
+Везде будем рассматривать модель для элемента инфоблока (ElementModel). 
+Для других сущностей API практически идентичен.
 
 Создадим, модель для инфоблока Товары.
 ```php
@@ -48,28 +49,35 @@ class Product extends ElementModel
 
 Для работы модели необходимо лишь реализовать `iblockId()` возвращающий ID информационного блока.
 Для юзеров не требуется и этого.
+В дальнейшем мы будем использовать данный класс `Product` как в статическом, так и в динамическом контексте.
 
-Рассмотрим примеры работы API моделей.
+### Добавление
 
-1) Получение элемента инфоблока из базы.
 ```php
-$product = Product::getById($productId);
-// $product  - объект модели Product (как в примере 1), однако он реализует ArrayAccess
-// и поэтому с ним во многом можно работать как с массивом, полученным из битриксового getById();
-if ($product['CODE'] === 'test') {
-    $product->deactivate();
-}
-
-// элемент выбирается из базы вместе со свойствами.
-echo $product['PROPERTY_VALUES']['GUID'];
+// $fields - массив аналогичный передаваемому в CIblockElement::Add()
+$product = Product::create($fields);
 ```
 
-2) Инстанцирование модели без запросов к базе.
+### Обновление
+
+```php
+
+// вариант 1
+$product['NAME'] = 'Новое имя продукта';
+$product->save();
+
+// вариант 2
+$product['NAME'] = 'Новое имя продукта';
+$product->update(['NAME' => 'Новое имя продукта']);
+```
+
+### Инстанцирование модели без запросов к базе.
+
 Зачастую нет необходимости в получении информации из БД, достаточно лишь ID объекта.
 В этом случае можно просто инстанцировать объект модели.
 ```php
 
-$product = new Product($productId);
+$product = new Product($id);
 //теперь есть возможно работать с моделью, допустим
 $product->deactivate();
 
@@ -77,7 +85,8 @@ $product->deactivate();
 $user = User::current();
 ```
 
-3) Если поля нужны, их потом дополучить
+### Дополучение полей из базы
+
 ```php
 $product = new Product($productId);
 // метод `get` обращается к базе, только если информация еще не была получена.
@@ -90,106 +99,80 @@ $arFields = $product->refreshFields(); // только поля
 $arProduct = $product->refresh(); // и то и то
 ```
 
-4) Преобразование модели в чистый массив.
+### Преобразование модели в массив/json.
+
 ```php
-$product = Product::getById($productId);
 $arProduct = $product->toArray();
 $json = $product->toJson();
 ```
 
-5) Обновление элемента инфоблока.
+### Получение информации из базы
+
+Наиболее распостраненный сценарий работы с моделями - получение нужной информации из БД.
+Для построение запроса используется "Fluent API" который представляет из себя надстройку над стандартным Битриксовым API
+
+Для начала построения запроса используется статический метод `::query()`.
+
+Простейший пример:
 ```php
-$product = Product::getById($productId);
-
-// вариант 1
-$product['NAME'] = 'Новое имя продукта';
-$product->save();
-
-// вариант 2
-$product['NAME'] = 'Новое имя продукта';
-$product->update(['NAME' => 'Новое имя продукта']);
+$products = Product::query()
+        ->select('ID')
+        ->getList();
 ```
 
-6) Добавление элемента инфоблока.
-```php
-// $fields - массив аналогичный передаваемому в CIblockElement::Add()
-$product = Product::create($fields);
-```
+Любая цепочка запросов должна заканчиваться одним из следующих методов:
 
-7) Подсчёт количества элементов инфоблока с учётом фильтра
-```php
-$count = Product::count(['ACTIVE'=>'Y']);
-```
+1. `->getList()` - получение коллекции (см. http://laravel.com/docs/5.1/collections) объектов.
 
-8) Получения списка элементов
+2. `->getById($id)` - получение объекта по его ID.
+
+3. `->first()` - получение одного (самого первого) объекта удовлетворяющего параметрам запроса.
+
+4. `->count()` - получение количества объектов.
+
+5. `->paginate() или ->simplePaginate()` - получение спагинированного списка с мета-данными (см. http://laravel.com/docs/5.1/pagination)
+
+Объекты-модели реализуют ArrayAccess поэтому с ними можно во многом работать как с массивами.
 ```php
-$products = Product::getList([
-    'filter' => ['ACTIVE'=>'N'],
-    'select' => ['ID', 'NAME', 'CODE'],
-    'sort => ['NAME' => 'ASC'],
-    'keyBy' => 'ID'
-]);
-foreach ($products as $id => $product) {
-    if ($product['CODE'] === 'test') {
-        $product->deactivate();
-    }
+$product = Product::query()->getById($productId);
+if ($product['CODE'] === 'test') {
+    $product->deactivate();
 }
 ```
 
-`getList` возвращает инстанс `Illuminate\Support\Collection` с котором как видно можно во многом обращатся как с массивом
-```php
-$products->toArray()
-```
-преобразует коллекцию в обычный массив. При этом для каждого элемента коллекции будет тоже вызван `->toArray()`
+Для управления запросом есть следующие методы:
 
-9) Получение первого элемента удовлетворяющего параметрам запроса
-```php
-$product = Product::first([
-    'filter' => ['CODE'=>'30-2515'],
-    'select' => ['ID', 'NAME', 'CODE']
-]);
-```
+1) `->sort($array)` - аналог `$arSort`
+Примеры:
+`->sort(['NAME' => 'ASC', 'ID => 'DESC'])`
+`->sort('NAME', 'DESC') // = ->sort(['NAME' => 'DESC'])`
+`->sort('NAME') // = ->sort(['NAME' => 'ASC'])`
 
-### "Fluent API" для запросов.
+2) `->filter($array)` - аналог `$arFilter`
 
-Для `getById`, `getList`, `first` и `count` можно также использовать fluent API.
+3) `->navigation($array)`
 
-10) Пример 7 можно также реализовать и так:
-```php
-$count = Product::query()->filter(['ACTIVE'=>'Y'])->count();
-```
-
-11) Получения списка элементов через query
-```php
-$products = Product::query()
-                    ->filter($filter)
-                    ->navigation(['nTopCount'=>100])
-                    ->select('ID','NAME')
-                    ->getList();
-```
-
-Опущенные модификаторы будут заполнены дефолтными значениями.
-В значения модификаторов можно передавать прямо такие же значения как и в соответсвующие параметры CIblockElement::getList
-Некоторые дополнительные моменты:
-
-1. В фильтр автоматически подставляется ID инфоблока.
-
-2. Как видно из примера `select()` поддерживает не только массив но и произвольное число аргументов
-`select('ID', 'NAME')`  равнозначно `select(['ID', 'NAME'])` 
-
-3. `select()` поддерживает два дополнительных значения - `'FIELDS'` (выбрать все поля), `'PROPS'` (выбрать все свойства).
+4) `->select(...)` - аналог `$arSelect`
+Примеры:
+`->select(['ID', 'NAME'])`
+`->select('ID', 'NAME')`
+`select()` поддерживает два дополнительных значения - `'FIELDS'` (выбрать все поля), `'PROPS'` (выбрать все свойства).
 Для пользователей также можно указать `'GROUPS'` (добавить группы пользователя в выборку)
 Значение по-умолчанию - `['FIELDS', 'PROPS']`
 
-4.  Есть возможность указать `keyBy()` - именно указанное тут поле станет ключом в списке-результате.
+5) `->limit($int)`, `->take($int)`, `->page($int)`, `->forPage($page, $perPage)` - для навигации 
+
+
+Некоторые дополнительные моменты:
+
+1.  Есть возможность указать `keyBy()` - именно указанное тут поле станет ключом в списке-результате.
 Значение по-умолчанию - `false`, используется обычный автоинкриментирующийся integer.
 
-5. Для ограничения выборки добавлены алиасы `limit($value)` (соответсвует `nPageSize`) и `page($num)` (соответсвует `iNumPage`)
+2. Для ограничения выборки добавлены алиасы `limit($value)` (соответсвует `nPageSize`) и `page($num)` (соответсвует `iNumPage`)
 
-5. В некоторых местах API более дружелюбный чем в самом Битриксе. Допустим в фильтре по пользователям не обязательно использовать
+3. В некоторых местах API более дружелюбный чем в самом Битриксе. Допустим в фильтре по пользователям не обязательно использовать
 `'GROUP_IDS'`. При передаче `'GROUP_ID'` (именно такой ключ требует Битрикс допустим при создании пользователя) или `'GROUPS'` 
 результат будет аналогичен.
-
 
 
 ### Query Scopes
@@ -219,7 +202,6 @@ $products = Product::query()
 $products = Product::query()
                     ->filter(['SECTION_ID' => $secId])
                     ->active()
-                    ->navigation(['nTopCount'=>100])
                     ->getList();
 ```
 
@@ -232,7 +214,7 @@ $products = Product::query()
      *
      * @return ElementQuery
      */
-    public function scopeFromCategory($query, $category)
+    public function scopeFromCategoryWithCode($query, $category)
     {
         $query->filter['SECTION_CODE'] = $category;
 
@@ -240,7 +222,7 @@ $products = Product::query()
     }
 
 ...
-$users = User::query()->sort(["ID" => "ASC"])->filter(['NAME'=>'John'])->fromGroup(7)->getList();
+$users = Product::query()->fromCategoryWithCode('sale')->getList();
 ```
 
 #### Остановка действия

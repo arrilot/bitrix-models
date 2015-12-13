@@ -3,6 +3,8 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use BadMethodCallException;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
@@ -100,26 +102,6 @@ abstract class BaseQuery
         $this->bxObject = $bxObject;
         $this->modelName = $modelName;
         $this->model = new $modelName();
-    }
-
-    /**
-     * Paginate the given query into a paginator.
-     *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int|null  $page
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    public function paginate($perPage = 15, $pageName = 'page', $page = null)
-    {
-        $page = $page ?: Paginator::resolveCurrentPage($pageName);
-        $total = $this->getCountForPagination($columns);
-        $results = $this->forPage($page, $perPage)->get($columns);
-        return new LengthAwarePaginator($results, $total, $perPage, $page, [
-            'path' => Paginator::resolveCurrentPath(),
-            'pageName' => $pageName,
-        ]);
     }
 
     /**
@@ -291,6 +273,59 @@ abstract class BaseQuery
     public function take($value)
     {
         return $this->limit($value);
+    }
+
+    /**
+     * Set the limit and offset for a given page.
+     *
+     * @param  int  $page
+     * @param  int  $perPage
+     * @return $this
+     */
+    public function forPage($page, $perPage = 15)
+    {
+        return $this->page($page)->take($perPage);
+    }
+
+    /**
+     * Paginate the given query into a paginator.
+     *
+     * @param  int  $perPage
+     * @param  string  $pageName
+     *
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function paginate($perPage = 15, $pageName = 'page')
+    {
+        $page = Paginator::resolveCurrentPage($pageName);
+        $total = $this->count();
+        $results = $this->forPage($page, $perPage)->getList();
+
+        return new LengthAwarePaginator($results, $total, $perPage, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
+    }
+
+    /**
+     * Get a paginator only supporting simple next and previous links.
+     *
+     * This is more efficient on larger data-sets, etc.
+     *
+     * @param  int  $perPage
+     * @param  string  $pageName
+     *
+     * @return \Illuminate\Pagination\Paginator
+     */
+    public function simplePaginate($perPage = 15, $pageName = 'page')
+    {
+        $page = Paginator::resolveCurrentPage($pageName);
+        $results = $this->forPage($page, $perPage + 1)->getList();
+
+        return new Paginator($results, $perPage, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
     }
 
     /**
