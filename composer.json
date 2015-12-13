@@ -11,7 +11,7 @@
       "email": "nekrasov.ilya90@gmail.com"
     }
   ],
-  "homepage": "https://github.com/arrilot/bitrix-models",
+  "homepage": "https://github.com/Arrilot/bitrix-models",
   "require": {
     "php": ">=5.4.0",
     "illuminate/support": "5.*",
@@ -24,10 +24,7 @@
   "autoload": {
     "psr-4": {
       "Arrilot\\BitrixModels\\": "src/"
-    },
-    "files": [
-      "src/helpers.php"
-    ]
+    }
   },
   "autoload-dev": {
     "psr-4": {
