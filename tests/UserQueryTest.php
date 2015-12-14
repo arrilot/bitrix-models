@@ -83,4 +83,26 @@ class UserQueryTest extends TestCase
             $this->assertSame($expected[$k], $item->toArray());
         }
     }
+
+    public function testGetByLogin()
+    {
+        $bxObject = m::mock('object');
+        TestUser::$bxObject = $bxObject;
+        $bxObject->shouldReceive('getList')->with(
+            ['SORT' => 'ASC'],
+            false,
+            ['LOGIN_EQUAL_EXACT' => 'JohnDoe' ],
+            [
+                'SELECT'     => false,
+                'NAV_PARAMS' => ['nPageSize' => 1 ],
+                'FIELDS'     => ['ID', 'NAME'],
+            ]
+        )->once()->andReturn(m::self());
+        $bxObject->shouldReceive('fetch')->times(2)->andReturn(['ID' => 1, 'NAME' => 'foo'], false);
+
+        $query = $this->createQuery($bxObject);
+        $item = $query->sort(['SORT' => 'ASC'])->select('ID', 'NAME')->getByLogin('JohnDoe');
+
+        $this->assertSame(['ID' => 1, 'NAME' => 'foo'], $item->toArray());
+    }
 }

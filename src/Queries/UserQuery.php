@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Collection;
+use Arrilot\BitrixModels\Models\UserModel;
 
 /**
  * @method UserQuery fromGroup($groupId)
@@ -111,6 +112,20 @@ class UserQuery extends BaseQuery
         }
 
         return new Collection($users);
+    }
+
+    /**
+     * Scope to get only users from a given group / groups.
+     *
+     * @param string $login
+     *
+     * @return UserModel
+     */
+    public function getByLogin($login)
+    {
+        $this->filter['LOGIN_EQUAL_EXACT'] = $login;
+
+        return $this->first();
     }
 
     /**
