@@ -105,4 +105,26 @@ class UserQueryTest extends TestCase
 
         $this->assertSame(['ID' => 1, 'NAME' => 'foo'], $item->toArray());
     }
+
+    public function testGetByEmail()
+    {
+        $bxObject = m::mock('object');
+        TestUser::$bxObject = $bxObject;
+        $bxObject->shouldReceive('getList')->with(
+            ['SORT' => 'ASC'],
+            false,
+            ['EMAIL' => 'john@example.com' ],
+            [
+                'SELECT'     => false,
+                'NAV_PARAMS' => ['nPageSize' => 1 ],
+                'FIELDS'     => ['ID', 'NAME'],
+            ]
+        )->once()->andReturn(m::self());
+        $bxObject->shouldReceive('fetch')->times(2)->andReturn(['ID' => 1, 'NAME' => 'foo'], false);
+
+        $query = $this->createQuery($bxObject);
+        $item = $query->sort(['SORT' => 'ASC'])->select('ID', 'NAME')->getByEmail('john@example.com');
+
+        $this->assertSame(['ID' => 1, 'NAME' => 'foo'], $item->toArray());
+    }
 }

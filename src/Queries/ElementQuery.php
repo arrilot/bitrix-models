@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Collection;
+use Arrilot\BitrixModels\Models\ElementModel;
 use CIBlock;
 use Exception;
 
@@ -190,6 +191,34 @@ class ElementQuery extends BaseQuery
         }
 
         return new Collection($items);
+    }
+
+    /**
+     * Get the first element with a given code.
+     *
+     * @param string $code
+     *
+     * @return ElementModel
+     */
+    public function getByCode($code)
+    {
+        $this->filter['CODE'] = $code;
+
+        return $this->first();
+    }
+
+    /**
+     * Get the first element with a given external id.
+     *
+     * @param string $id
+     *
+     * @return ElementModel
+     */
+    public function getByExternalId($id)
+    {
+        $this->filter['EXTERNAL_ID'] = $id;
+
+        return $this->first();
     }
 
     /**

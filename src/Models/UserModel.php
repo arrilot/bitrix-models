@@ -250,4 +250,27 @@ class UserModel extends BaseModel
 
         return $query;
     }
+
+    /**
+     * Substitute old group with the new one.
+     *
+     * @param int $old
+     * @param int $new
+     *
+     * @return void
+     */
+    public function substituteGroup($old, $new)
+    {
+        $groups = $this->getGroups();
+
+        if(($key = array_search($old, $groups)) !== false) {
+            unset($groups[$key]);
+        }
+
+        if (!in_array($new, $groups)) {
+            $groups[] = $new;
+        }
+
+        $this->fields['GROUP_ID'] = $groups;
+    }
 }

@@ -94,4 +94,56 @@ class SectionModel extends BaseModel
 
         return $this->fields;
     }
+
+    /**
+     * Get IDs of direct children of the section.
+     * Additional filter can be specified.
+     *
+     * @param array $filter
+     *
+     * @return array
+     */
+    public function getDirectChildren(array $filter = [])
+    {
+        return static::query()
+            ->filter($filter)
+            ->filter(['SECTION_ID' => $this->id])
+            ->select('ID')
+            ->getList()
+            ->transform(function ($section) {
+                return (int) $section['ID'];
+            })
+            ->all();
+    }
+
+    /**
+     * Get IDs of all children of the section (direct or not).
+     * Additional filter can be specified.
+     *
+     * @param array $filter
+     * @param array|string $sort
+     *
+     * @return array
+     */
+    public function getAllChildren(array $filter = [], $sort = ['LEFT_MARGIN' => 'ASC'])
+    {
+        if (!isset($this->fields['LEFT_MARGIN']) || !isset($this->fields['RIGHT_MARGIN'])) {
+            $this->refresh();
+        }
+
+        return static::query()
+            ->sort($sort)
+            ->filter($filter)
+            ->filter([
+                '!ID' => $this->id,
+                '>LEFT_MARGIN' => $this->fields['LEFT_MARGIN'],
+                '<RIGHT_MARGIN' => $this->fields['RIGHT_MARGIN'],
+            ])
+            ->select('ID')
+            ->getList()
+            ->transform(function ($section) {
+                return (int) $section['ID'];
+            })
+            ->all();
+    }
 }

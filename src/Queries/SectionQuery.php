@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Collection;
+use Arrilot\BitrixModels\Models\SectionModel;
 
 class SectionQuery extends BaseQuery
 {
@@ -95,6 +96,34 @@ class SectionQuery extends BaseQuery
         }
 
         return new Collection($sections);
+    }
+
+    /**
+     * Get the first section with a given code.
+     *
+     * @param string $code
+     *
+     * @return SectionModel
+     */
+    public function getByCode($code)
+    {
+        $this->filter['CODE'] = $code;
+
+        return $this->first();
+    }
+
+    /**
+     * Get the first section with a given external id.
+     *
+     * @param string $id
+     *
+     * @return SectionModel
+     */
+    public function getByExternalId($id)
+    {
+        $this->filter['EXTERNAL_ID'] = $id;
+
+        return $this->first();
     }
 
     /**

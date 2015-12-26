@@ -67,7 +67,6 @@ $product['NAME'] = 'Новое имя продукта';
 $product->save();
 
 // вариант 2
-$product['NAME'] = 'Новое имя продукта';
 $product->update(['NAME' => 'Новое имя продукта']);
 ```
 
@@ -131,6 +130,10 @@ $products = Product::query()
 4. `->count()` - получение количества объектов.
 
 5. `->paginate() или ->simplePaginate()` - получение спагинированного списка с мета-данными (см. http://laravel.com/docs/5.1/pagination)
+
+6. Методы для конкретных моделей:
+`->getByLogin($login)` и `->getByEmail($email)` - получение первого попавшегося юзера с данным логином/email.
+`->getByCode($code)` и `->getByExternalId($id)` - получение первого попавшегося элемента или раздела ИБ по CODE/EXTERNAL_ID
 
 Объекты-модели реализуют ArrayAccess поэтому с ними можно во многом работать как с массивами.
 ```php

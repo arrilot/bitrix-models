@@ -85,7 +85,7 @@ class UserQuery extends BaseQuery
     ];
 
     /**
-     * CUser::getList substitution.
+     * Get the collection of users according to the current query.
      *
      * @return Collection
      */
@@ -115,7 +115,7 @@ class UserQuery extends BaseQuery
     }
 
     /**
-     * Scope to get only users from a given group / groups.
+     * Get the first user with a given login.
      *
      * @param string $login
      *
@@ -129,7 +129,21 @@ class UserQuery extends BaseQuery
     }
 
     /**
-     * Get count of users that match $filter.
+     * Get the first user with a given email.
+     *
+     * @param string $email
+     *
+     * @return UserModel
+     */
+    public function getByEmail($email)
+    {
+        $this->filter['EMAIL'] = $email;
+
+        return $this->first();
+    }
+
+    /**
+     * Get count of users according the current query.
      *
      * @return int
      */
