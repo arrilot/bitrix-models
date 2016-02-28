@@ -184,6 +184,8 @@ class SectionQuery extends BaseQuery
             $this->select[] = 'UF_*';
         }
 
+        $this->select[] = 'ID';
+
         return $this->clearSelectArray();
     }
 }

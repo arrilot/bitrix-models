@@ -196,6 +196,8 @@ class UserQuery extends BaseQuery
             $this->select = array_merge($this->standardFields, $this->select);
         }
 
+        $this->select[] = 'ID';
+
         return $this->clearSelectArray();
     }
 }
