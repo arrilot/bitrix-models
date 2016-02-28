@@ -2,10 +2,12 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
+use Arrilot\BitrixModels\Models\BaseModel;
 use BadMethodCallException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use LogicException;
 
 /**
  * @method ElementQuery active()
@@ -67,7 +69,7 @@ abstract class BaseQuery
      *
      * @var string|bool
      */
-    public $keyBy = false;
+    public $keyBy = 'ID';
 
     /**
      * Indicates that the query should be stopped instead of touching the DB.
@@ -128,12 +130,9 @@ abstract class BaseQuery
         }
 
         $this->sort = [];
-        $this->keyBy = false;
         $this->filter['ID'] = $id;
 
-        $items = $this->getList();
-
-        return !empty($items) ? $items[0] : false;
+        return $this->getList()->first(null, false);
     }
 
     /**
@@ -344,18 +343,46 @@ abstract class BaseQuery
      * Adds $item to $results using keyBy value.
      *
      * @param $results
-     * @param $item
+     * @param BaseModel $object
      *
-     * @return array
+     * @return void
      */
-    protected function addItemToResultsUsingKeyBy(&$results, $item)
+    protected function addItemToResultsUsingKeyBy(&$results, BaseModel $object)
     {
-        $keyByValue = ($this->keyBy && isset($item[$this->keyBy])) ? $item[$this->keyBy] : false;
+        $item = $object->fields;
+        if (!isset($item[$this->keyBy])) {
+            throw new LogicException("Field {$this->keyBy} is not found in object");
+        }
 
-        if ($keyByValue) {
-            $results[$keyByValue] = $item;
+        $keyByValue = $item[$this->keyBy];
+
+        if (!isset($results[$keyByValue])) {
+            $results[$keyByValue] = $object;
         } else {
-            $results[] = $item;
+            $oldFields = $results[$keyByValue]->fields;
+            foreach ($oldFields as $field => $oldValue) {
+                // пропускаем служебные поля.
+                if (in_array($field, ['_was_multiplied', 'PROPERTIES'])) {
+                    continue;
+                }
+
+                // мультиплицируем только несовпадающие значения полей
+                $newValue = $item[$field];
+                if ($oldValue !== $newValue) {
+                    // если еще не мультиплицироваи объект то все поля надо превратить в массивы
+                    if (empty($oldFields['_was_multiplied'])) {
+                        $oldFields[$field] = [
+                            $oldFields[$field]
+                        ];
+                    }
+
+                    // в любом случае добавляем новое значение полю
+                    $oldFields[$field][] = $newValue;
+                }
+            }
+
+            $oldFields['_was_multiplied'] = true;
+            $results[$keyByValue]->fields = $oldFields;
         }
     }
 

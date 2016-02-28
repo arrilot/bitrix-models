@@ -266,8 +266,8 @@ class ElementModelTest extends TestCase
         ]);
 
         $expected = [
-            ['ID' => 1],
-            ['ID' => 2],
+            1 => ['ID' => 1],
+            2 => ['ID' => 2],
         ];
         foreach ($elements as $k => $item) {
             $this->assertSame($expected[$k], $item->fields);

@@ -23,6 +23,7 @@ class ElementQueryTest extends TestCase
      */
     protected function createQuery($bxObject)
     {
+        ElementQuery::$cIblockObject =  m::mock('ciblockObject');
         return new ElementQuery($bxObject, 'Arrilot\Tests\BitrixModels\Stubs\TestElement');
     }
 
@@ -59,8 +60,8 @@ class ElementQueryTest extends TestCase
         $items = $query->filter(['ACTIVE' => 'N'])->addFilter(['!CODE' => false])->select('ID', 'NAME')->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo'],
-            ['ID' => 2, 'NAME' => 'bar'],
+            1 => ['ID' => 1, 'NAME' => 'foo'],
+            2 => ['ID' => 2, 'NAME' => 'bar'],
         ];
         foreach ($items as $k => $item) {
             $this->assertSame($expected[$k], $item->fields);
@@ -75,11 +76,11 @@ class ElementQueryTest extends TestCase
         $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar']);
 
         $query = $this->createQuery($bxObject);
-        $items = $query->filter(['ACTIVE' => 'N'])->keyBy(false)->select('ID', 'NAME')->getList();
+        $items = $query->filter(['ACTIVE' => 'N'])->select('ID', 'NAME')->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo', 'ACCESSOR_THREE' => []],
-            ['ID' => 2, 'NAME' => 'bar', 'ACCESSOR_THREE' => []],
+            1 => ['ID' => 1, 'NAME' => 'foo', 'ACCESSOR_THREE' => []],
+            2 => ['ID' => 2, 'NAME' => 'bar', 'ACCESSOR_THREE' => []],
         ];
 
         $this->assertSame($expected, $items->toArray());
@@ -102,6 +103,46 @@ class ElementQueryTest extends TestCase
         }
     }
 
+    public function testGetListWithKeyByAndMissingKey()
+    {
+        $this->setExpectedException('LogicException');
+
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'NAME', 'IBLOCK_ID'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
+        $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar']);
+
+        $query = $this->createQuery($bxObject);
+        $items = $query->filter(['ACTIVE' => 'N'])->keyBy('GUID')->select(['ID', 'NAME'])->getList();
+
+        $expected = [
+            'foo' => ['ID' => 1, 'NAME' => 'foo'],
+            'bar' => ['ID' => 2, 'NAME' => 'bar'],
+        ];
+        foreach ($items as $k => $item) {
+            $this->assertSame($expected[$k], $item->fields);
+        }
+    }
+
+    public function testGetListGroupsItemsByKeyBy()
+    {
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'N', 'IBLOCK_ID' => 1], false, false, ['ID', 'PROPERTY_FOO', 'IBLOCK_ID'])->once()->andReturn(m::self());
+        $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), m::self(), m::self(), false);
+        $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1, 'PROPERTY_FOO_VALUE' => 'foo'], ['ID' => 2, 'PROPERTY_FOO_VALUE' => 'bar'], ['ID' => 2, 'PROPERTY_FOO_VALUE' => 'bar2'], ['ID' => 2, 'PROPERTY_FOO_VALUE' => 'bar3']);
+
+        $query = $this->createQuery($bxObject);
+        $items = $query->filter(['ACTIVE' => 'N'])->select(['ID', 'PROPERTY_FOO'])->getList();
+
+        $expected = [
+            1 => ['ID' => 1, 'PROPERTY_FOO_VALUE' => 'foo'],
+            2 => ['ID' => 2, 'PROPERTY_FOO_VALUE' => ['bar', 'bar2', 'bar3'], '_was_multiplied' => true],
+        ];
+        foreach ($items as $k => $item) {
+            $this->assertSame($expected[$k], $item->fields);
+        }
+    }
+
     public function testResetFilter()
     {
         $bxObject = m::mock('object');
@@ -114,8 +155,8 @@ class ElementQueryTest extends TestCase
         $items = $query->filter(['NAME' => 'John'])->resetFilter()->select('ID', 'NAME')->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo'],
-            ['ID' => 2, 'NAME' => 'bar'],
+            1 => ['ID' => 1, 'NAME' => 'foo'],
+            2 => ['ID' => 2, 'NAME' => 'bar'],
         ];
         foreach ($items as $k => $item) {
             $this->assertSame($expected[$k], $item->fields);
@@ -134,8 +175,8 @@ class ElementQueryTest extends TestCase
         $items = $query->active()->filter(['NAME' => 'John'])->select('ID', 'NAME')->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo'],
-            ['ID' => 2, 'NAME' => 'bar'],
+            1 => ['ID' => 1, 'NAME' => 'foo'],
+            2 => ['ID' => 2, 'NAME' => 'bar'],
         ];
         foreach ($items as $k => $item) {
             $this->assertSame($expected[$k], $item->fields);
@@ -158,8 +199,8 @@ class ElementQueryTest extends TestCase
             ->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo'],
-            ['ID' => 2, 'NAME' => 'bar'],
+            1 => ['ID' => 1, 'NAME' => 'foo'],
+            2 => ['ID' => 2, 'NAME' => 'bar'],
         ];
         foreach ($items as $k => $item) {
             $this->assertSame($expected[$k], $item->fields);
@@ -170,12 +211,12 @@ class ElementQueryTest extends TestCase
     {
         $bxObject = m::mock('object');
         $query = m::mock('Arrilot\BitrixModels\Queries\ElementQuery[getList]', [$bxObject, 'Arrilot\Tests\BitrixModels\Stubs\TestElement', 1]);
-        $query->shouldReceive('getList')->once()->andReturn([
-            [
+        $query->shouldReceive('getList')->once()->andReturn(new Collection([
+            1 => [
                 'ID'   => 1,
                 'NAME' => 2,
             ],
-        ]);
+        ]));
 
         $this->assertSame(['ID' => 1, 'NAME' => 2], $query->getById(1));
         $this->assertSame(false, $query->getById(0));
@@ -199,8 +240,8 @@ class ElementQueryTest extends TestCase
         $items = $query->filter(['ACTIVE' => 'N'])->select('ID', 'NAME', 'PROPERTY_GUID')->fetchUsing('getNext')->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo', 'PROPERTY_GUID_VALUE' => 'foo'],
-            ['ID' => 2, 'NAME' => 'bar', 'PROPERTY_GUID_VALUE' => ''],
+            1 => ['ID' => 1, 'NAME' => 'foo', 'PROPERTY_GUID_VALUE' => 'foo'],
+            2 => ['ID' => 2, 'NAME' => 'bar', 'PROPERTY_GUID_VALUE' => ''],
         ];
         foreach ($items as $k => $item) {
             $this->assertSame($expected[$k], $item->fields);
@@ -218,8 +259,8 @@ class ElementQueryTest extends TestCase
         $items = $query->filter(['ACTIVE' => 'N'])->select('ID', 'NAME')->fetchUsing('getNext')->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo'],
-            ['ID' => 2, 'NAME' => 'bar'],
+            1 => ['ID' => 1, 'NAME' => 'foo'],
+            2 => ['ID' => 2, 'NAME' => 'bar'],
         ];
         foreach ($items as $k => $item) {
             $this->assertSame($expected[$k], $item->fields);
@@ -238,8 +279,8 @@ class ElementQueryTest extends TestCase
         $items = $query->filter(['NAME' => 'John'])->page(3)->limit(2)->select('ID', 'NAME')->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo'],
-            ['ID' => 2, 'NAME' => 'bar'],
+            1 => ['ID' => 1, 'NAME' => 'foo'],
+            2 => ['ID' => 2, 'NAME' => 'bar'],
         ];
         foreach ($items as $k => $item) {
             $this->assertSame($expected[$k], $item->fields);

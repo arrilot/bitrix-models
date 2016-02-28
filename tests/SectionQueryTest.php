@@ -44,8 +44,8 @@ class SectionQueryTest extends TestCase
         $items = $query->sort(['SORT' => 'ASC'])->filter(['NAME' => 'John'])->active()->select('ID', 'NAME')->getList();
 
         $expected = [
-            ['ID' => 1, 'NAME' => 'foo'],
-            ['ID' => 2, 'NAME' => 'bar'],
+            1 => ['ID' => 1, 'NAME' => 'foo'],
+            2 => ['ID' => 2, 'NAME' => 'bar'],
         ];
         foreach ($items as $k => $item) {
             $this->assertSame($expected[$k], $item->toArray());
