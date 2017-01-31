@@ -2,9 +2,8 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
-use Arrilot\BitrixModels\Collection;
+use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Models\ElementModel;
-use CIBlock;
 use Exception;
 
 /**

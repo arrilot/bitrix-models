@@ -2,7 +2,7 @@
 
 namespace Arrilot\Tests\BitrixModels;
 
-use Arrilot\BitrixModels\Collection;
+use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use Arrilot\Tests\BitrixModels\Stubs\TestElement;
 use Mockery as m;
