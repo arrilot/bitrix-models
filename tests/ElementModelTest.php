@@ -252,28 +252,6 @@ class ElementModelTest extends TestCase
         $this->assertSame(['NAME' => 'John Doe', 'ID' => 2], $newElement->fields);
     }
 
-    public function testGetList()
-    {
-        $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getList')->with(['SORT' => 'ASC'], ['ACTIVE' => 'Y', 'IBLOCK_ID' => 1], false, false, ['ID', 'IBLOCK_ID'])->once()->andReturn(m::self());
-        $bxObject->shouldReceive('getNextElement')->andReturn(m::self(), m::self(), false);
-        $bxObject->shouldReceive('getFields')->andReturn(['ID' => 1], ['ID' => 2]);
-
-        TestElement::$bxObject = $bxObject;
-        $elements = TestElement::getlist([
-            'select'       => ['ID', 'IBLOCK_ID'],
-            'filter'       => ['ACTIVE' => 'Y'],
-        ]);
-
-        $expected = [
-            1 => ['ID' => 1],
-            2 => ['ID' => 2],
-        ];
-        foreach ($elements as $k => $item) {
-            $this->assertSame($expected[$k], $item->fields);
-        }
-    }
-
     public function testCount()
     {
         $bxObject = m::mock('object');

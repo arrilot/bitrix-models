@@ -14,11 +14,18 @@ abstract class BaseModel extends ArrayableModel
     use ModelEventsTrait;
 
     /**
-     * The loaded relationships for the model.
+     * Bitrix entity object.
      *
-     * @var array
+     * @var object
      */
-    protected $relations = [];
+    public static $bxObject;
+
+    /**
+     * Corresponding object class name.
+     *
+     * @var string
+     */
+    protected static $objectClass = '';
 
     /**
      * Have fields been already fetched from DB?
@@ -26,13 +33,6 @@ abstract class BaseModel extends ArrayableModel
      * @var bool
      */
     protected $fieldsAreFetched = false;
-
-    /**
-     * List of additional params that can modify query.
-     *
-     * @var array
-     */
-    protected static $additionalQueryModifiers = [];
 
     /**
      * Refresh model from database and place data to $this->fields.
@@ -202,37 +202,6 @@ abstract class BaseModel extends ArrayableModel
     }
 
     /**
-     * Create a new query and apply modifiers according to $params.
-     *
-     * @param array $params
-     *
-     * @return BaseQuery
-     */
-    protected static function createQueryWithModifiers($params)
-    {
-        $query = static::query();
-
-        $modifiers = array_merge(static::$additionalQueryModifiers, [
-            'sort',
-            'filter',
-            'navigation',
-            'select',
-            'keyBy',
-            'limit',
-            'take',
-        ]);
-
-        foreach ($modifiers as $modifier) {
-            if (isset($params[$modifier])) {
-                $query = $query->{$modifier}($params[$modifier]);
-            }
-        }
-
-        return $query;
-    }
-
-    /**
-     * @deprecated in favour of `static::query()->getById()`
      *
      * Get item by its id.
      *
@@ -243,38 +212,6 @@ abstract class BaseModel extends ArrayableModel
     public static function getById($id)
     {
         return static::query()->getById($id);
-    }
-
-    /**
-     * @deprecated in favour of `static::query()->getList()`
-     *
-     * Get list of items.
-     *
-     * @param array $params
-     *
-     * @return static[]
-     */
-    public static function getList($params = [])
-    {
-        $query = static::createQueryWithModifiers($params);
-
-        return $query->getList();
-    }
-
-    /**
-     * @deprecated in favour of `static::query()->first()`
-     *
-     * Get first item that match $params.
-     *
-     * @param array $params
-     *
-     * @return static
-     */
-    public static function first($params = [])
-    {
-        $query = static::createQueryWithModifiers($params);
-
-        return $query->first();
     }
 
     /**
@@ -454,57 +391,5 @@ abstract class BaseModel extends ArrayableModel
     {
         $this->id = $id;
         $this->fields['ID'] = $id;
-    }
-
-    /**
-     * Determine if the given relation is loaded.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function relationIsLoaded($key)
-    {
-        return array_key_exists($key, $this->relations);
-    }
-
-    /**
-     * Get a relationship value from a method.
-     *
-     * @param string $method
-     *
-     * @return mixed
-     */
-    protected function getRelationshipFromMethod($method)
-    {
-        $relation = $this->$method();
-
-        if (!$relation instanceof BaseRelation) {
-            throw new LogicException('Relationship method must return an object of type Arrilot\BitrixModels\Relations\BaseRelation');
-        }
-
-        return $this->relations[$method] = $relation->fetch();
-    }
-
-    /**
-     * Dynamically retrieve fields on the model.
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        if ($this->relationIsLoaded($key)) {
-            return $this->relations[$key];
-        }
-
-        if (method_exists($this, $key)) {
-            return $this->getRelationshipFromMethod($key);
-        }
-
-        $className = get_class($this);
-
-        throw new InvalidArgumentException("Invalid property {$className}::{$key}");
     }
 }

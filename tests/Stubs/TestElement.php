@@ -7,11 +7,8 @@ use Arrilot\BitrixModels\Models\ElementModel;
 class TestElement extends ElementModel
 {
     protected $appends = ['ACCESSOR_THREE'];
-
-    public static function iblockId()
-    {
-        return 1;
-    }
+    
+    protected static $iblockId = 1;
 
     public function getAccessorOneField($value)
     {

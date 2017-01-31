@@ -8,13 +8,6 @@ use Exception;
 class ElementModel extends BaseModel
 {
     /**
-     * Bitrix entity object.
-     *
-     * @var object
-     */
-    public static $bxObject;
-
-    /**
      * Corresponding object class name.
      *
      * @var string
@@ -22,14 +15,11 @@ class ElementModel extends BaseModel
     protected static $objectClass = 'CIBlockElement';
 
     /**
-     * List of additional params that can modify query.
+     * Corresponding IBLOCK_ID
      *
-     * @var array
+     * @var int
      */
-    protected static $additionalQueryModifiers = [
-        'groupBy',
-        'fetchUsing',
-    ];
+    protected static $iblockId;
 
     /**
      * Have sections been already fetched from DB?
@@ -47,8 +37,7 @@ class ElementModel extends BaseModel
     public static $fetchUsing = 'getNextElement';
 
     /**
-     * Corresponding iblock id.
-     * MUST be overridden.
+     * Getter for corresponding iblock id.
      *
      * @throws Exception
      *
@@ -56,7 +45,12 @@ class ElementModel extends BaseModel
      */
     public static function iblockId()
     {
-        throw new Exception('public static function iblockId() MUST be overridden');
+        $id = static::$iblockId;
+        if (!$id) {
+            throw new Exception('You must set $iblockId property or override iblockId() method');
+        }
+        
+        return $id;
     }
 
     /**

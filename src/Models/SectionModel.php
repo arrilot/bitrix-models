@@ -8,13 +8,6 @@ use Exception;
 class SectionModel extends BaseModel
 {
     /**
-     * Bitrix entity object.
-     *
-     * @var object
-     */
-    public static $bxObject;
-
-    /**
      * Corresponding object class name.
      *
      * @var string
@@ -22,17 +15,14 @@ class SectionModel extends BaseModel
     protected static $objectClass = 'CIBlockSection';
 
     /**
-     * List of params that can modify query.
+     * Corresponding IBLOCK_ID
      *
-     * @var array
+     * @var int
      */
-    protected static $additionalQueryModifiers = [
-        'countElements',
-    ];
+    protected static $iblockId;
 
     /**
-     * Corresponding iblock id.
-     * MUST be overridden.
+     * Getter for corresponding iblock id.
      *
      * @throws Exception
      *
@@ -40,7 +30,12 @@ class SectionModel extends BaseModel
      */
     public static function iblockId()
     {
-        throw new Exception('public static function iblockId() MUST be overridden');
+        $id = static::$iblockId;
+        if (!$id) {
+            throw new Exception('You must set $iblockId property or override iblockId() method');
+        }
+        
+        return $id;
     }
 
     /**
