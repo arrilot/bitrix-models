@@ -176,6 +176,18 @@ abstract class BaseModel extends ArrayableModel
     }
 
     /**
+     * Get count of items that match $filter.
+     *
+     * @param array $filter
+     *
+     * @return int
+     */
+    public static function count(array $filter = [])
+    {
+        return static::query()->filter($filter)->count();
+    }
+
+    /**
      * Get item by its id.
      *
      * @param int $id
