@@ -97,7 +97,7 @@ abstract class BaseModel extends ArrayableModel
      *
      * @param array $fields
      *
-     * @return null
+     * @return void
      */
     public function fill($fields)
     {
@@ -149,7 +149,7 @@ abstract class BaseModel extends ArrayableModel
      *
      * @throws Exception
      *
-     * @return static
+     * @return static|bool
      */
     public static function create($fields)
     {
@@ -176,40 +176,13 @@ abstract class BaseModel extends ArrayableModel
     }
 
     /**
-     * @deprecated in favour of `static::query()->count()`
-     *
-     * Get count of items that match $filter.
-     *
-     * @param array $filter
-     *
-     * @return int
-     */
-    public static function count(array $filter = [])
-    {
-        return static::query()->filter($filter)->count();
-    }
-
-    /**
      * Get item by its id.
      *
      * @param int $id
      *
-     * @return static
+     * @return static|bool
      */
     public static function find($id)
-    {
-        return static::query()->getById($id);
-    }
-
-    /**
-     *
-     * Get item by its id.
-     *
-     * @param int $id
-     *
-     * @return static
-     */
-    public static function getById($id)
     {
         return static::query()->getById($id);
     }
