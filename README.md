@@ -133,37 +133,37 @@ $products = Product::query()
 3. `->first()` - получение одного (самого первого) объекта удовлетворяющего параметрам запроса.
 4. `->count()` - получение количества объектов.
 5. `->paginate() или ->simplePaginate()` - получение спагинированного списка с мета-данными (см. http://laravel.com/docs/5.4/pagination)
-
 6. Методы для отдельных сущностей:
-`->getByLogin($login)` и `->getByEmail($email)` - получение первого попавшегося юзера с данным логином/email.
-`->getByCode($code)` и `->getByExternalId($id)` - получение первого попавшегося элемента или раздела ИБ по CODE/EXTERNAL_ID
+ `->getByLogin($login)` и `->getByEmail($email)` - получение первого попавшегося юзера с данным логином/email.
+ `->getByCode($code)` и `->getByExternalId($id)` - получение первого попавшегося элемента или раздела ИБ по CODE/EXTERNAL_ID
 
 #### Управление выборкой
 
 1. `->sort($array)` - аналог `$arSort` (первого параметра `CIBlockElement::GetList`)
 
-Примеры:
+ Примеры:
+ 
+ `->sort(['NAME' => 'ASC', 'ID => 'DESC'])`
 
-`->sort(['NAME' => 'ASC', 'ID => 'DESC'])`
+ `->sort('NAME', 'DESC') // = ->sort(['NAME' => 'DESC'])`
 
-`->sort('NAME', 'DESC') // = ->sort(['NAME' => 'DESC'])`
-
-`->sort('NAME') // = ->sort(['NAME' => 'ASC'])`
+ `->sort('NAME') // = ->sort(['NAME' => 'ASC'])`
 
 
 2. `->filter($array)` - аналог `$arFilter`
 3. `->navigation($array)`
 4. `->select(...)` - аналог `$arSelect`
 
-Примеры:
+ Примеры:
 
-`->select(['ID', 'NAME'])`
+ `->select(['ID', 'NAME'])`
+ 
+ `->select('ID', 'NAME')`
 
-`->select('ID', 'NAME')`
+ `select()` поддерживает два дополнительных значения - `'FIELDS'` (выбрать все поля), `'PROPS'` (выбрать все свойства).
+ Для пользователей также можно указать `'GROUPS'` (добавить группы пользователя в выборку).
+ Значение по-умолчанию - `['FIELDS', 'PROPS']`
 
-`select()` поддерживает два дополнительных значения - `'FIELDS'` (выбрать все поля), `'PROPS'` (выбрать все свойства).
-Для пользователей также можно указать `'GROUPS'` (добавить группы пользователя в выборку).
-Значение по-умолчанию - `['FIELDS', 'PROPS']`
 5. `->limit($int)`, `->take($int)`, `->page($int)`, `->forPage($page, $perPage)` - для навигации 
 
 
