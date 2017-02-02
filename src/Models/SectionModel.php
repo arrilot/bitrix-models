@@ -8,18 +8,18 @@ use Exception;
 class SectionModel extends BaseModel
 {
     /**
+     * Corresponding IBLOCK_ID
+     *
+     * @var int
+     */
+    const IBLOCK_ID = null;
+
+    /**
      * Corresponding object class name.
      *
      * @var string
      */
     protected static $objectClass = 'CIBlockSection';
-
-    /**
-     * Corresponding IBLOCK_ID
-     *
-     * @var int
-     */
-    protected static $iblockId;
 
     /**
      * Getter for corresponding iblock id.
@@ -30,7 +30,7 @@ class SectionModel extends BaseModel
      */
     public static function iblockId()
     {
-        $id = static::$iblockId;
+        $id = static::IBLOCK_ID;
         if (!$id) {
             throw new Exception('You must set $iblockId property or override iblockId() method');
         }

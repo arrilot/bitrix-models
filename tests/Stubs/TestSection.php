@@ -6,5 +6,5 @@ use Arrilot\BitrixModels\Models\SectionModel;
 
 class TestSection extends SectionModel
 {
-    protected static $iblockId = 1;
+    const IBLOCK_ID = 1;
 }

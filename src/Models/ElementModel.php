@@ -8,18 +8,18 @@ use Exception;
 class ElementModel extends BaseModel
 {
     /**
+     * Corresponding IBLOCK_ID
+     *
+     * @var int
+     */
+    const IBLOCK_ID = null;
+
+    /**
      * Corresponding object class name.
      *
      * @var string
      */
     protected static $objectClass = 'CIBlockElement';
-
-    /**
-     * Corresponding IBLOCK_ID
-     *
-     * @var int
-     */
-    protected static $iblockId;
 
     /**
      * Have sections been already fetched from DB?
@@ -45,9 +45,9 @@ class ElementModel extends BaseModel
      */
     public static function iblockId()
     {
-        $id = static::$iblockId;
+        $id = static::IBLOCK_ID;
         if (!$id) {
-            throw new Exception('You must set $iblockId property or override iblockId() method');
+            throw new Exception('You must set IBLOCK_ID constant inside a model or override iblockId() method');
         }
         
         return $id;
