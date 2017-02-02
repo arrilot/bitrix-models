@@ -17,6 +17,15 @@ class ServiceProvider
     public static function register()
     {
         self::bootstrapIlluminatePagination();
+    }
+    
+    /**
+     * Register eloquent.
+     *
+     * @return void
+     */
+    public static function registerEloquent()
+    {
         self::bootstrapIlluminateDatabase();
     }
     
@@ -50,10 +59,10 @@ class ServiceProvider
         $capsule = new Capsule(self::instantiateServiceContainer());
         $capsule->addConnection([
             'driver'    => 'mysql',
-            'host'      => 'localhost',
-            'database'  => 'orm_test',
-            'username'  => 'homestead',
-            'password'  => 'secret',
+            'host'      => $config['host'],
+            'database'  => $config['database'],
+            'username'  => $config['login'],
+            'password'  => $config['password'],
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
