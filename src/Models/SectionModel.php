@@ -49,48 +49,6 @@ class SectionModel extends BaseModel
     }
 
     /**
-     * Get all model attributes from cache or database.
-     *
-     * @return array
-     */
-    public function get()
-    {
-        $this->getFields();
-
-        return $this->fields;
-    }
-
-    /**
-     * Refresh model from database and place data to $this->fields.
-     *
-     * @return array
-     */
-    public function refresh()
-    {
-        $this->refreshFields();
-
-        return $this->fields;
-    }
-
-    /**
-     * Refresh user fields and save them to a class field.
-     *
-     * @return array
-     */
-    public function refreshFields()
-    {
-        if ($this->id === null) {
-            return  $this->fields = [];
-        }
-
-        $this->fields = static::query()->getById($this->id)->fields;
-
-        $this->fieldsAreFetched = true;
-
-        return $this->fields;
-    }
-
-    /**
      * Get IDs of direct children of the section.
      * Additional filter can be specified.
      *

@@ -35,20 +35,6 @@ abstract class BaseModel extends ArrayableModel
     protected $fieldsAreFetched = false;
 
     /**
-     * Refresh model from database and place data to $this->fields.
-     *
-     * @return array
-     */
-    abstract public function refresh();
-
-    /**
-     * Refresh model fields from database and place them to $this->fields.
-     *
-     * @return array
-     */
-    abstract public function refreshFields();
-
-    /**
      * Constructor.
      *
      * @param $id
@@ -89,6 +75,36 @@ abstract class BaseModel extends ArrayableModel
         }
 
         return $this->refreshFields();
+    }
+
+    /**
+     * Refresh model from database and place data to $this->fields.
+     *
+     * @return array
+     */
+    public function refresh()
+    {
+        $this->refreshFields();
+        
+        return $this->fields;
+    }
+
+    /**
+     * Refresh user fields and save them to a class field.
+     *
+     * @return array
+     */
+    public function refreshFields()
+    {
+        if ($this->id === null) {
+            return $this->fields = [];
+        }
+        
+        $this->fields = static::query()->getById($this->id)->fields;
+        
+        $this->fieldsAreFetched = true;
+        
+        return $this->fields;
     }
 
     /**
