@@ -2,6 +2,7 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
+use CIBlock;
 use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Models\ElementModel;
 use Exception;
@@ -117,8 +118,8 @@ class ElementQuery extends BaseQuery
             return static::$cIblockObject;
         }
 
-        if (class_exists('CIblock')) {
-            return static::$cIblockObject = new CIblock();
+        if (class_exists('CIBlock')) {
+            return static::$cIblockObject = new CIBlock();
         }
 
         throw new Exception('CIblock object initialization failed');
