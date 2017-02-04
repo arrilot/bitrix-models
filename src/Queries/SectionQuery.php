@@ -91,7 +91,7 @@ class SectionQuery extends BaseQuery
             $this->normalizeSelect(),
             $this->navigation
         );
-        while ($arSection = $rsSections->fetch()) {
+        while ($arSection = $rsSections->Fetch()) {
             $this->addItemToResultsUsingKeyBy($sections, new $this->modelName($arSection['ID'], $arSection));
         }
 

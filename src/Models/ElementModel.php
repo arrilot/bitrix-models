@@ -29,14 +29,6 @@ class ElementModel extends BaseModel
     protected $sectionsAreFetched = false;
 
     /**
-     * Method that is used to fetch getList results.
-     * Available values: 'getNext' or 'getNextElement'.
-     *
-     * @var string
-     */
-    public static $fetchUsing = 'getNextElement';
-
-    /**
      * Getter for corresponding iblock id.
      *
      * @throws Exception

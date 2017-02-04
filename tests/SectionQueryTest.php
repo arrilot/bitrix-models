@@ -38,7 +38,7 @@ class SectionQueryTest extends TestCase
             ['ID', 'NAME'],
             false
         )->once()->andReturn(m::self());
-        $bxObject->shouldReceive('fetch')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar'], false);
+        $bxObject->shouldReceive('Fetch')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar'], false);
 
         $query = $this->createQuery($bxObject);
         $items = $query->sort(['SORT' => 'ASC'])->filter(['NAME' => 'John'])->active()->select('ID', 'NAME')->getList();

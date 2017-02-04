@@ -82,14 +82,6 @@ class ElementQuery extends BaseQuery
     ];
 
     /**
-     * Method that is used to fetch getList results.
-     * Available values: 'getNext' or 'getNextElement'.
-     *
-     * @var string
-     */
-    protected $fetchUsing = 'getNextElement';
-
-    /**
      * Constructor.
      *
      * @param object $bxObject
@@ -98,11 +90,9 @@ class ElementQuery extends BaseQuery
     public function __construct($bxObject, $modelName)
     {
         static::instantiateCIblockObject();
-
         parent::__construct($bxObject, $modelName);
 
         $this->iblockId = $modelName::iblockId();
-        $this->fetchUsing = $modelName::$fetchUsing;
     }
 
     /**
@@ -140,20 +130,6 @@ class ElementQuery extends BaseQuery
     }
 
     /**
-     * Setter for fetchUsing.
-     *
-     * @param string $fetchUsing
-     *
-     * @return $this
-     */
-    public function fetchUsing($fetchUsing)
-    {
-        $this->fetchUsing = $fetchUsing;
-
-        return $this;
-    }
-
-    /**
      * Get list of items.
      *
      * @return Collection
@@ -166,28 +142,16 @@ class ElementQuery extends BaseQuery
 
         $items = [];
 
-        $rsItems = $this->bxObject->getList(
+        $rsItems = $this->bxObject->GetList(
             $this->sort,
             $this->normalizeFilter(),
             $this->groupBy,
             $this->navigation,
             $this->normalizeSelect()
         );
-
-        if ($this->shouldBeFetchedUsingGetNext()) {
-            while ($arItem = $rsItems->getNext()) {
-                $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
-            }
-        } else {
-            while ($obItem = $rsItems->getNextElement()) {
-                $arItem = $obItem->getFields();
-                if ($this->propsMustBeSelected()) {
-                    $arItem['PROPERTIES'] = $obItem->getProperties();
-                    $this->normalizePropertyResultFormat($arItem);
-                }
-
-                $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
-            }
+    
+        while ($arItem = $rsItems->Fetch()) {
+            $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
         }
 
         return new Collection($items);
@@ -232,33 +196,33 @@ class ElementQuery extends BaseQuery
             return 0;
         }
 
-        return (int) $this->bxObject->getList(false, $this->normalizeFilter(), []);
+        return (int) $this->bxObject->GetList(false, $this->normalizeFilter(), []);
     }
 
-    /**
-     * Normalize properties's format converting it to 'PROPERTY_"CODE"_VALUE'.
-     *
-     * @param array $fields
-     *
-     * @return null
-     */
-    protected function normalizePropertyResultFormat(&$fields)
-    {
-        if (empty($fields['PROPERTIES'])) {
-            return;
-        }
-
-        foreach ($fields['PROPERTIES'] as $code => $prop) {
-            $fields['PROPERTY_'.$code.'_VALUE'] = $prop['VALUE'];
-            $fields['~PROPERTY_'.$code.'_VALUE'] = $prop['~VALUE'];
-            $fields['PROPERTY_'.$code.'_DESCRIPTION'] = $prop['DESCRIPTION'];
-            $fields['~PROPERTY_'.$code.'_DESCRIPTION'] = $prop['~DESCRIPTION'];
-            $fields['PROPERTY_'.$code.'_VALUE_ID'] = $prop['PROPERTY_VALUE_ID'];
-            if (isset($prop['VALUE_ENUM_ID'])) {
-                $fields['PROPERTY_'.$code.'_ENUM_ID'] = $prop['VALUE_ENUM_ID'];
-            }
-        }
-    }
+//    /**
+//     * Normalize properties's format converting it to 'PROPERTY_"CODE"_VALUE'.
+//     *
+//     * @param array $fields
+//     *
+//     * @return null
+//     */
+//    protected function normalizePropertyResultFormat(&$fields)
+//    {
+//        if (empty($fields['PROPERTIES'])) {
+//            return;
+//        }
+//
+//        foreach ($fields['PROPERTIES'] as $code => $prop) {
+//            $fields['PROPERTY_'.$code.'_VALUE'] = $prop['VALUE'];
+//            $fields['~PROPERTY_'.$code.'_VALUE'] = $prop['~VALUE'];
+//            $fields['PROPERTY_'.$code.'_DESCRIPTION'] = $prop['DESCRIPTION'];
+//            $fields['~PROPERTY_'.$code.'_DESCRIPTION'] = $prop['~DESCRIPTION'];
+//            $fields['PROPERTY_'.$code.'_VALUE_ID'] = $prop['PROPERTY_VALUE_ID'];
+//            if (isset($prop['VALUE_ENUM_ID'])) {
+//                $fields['PROPERTY_'.$code.'_ENUM_ID'] = $prop['VALUE_ENUM_ID'];
+//            }
+//        }
+//    }
 
     /**
      * Normalize filter before sending it to getList.
@@ -285,7 +249,7 @@ class ElementQuery extends BaseQuery
             $this->select = array_merge($this->standardFields, $this->select);
         }
 
-        if ($this->propsMustBeSelected() && $this->shouldBeFetchedUsingGetNext()) {
+        if ($this->propsMustBeSelected()) {
             $this->addAllPropsToSelect();
         }
 
@@ -305,19 +269,10 @@ class ElementQuery extends BaseQuery
         $this->select[] = 'ID';
         $this->select[] = 'IBLOCK_ID';
 
-        $rsProps = static::$cIblockObject->getProperties($this->iblockId);
-        while ($prop = $rsProps->fetch()) {
+        //dd (static::$cIblockObject);
+        $rsProps = static::$cIblockObject->GetProperties($this->iblockId);
+        while ($prop = $rsProps->Fetch()) {
             $this->select[] = 'PROPERTY_'.$prop['CODE'];
         }
-    }
-
-    /**
-     * Determine if we should fetch using GetNext() method.
-     *
-     * @return bool
-     */
-    protected function shouldBeFetchedUsingGetNext()
-    {
-        return $this->fetchUsing === 'getNext' || $this->fetchUsing === 'GetNext';
     }
 }

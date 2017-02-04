@@ -103,7 +103,7 @@ class UserQuery extends BaseQuery
 
         $users = [];
         $rsUsers = $this->bxObject->getList($this->sort, $sortOrder = false, $this->normalizeFilter(), $params);
-        while ($arUser = $rsUsers->fetch()) {
+        while ($arUser = $rsUsers->Fetch()) {
             if ($this->groupsMustBeSelected()) {
                 $arUser['GROUP_ID'] = $this->bxObject->getUserGroup($arUser['ID']);
             }

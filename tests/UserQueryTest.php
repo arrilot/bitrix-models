@@ -70,7 +70,7 @@ class UserQueryTest extends TestCase
                 'FIELDS'     => ['ID', 'NAME'],
             ]
         )->once()->andReturn(m::self());
-        $bxObject->shouldReceive('fetch')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar'], false);
+        $bxObject->shouldReceive('Fetch')->andReturn(['ID' => 1, 'NAME' => 'foo'], ['ID' => 2, 'NAME' => 'bar'], false);
 
         $query = $this->createQuery($bxObject);
         $items = $query->sort(['SORT' => 'ASC'])->filter(['NAME' => 'John'])->active()->select('ID', 'NAME')->getList();
@@ -98,7 +98,7 @@ class UserQueryTest extends TestCase
                 'FIELDS'     => ['ID', 'NAME'],
             ]
         )->once()->andReturn(m::self());
-        $bxObject->shouldReceive('fetch')->times(2)->andReturn(['ID' => 1, 'NAME' => 'foo'], false);
+        $bxObject->shouldReceive('Fetch')->times(2)->andReturn(['ID' => 1, 'NAME' => 'foo'], false);
 
         $query = $this->createQuery($bxObject);
         $item = $query->sort(['SORT' => 'ASC'])->select('ID', 'NAME')->getByLogin('JohnDoe');
@@ -120,7 +120,7 @@ class UserQueryTest extends TestCase
                 'FIELDS'     => ['ID', 'NAME'],
             ]
         )->once()->andReturn(m::self());
-        $bxObject->shouldReceive('fetch')->times(2)->andReturn(['ID' => 1, 'NAME' => 'foo'], false);
+        $bxObject->shouldReceive('Fetch')->times(2)->andReturn(['ID' => 1, 'NAME' => 'foo'], false);
 
         $query = $this->createQuery($bxObject);
         $item = $query->sort(['SORT' => 'ASC'])->select('ID', 'NAME')->getByEmail('john@example.com');

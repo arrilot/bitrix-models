@@ -85,42 +85,39 @@ class ElementModelTest extends TestCase
 
     public function testGet()
     {
-        $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getList')->withAnyArgs()->once()->andReturn(m::self());
-        $bxObject->shouldReceive('getNextElement')->twice()->andReturn(m::self(), false);
-        $bxObject->shouldReceive('getFields')->once()->andReturn([
-            'ID'   => 1,
-            'NAME' => 'John Doe',
-        ]);
-        $bxObject->shouldReceive('getProperties')->once()->andReturn([
-            'FOO' => [
-                'VALUE'             => 'bar',
-                '~VALUE'            => '~bar',
-                'DESCRIPTION'       => 'baz',
-                '~DESCRIPTION'      => '~baz',
-                'PROPERTY_VALUE_ID' => 'bar_id',
+        $cIblockObject = m::mock('cIblockObject');
+        $cIblockObject->shouldReceive('GetProperties')->withAnyArgs()->andReturn(m::self());
+        $cIblockObject->shouldReceive('Fetch')->twice()->andReturn(
+            [
+                'ID'        => '1',
+                'IBLOCK_ID' => '1',
+                'CODE'      => 'FOO',
             ],
-        ]);
-
+            false
+        );
+        ElementQuery::$cIblockObject = $cIblockObject;
+    
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('GetList')->withAnyArgs()->once()->andReturn(m::self());
+        $bxObject->shouldReceive('Fetch')->twice()->andReturn(
+            [
+                'ID'   => 1,
+                'NAME' => 'John Doe',
+                'PROPERTY_FOO_VALUE'        => 'bar',
+                'PROPERTY_FOO_DESCRIPTION'  => 'baz',
+                'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
+            ],
+            false
+        );
         TestElement::$bxObject = $bxObject;
+
         $element = new TestElement(1);
 
         $expected = [
             'ID'         => 1,
             'NAME'       => 'John Doe',
-            'PROPERTIES' => [
-                'FOO' => [
-                    'VALUE'             => 'bar',
-                    '~VALUE'            => '~bar',
-                    'DESCRIPTION'       => 'baz',
-                    '~DESCRIPTION'      => '~baz',
-                    'PROPERTY_VALUE_ID' => 'bar_id',
-                ],
-            ],
             'PROPERTY_FOO_VALUE'        => 'bar',
-            '~PROPERTY_FOO_VALUE'       => '~bar',
             'PROPERTY_FOO_DESCRIPTION'  => 'baz',
-            '~PROPERTY_FOO_DESCRIPTION' => '~baz',
             'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
         ];
         $this->assertEquals($expected, $element->get());
@@ -133,22 +130,44 @@ class ElementModelTest extends TestCase
 
     public function testRefresh()
     {
-        $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getList')->withAnyArgs()->twice()->andReturn(m::self());
-        $bxObject->shouldReceive('getNextElement')->times(4)->andReturn(m::self(), false, m::self(), false);
-        $bxObject->shouldReceive('getFields')->twice()->andReturn([
-            'ID'   => 1,
-            'NAME' => 'John Doe',
-        ]);
-        $bxObject->shouldReceive('getProperties')->twice()->andReturn([
-            'FOO' => [
-                'VALUE'             => 'bar',
-                '~VALUE'            => '~bar',
-                'DESCRIPTION'       => 'baz',
-                '~DESCRIPTION'      => '~baz',
-                'PROPERTY_VALUE_ID' => 'bar_id',
+        $cIblockObject = m::mock('cIblockObject');
+        $cIblockObject->shouldReceive('GetProperties')->twice()->withAnyArgs()->andReturn(m::self(), m::self());
+        $cIblockObject->shouldReceive('Fetch')->times(4)->andReturn(
+            [
+                'ID'        => '1',
+                'IBLOCK_ID' => '1',
+                'CODE'      => 'FOO',
             ],
-        ]);
+            false,
+            [
+                'ID'        => '1',
+                'IBLOCK_ID' => '1',
+                'CODE'      => 'FOO',
+            ],
+            false
+        );
+        ElementQuery::$cIblockObject = $cIblockObject;
+
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('GetList')->withAnyArgs()->twice()->andReturn(m::self());
+        $bxObject->shouldReceive('Fetch')->times(4)->andReturn(
+            [
+                'ID'   => 1,
+                'NAME' => 'John Doe',
+                'PROPERTY_FOO_VALUE'        => 'bar',
+                'PROPERTY_FOO_DESCRIPTION'  => 'baz',
+                'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
+            ],
+            false,
+            [
+                'ID'   => 1,
+                'NAME' => 'John Doe',
+                'PROPERTY_FOO_VALUE'        => 'bar',
+                'PROPERTY_FOO_DESCRIPTION'  => 'baz',
+                'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
+            ],
+            false
+        );
 
         TestElement::$bxObject = $bxObject;
         $element = new TestElement(1);
@@ -156,19 +175,8 @@ class ElementModelTest extends TestCase
         $expected = [
             'ID'         => 1,
             'NAME'       => 'John Doe',
-            'PROPERTIES' => [
-                'FOO' => [
-                    'VALUE'             => 'bar',
-                    '~VALUE'            => '~bar',
-                    'DESCRIPTION'       => 'baz',
-                    '~DESCRIPTION'      => '~baz',
-                    'PROPERTY_VALUE_ID' => 'bar_id',
-                ],
-            ],
             'PROPERTY_FOO_VALUE'        => 'bar',
-            '~PROPERTY_FOO_VALUE'       => '~bar',
             'PROPERTY_FOO_DESCRIPTION'  => 'baz',
-            '~PROPERTY_FOO_DESCRIPTION' => '~baz',
             'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
         ];
 
@@ -255,14 +263,14 @@ class ElementModelTest extends TestCase
     public function testCount()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getList')->with(false, ['ACTIVE' => 'Y', 'IBLOCK_ID' => 1], [])->once()->andReturn(2);
+        $bxObject->shouldReceive('GetList')->with(false, ['ACTIVE' => 'Y', 'IBLOCK_ID' => 1], [])->once()->andReturn(2);
 
         TestElement::$bxObject = $bxObject;
 
         $this->assertEquals(2, TestElement::count(['ACTIVE' => 'Y', 'IBLOCK_ID' => 1]));
 
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('getList')->with(false, ['IBLOCK_ID' => 1], [])->once()->andReturn(3);
+        $bxObject->shouldReceive('GetList')->with(false, ['IBLOCK_ID' => 1], [])->once()->andReturn(3);
 
         TestElement::$bxObject = $bxObject;
 
