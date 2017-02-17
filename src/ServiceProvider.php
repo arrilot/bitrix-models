@@ -18,7 +18,7 @@ class ServiceProvider
     {
         self::bootstrapIlluminatePagination();
     }
-    
+
     /**
      * Register eloquent.
      *
@@ -27,8 +27,9 @@ class ServiceProvider
     public static function registerEloquent()
     {
         self::bootstrapIlluminateDatabase();
+        class_alias(Capsule::class, 'DB');
     }
-    
+
     /**
      * Bootstrap illuminate/pagination
      */
@@ -37,14 +38,14 @@ class ServiceProvider
         Paginator::currentPathResolver(function () {
             return $GLOBALS['APPLICATION']->getCurPage();
         });
-        
+
         Paginator::currentPageResolver(function ($pageName = 'page') {
             $page = $_GET[$pageName];
-            
+
             if (filter_var($page, FILTER_VALIDATE_INT) !== false && (int)$page >= 1) {
                 return $page;
             }
-            
+
             return 1;
         });
     }
@@ -55,7 +56,7 @@ class ServiceProvider
     protected static function bootstrapIlluminateDatabase()
     {
         $config = self::getBitrixDbConfig();
-        
+
         $capsule = new Capsule(self::instantiateServiceContainer());
         $capsule->addConnection([
             'driver'    => 'mysql',
@@ -79,15 +80,15 @@ class ServiceProvider
     protected static function instantiateServiceContainer()
     {
         $container = Container::getInstance();
-        
+
         if (!$container) {
             $container = new Container();
             Container::setInstance($container);
         }
-        
+
         return $container;
     }
-    
+
     /**
      * Get bitrix database configuration array.
      *
