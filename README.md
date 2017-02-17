@@ -19,7 +19,7 @@ Arrilot\BitrixModels\Models\SectionModel
 Arrilot\BitrixModels\Models\UserModel
 ```
 
-## Использование
+## Использование моделей Bitrix
 
 Для пример далее везде будем рассматривать модель для элемента инфоблока (ElementModel). 
 Для других сущностей API практически идентичен.
@@ -127,11 +127,11 @@ $products = Product::query()
 
 Любая цепочка запросов должна заканчиваться одним из следующих методов:
 
-1. `->getList()` - получение коллекции (см. http://laravel.com/docs/5.4/collections) объектов. По умолчанию ключом каждого элемента является его ID.
+1. `->getList()` - получение коллекции (см. http://laravel.com/docs/master/collections) объектов. По умолчанию ключом каждого элемента является его ID.
 2. `->getById($id)` - получение объекта по его ID.
 3. `->first()` - получение одного (самого первого) объекта удовлетворяющего параметрам запроса.
 4. `->count()` - получение количества объектов.
-5. `->paginate() или ->simplePaginate()` - получение спагинированного списка с мета-данными (см. http://laravel.com/docs/5.4/pagination)
+5. `->paginate() или ->simplePaginate()` - получение спагинированного списка с мета-данными (см. http://laravel.com/docs/master/pagination)
 6. Методы для отдельных сущностей:
  `->getByLogin($login)` и `->getByEmail($email)` - получение первого попавшегося юзера с данным логином/email.
  `->getByCode($code)` и `->getByExternalId($id)` - получение первого попавшегося элемента или раздела ИБ по CODE/EXTERNAL_ID
@@ -335,3 +335,64 @@ class News extends ElementModel
 8. `onAfterDelete` - после удаления записи
 
 Если сделать `return false;` из обработчика `onBefore...` то последующее действие будет отменено.
+
+## Использование моделей Eloquent
+
+Вторая часть пакета - модели для пользовательских таблиц, то есть созданных вручную, а не через админку Битрикса.
+Для работы с ними мы можем вместо "ORM d7" или прямых запросов в базу подключить полновесную ORM от Laravel - [Eloquent](https://laravel.com/docs/master/eloquent)
+Стоит учитывать что в отличии от Битрикса `Eloquent` использует в качестве расширения PHP для доступа к mysql не mysql/mysqli а PDO
+А это значит что во-первых необходимо чтобы PDO был установлен и настроен, а во-вторых что у вас будут создаваться два подключения к базе на запрос.
+
+Первым делом нужно добавить в `init.php` еще одну строку - `Arrilot\BitrixModels\ServiceProvider::registerEloquent();`
+После этого можно создавать модели схожим с описанным выше образом, только наследоваться нужно от `EloquentModel`
+
+```php
+<?php
+
+use Arrilot\BitrixModels\Models\EloquentModel;
+
+class Product extends EloquentModel
+{
+    protected $table = 'app_products';
+}
+```
+> Если таблица называется `products` (множественная форма названия класса), то `protected $table = 'products';` можно опустить - это стандартное для Eloquent поведение.
+
+Из нестандартного
+ 1. Первичным ключом является `ID`, а не `id`
+ 2. Поля для времени создания и обновления записи называются `CREATED_AT` и `UPDATED_AT` а не `created_at` и `updated_at`
+
+> Если вы решили не добавлять в таблицу поля CREATED_AT и UPDATED_AT, то в модели нужно задать `public $timestamps = false;`
+
+Через `Eloquent` можно работать не только с пользовательскими таблицами, но и с Highload-блоками, что очень удобно.
+Для этого мы работаем напрямую с таблицей Highload-блока минуя API Битрикса.
+
+Например, представим что мы создали Highload-блок для брендов `Brands`, задали для него таблицу `brands` и добавили свойство `UF_NAME`.
+Тогда класс-модель для него будет выглядеть так:
+
+```php
+<?php
+
+use Arrilot\BitrixModels\Models\EloquentModel;
+
+class Brand extends EloquentModel
+{
+    public $timestamps = false;
+}
+```
+
+А для добавления новой записи в него достаточно следующего кода:
+```php
+$brand = new Brand();
+$brand['UF_NAME'] = 'Nike';
+$brand->save();
+
+// либо даже такого если настроены $fillable поля.
+$brand = Brand::create(['UF_NAME' => 'Nike']);
+```
+
+Для полноценной работой с Eloquent-моделями важно ознакомиться с официальной документацией данной ORM [(ссылка еще раз)](http://laravel.com/docs/master/eloquent)
+
+В заключение обращу внимание на то что, несмотря на то что API моделей Битрикса и моделей Eloquent очень похожи (во многом из-за того что bitrix-models разрабатывались под влияением Eloquent)
+это всё же разные вещи и внутри они совершенно независимые. Нельзя допустим сделать связь (relation) Eloquent модели и Битриксовой модели.
+
