@@ -2,6 +2,7 @@
 
 namespace Arrilot\BitrixModels;
 
+use Arrilot\BitrixBlade\BladeProvider;
 use Bitrix\Main\Config\Configuration;
 use Illuminate\Container\Container;
 use Illuminate\Pagination\Paginator;
@@ -35,6 +36,15 @@ class ServiceProvider
      */
     protected static function bootstrapIlluminatePagination()
     {
+        if (class_exists(BladeProvider::class)) {
+            Paginator::viewFactoryResolver(function () {
+                return BladeProvider::getViewFactory();
+            });
+        }
+
+        Paginator::$defaultView = 'pagination.default';
+        Paginator::$defaultSimpleView = 'pagination.simple-default';
+
         Paginator::currentPathResolver(function () {
             return $GLOBALS['APPLICATION']->getCurPage();
         });

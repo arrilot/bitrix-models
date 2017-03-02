@@ -18,6 +18,7 @@
     "illuminate/pagination": "^5.4"
   },
   "suggest": {
+    "arrilot/bitrix-blade": "To render pagination views using ->links()",
     "illuminate/database": "^5.4 to use Eloquent models"
   },
   "require-dev": {

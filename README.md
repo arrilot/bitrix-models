@@ -406,3 +406,13 @@ $brand = Brand::create(['UF_NAME' => 'Nike']);
 ```php
 DB::table('brands')->insert(['UF_NAME' => 'Nike']);
 ```
+
+## Постраничная навигация (pagination)
+
+И Битрикс-модели и Eloquent-модели поддерживают `->paginate()` и `->simplePaginate()` (см. http://laravel.com/docs/master/pagination)
+Для того чтобы затем отобразить постраничную навигацию через `->links()` нужно
+
+ 1. Установить [https://github.com/arrilot/bitrix-blade/](https://github.com/arrilot/bitrix-blade/)
+ 2. Скопировать дефолтные вьюшки из [https://github.com/laravel/framework/tree/master/src/Illuminate/Pagination/resources/views](https://github.com/laravel/framework/tree/master/src/Illuminate/Pagination/resources/views) в `local/views/pagination`
+
+После этого вьюшки можно модифицировать или создавать новые.
