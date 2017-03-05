@@ -11,7 +11,7 @@
 Он логически состоит из двух частей:
 
 1. Модели для сущностей битрикса (Битрикс-модели), которые представляет собой надстройку над традиционным API Битрикса, которая выглядит как Eloquent
-2. Модели для произвольных таблицы - интеграция `illuminate/support` в целом и `Eloquent` в частности для пользовательских таблиц.
+2. Модели для произвольных таблицы - интеграция `illuminate/support` в целом и `Eloquent` в частности.
 
 ## Установка
 
@@ -129,12 +129,12 @@ $json = $product->toJson();
 
 Простейший пример:
 ```php
-$products = Product::query()->select('ID')->sort(['ID' => 'DESC'])->getList();
+$products = Product::query()->select('ID')->getList();
 ```
 
 На самом деле данная форма приведена больше для понимания, есть более удобный вид, который использует `__callStatic` для передачи управления в объект-запрос.
 ```php
-$products = Product::select('ID')->sort(['ID' => 'DESC'])->getList();
+$products = Product::select('ID')->getList();
 ```
 
 Любая цепочка запросов должна заканчиваться одним из следующих методов:
@@ -209,8 +209,7 @@ $products = Product::select('ID')->sort(['ID' => 'DESC'])->getList();
 
 ...
 
-$products = Product::query()
-                    ->filter(['SECTION_ID' => $secId])
+$products = Product::filter(['SECTION_ID' => $secId])
                     ->active()
                     ->getList();
 ```
@@ -232,7 +231,7 @@ $products = Product::query()
     }
 
 ...
-$users = Product::query()->fromSectionWithCode('sale')->getList();
+$users = Product::fromSectionWithCode('sale')->getList();
 ```
 
 Данные скоупы уже присутсвуют в пакете, ими можно пользоваться.
