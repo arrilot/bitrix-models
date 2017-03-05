@@ -201,14 +201,14 @@ class ElementModel extends BitrixModel
     /**
      * Get element direct section as ID or array of fields.
      *
-     * @param bool $withProps
+     * @param bool $load
      *
      * @return false|int|array
      */
-    public function getSection($withProps = false)
+    public function getSection($load = false)
     {
         $fields = $this->getFields();
-        if (!$withProps) {
+        if (!$load) {
             return $fields['IBLOCK_SECTION_ID'];
         }
 
@@ -224,18 +224,18 @@ class ElementModel extends BitrixModel
     /**
      * Get element direct section as model object.
      *
-     * @param bool $withProps
+     * @param bool $load
      *
      * @return false|SectionModel
      */
-    public function section($withProps = false)
+    public function section($load = false)
     {
         $fields = $this->getFields();
 
         /** @var SectionModel $sectionModel */
         $sectionModel = static::sectionModel();
 
-        return $withProps
+        return $load
             ? $sectionModel::query()->getById($fields['IBLOCK_SECTION_ID'])
             : new $sectionModel($fields['IBLOCK_SECTION_ID']);
     }

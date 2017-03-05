@@ -214,7 +214,7 @@ $products = Product::query()
      *
      * @return ElementQuery
      */
-    public function scopeFromCategoryWithCode($query, $category)
+    public function scopeFromSectionWithCode($query, $category)
     {
         $query->filter['SECTION_CODE'] = $category;
 
@@ -222,7 +222,7 @@ $products = Product::query()
     }
 
 ...
-$users = Product::query()->fromCategoryWithCode('sale')->getList();
+$users = Product::query()->fromSectionWithCode('sale')->getList();
 ```
 
 Данные скоупы уже присутсвуют в пакете, ими можно пользоваться.
