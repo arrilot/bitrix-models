@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Models\UserModel;
 
 /**
+ * @method UserQuery active()
  * @method UserQuery fromGroup($groupId)
  */
 class UserQuery extends BaseQuery

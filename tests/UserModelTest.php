@@ -2,6 +2,7 @@
 
 namespace Arrilot\Tests\BitrixModels;
 
+use Arrilot\BitrixModels\Queries\UserQuery;
 use Arrilot\Tests\BitrixModels\Stubs\BxUserWithAuth;
 use Arrilot\Tests\BitrixModels\Stubs\BxUserWithoutAuth;
 use Arrilot\Tests\BitrixModels\Stubs\TestUser;
@@ -238,5 +239,19 @@ class UserModelTest extends TestCase
         $bxObject->shouldReceive('Fetch')->twice()->andReturn(['ID' => 1, 'NAME' => 'John Doe', 'GROUP_ID' => [1, 2, 3]], false);
     
         TestUser::$bxObject = $bxObject;
+    }
+    
+    public function testItCanWorkAsAStartingPointForAQuery()
+    {
+        $this->assertInstanceOf(UserQuery::class, TestUser::query());
+    }
+    
+    public function testItCanWorkAsAStaticProxy()
+    {
+        $this->assertInstanceOf(UserQuery::class, TestUser::filter(['ACTIVE'=> 'Y']));
+        $this->assertInstanceOf(UserQuery::class, TestUser::select('ID'));
+        $this->assertInstanceOf(UserQuery::class, TestUser::take(15));
+        $this->assertInstanceOf(UserQuery::class, TestUser::forPage(1, 22));
+        $this->assertInstanceOf(UserQuery::class, TestUser::active());
     }
 }

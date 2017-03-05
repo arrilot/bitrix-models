@@ -9,9 +9,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use LogicException;
 
-/**
- * @method ElementQuery active()
- */
 abstract class BaseQuery
 {
     /**
@@ -179,7 +176,7 @@ abstract class BaseQuery
     /**
      * Add another filter to filters array.
      *
-     * @param $filters
+     * @param array $filters
      *
      * @return $this
      */
@@ -223,7 +220,7 @@ abstract class BaseQuery
     /**
      * Setter for keyBy.
      *
-     * @param $value
+     * @param string $value
      *
      * @return $this
      */

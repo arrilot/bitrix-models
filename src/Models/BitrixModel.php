@@ -4,10 +4,8 @@ namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\ModelEventsTrait;
 use Arrilot\BitrixModels\Queries\BaseQuery;
-use Arrilot\BitrixModels\Relations\BaseRelation;
 use Exception;
-use InvalidArgumentException;
-use LogicException;
+use Illuminate\Support\Collection;
 
 abstract class BitrixModel extends ArrayableModel
 {
@@ -402,5 +400,17 @@ abstract class BitrixModel extends ArrayableModel
     {
         $this->id = $id;
         $this->fields['ID'] = $id;
+    }
+
+    /**
+     * Handle dynamic static method calls into a new query.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public static function __callStatic($method, $parameters)
+    {
+        return static::query()->$method(...$parameters);
     }
 }

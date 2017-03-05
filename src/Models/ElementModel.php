@@ -4,7 +4,39 @@ namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use Exception;
+use Illuminate\Support\Collection;
 
+/**
+ * ElementQuery methods
+ * @method static ElementQuery groupBy($value)
+ * @method static ElementModel getByCode(string $code)
+ * @method static ElementModel getByExternalId(string $id)
+ *
+ * Base Query methods
+ * @method static Collection getList()
+ * @method static ElementModel first()
+ * @method static ElementModel getById(int $id)
+ * @method static ElementQuery sort(string|array $by, string $order='ASC')
+ * @method static ElementQuery filter(array $filter)
+ * @method static ElementQuery addFilter(array $filters)
+ * @method static ElementQuery resetFilter()
+ * @method static ElementQuery navigation(array $filter)
+ * @method static ElementQuery select($value)
+ * @method static ElementQuery keyBy(string $value)
+ * @method static ElementQuery limit(int $value)
+ * @method static ElementQuery page(int $num)
+ * @method static ElementQuery take(int $value)
+ * @method static ElementQuery forPage(int $page, int $perPage=15)
+ * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, string $pageName = 'page')
+ * @method static \Illuminate\Pagination\Paginator simplePaginate(int $perPage = 15, string $pageName = 'page')
+ * @method static ElementQuery stopQuery()
+ *
+ * Scopes
+ * @method static ElementQuery active()
+ * @method static ElementQuery sortByDate(string $sort = 'DESC')
+ * @method static ElementQuery fromSectionWithId(int $id)
+ * @method static ElementQuery fromSectionWithCode(string $code)
+ */
 class ElementModel extends BitrixModel
 {
     /**
@@ -199,6 +231,7 @@ class ElementModel extends BitrixModel
     }
 
     /**
+     * @deprecated in favour of `->section()`
      * Get element direct section as ID or array of fields.
      *
      * @param bool $load

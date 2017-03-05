@@ -8,7 +8,10 @@ use Arrilot\BitrixModels\Models\ElementModel;
 use Exception;
 
 /**
+ * @method ElementQuery active()
  * @method ElementQuery sortByDate(string $sort = 'desc')
+ * @method ElementQuery fromSectionWithId(int $id)
+ * @method ElementQuery fromSectionWithCode(string $code)
  */
 class ElementQuery extends BaseQuery
 {

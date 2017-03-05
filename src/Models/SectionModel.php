@@ -4,7 +4,36 @@ namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\Queries\SectionQuery;
 use Exception;
+use Illuminate\Support\Collection;
 
+/**
+ * SectionQuery methods
+ * @method static SectionModel getByCode(string $code)
+ * @method static SectionModel getByExternalId(string $id)
+ * @method static SectionQuery countElements($value)
+ *
+ * Base Query methods
+ * @method static Collection getList()
+ * @method static SectionModel first()
+ * @method static SectionModel getById(int $id)
+ * @method static SectionQuery sort(string|array $by, string $order='ASC')
+ * @method static SectionQuery filter(array $filter)
+ * @method static SectionQuery addFilter(array $filters)
+ * @method static SectionQuery resetFilter()
+ * @method static SectionQuery navigation(array $filter)
+ * @method static SectionQuery select($value)
+ * @method static SectionQuery keyBy(string $value)
+ * @method static SectionQuery limit(int $value)
+ * @method static SectionQuery page(int $num)
+ * @method static SectionQuery take(int $value)
+ * @method static SectionQuery forPage(int $page, int $perPage=15)
+ * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, string $pageName = 'page')
+ * @method static \Illuminate\Pagination\Paginator simplePaginate(int $perPage = 15, string $pageName = 'page')
+ * @method static SectionQuery stopQuery()
+ *
+ * Scopes
+ * @method static SectionQuery active()
+ */
 class SectionModel extends BitrixModel
 {
     /**

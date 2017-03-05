@@ -3,7 +3,36 @@
 namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\Queries\UserQuery;
+use Illuminate\Support\Collection;
 
+/**
+ * UserQuery methods
+ * @method static UserModel getByLogin(string $login)
+ * @method static UserModel getByEmail(string $email)
+ *
+ * Base Query methods
+ * @method static Collection getList()
+ * @method static UserModel first()
+ * @method static UserModel getById(int $id)
+ * @method static UserQuery sort(string|array $by, string $order='ASC')
+ * @method static UserQuery filter(array $filter)
+ * @method static UserQuery addFilter(array $filters)
+ * @method static UserQuery resetFilter()
+ * @method static UserQuery navigation(array $filter)
+ * @method static UserQuery select($value)
+ * @method static UserQuery keyBy(string $value)
+ * @method static UserQuery limit(int $value)
+ * @method static UserQuery page(int $num)
+ * @method static UserQuery take(int $value)
+ * @method static UserQuery forPage(int $page, int $perPage=15)
+ * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, string $pageName = 'page')
+ * @method static \Illuminate\Pagination\Paginator simplePaginate(int $perPage = 15, string $pageName = 'page')
+ * @method static UserQuery stopQuery()
+ *
+ * Scopes
+ * @method static UserQuery active()
+ * @method UserQuery fromGroup(int $groupId)
+ */
 class UserModel extends BitrixModel
 {
     /**

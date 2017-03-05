@@ -5,6 +5,9 @@ namespace Arrilot\BitrixModels\Queries;
 use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Models\SectionModel;
 
+/**
+ * @method SectionQuery active()
+ */
 class SectionQuery extends BaseQuery
 {
     /**
