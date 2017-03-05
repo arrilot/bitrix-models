@@ -260,14 +260,15 @@ $users = Product::query()->fromCategoryWithCode('sale')->getList();
 Пример акссессора который принудительно делает первую букву имени заглавной:
 ```php
 
-    public function getNameField($value)
+    public function getXmlIdField($value)
     {
-        return ucfirst($value);  
+        return (int) $value;  
     }
     
-    // теперь в $product['NAME'] будет модифицированное значение
+    // теперь в $product['XML_ID'] всегда будет целочисленное значение
     
 ```
+Этим надо пользоваться с осторожностью, потому оригинальное значение становится недоступным.
 
 Аксессоры можно создавать также и для несуществущих полей, например:
 ```php
