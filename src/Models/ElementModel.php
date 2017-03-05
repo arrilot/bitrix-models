@@ -5,7 +5,7 @@ namespace Arrilot\BitrixModels\Models;
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use Exception;
 
-class ElementModel extends BaseModel
+class ElementModel extends BitrixModel
 {
     /**
      * Corresponding IBLOCK_ID
@@ -122,15 +122,15 @@ class ElementModel extends BaseModel
     }
 
     /**
-     * Get all model attributes from cache or database.
+     * Load all model attributes from cache or database.
      *
-     * @return array
+     * @return $this
      */
-    public function get()
+    public function load()
     {
         $this->getFields();
 
-        return $this->fields;
+        return $this;
     }
 
     /**

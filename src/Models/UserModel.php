@@ -4,7 +4,7 @@ namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\Queries\UserQuery;
 
-class UserModel extends BaseModel
+class UserModel extends BitrixModel
 {
     /**
      * Corresponding object class name.
@@ -12,6 +12,13 @@ class UserModel extends BaseModel
      * @var string
      */
     protected static $objectClass = 'CUser';
+
+    /**
+     * Current user cache.
+     *
+     * @var static
+     */
+    protected static $currentUser = null;
 
     /**
      * Have groups been already fetched from DB?
@@ -31,23 +38,27 @@ class UserModel extends BaseModel
     }
 
     /**
-     * Get a new instance for the current user.
-     *
-     * @param null $fields
+     * Get a new instance for the current user
      *
      * @return static
      */
-    public static function current($fields = null)
+    public static function current()
+    {
+        return is_null(static::$currentUser)
+            ? static::freshCurrent()
+            : static::$currentUser;
+    }
+
+    /**
+     * Get a fresh instance for the current user and save it to local cache.
+     *
+     * @return static
+     */
+    public static function freshCurrent()
     {
         global $USER;
 
-        $user = new static($USER->getId());
-
-        if (!is_null($fields)) {
-            $user->fill($fields);
-        }
-
-        return $user;
+        return static::$currentUser = (new static($USER->getId()))->load();
     }
 
     /**
@@ -78,17 +89,16 @@ class UserModel extends BaseModel
     }
 
     /**
-     * Get all model attributes from cache or database.
+     * Load model fields from database if they are not loaded yet.
      *
-     * @return array
+     * @return $this
      */
-    public function get()
+    public function load()
     {
         $this->getFields();
-
         $this->getGroups();
 
-        return $this->fields;
+        return $this;
     }
 
     /**

@@ -83,6 +83,51 @@ class ElementModelTest extends TestCase
         $this->assertTrue($element->deactivate());
     }
 
+    public function testLoad()
+    {
+        $cIblockObject = m::mock('cIblockObject');
+        $cIblockObject->shouldReceive('GetProperties')->withAnyArgs()->andReturn(m::self());
+        $cIblockObject->shouldReceive('Fetch')->twice()->andReturn(
+            [
+                'ID'        => '1',
+                'IBLOCK_ID' => '1',
+                'CODE'      => 'FOO',
+            ],
+            false
+        );
+        ElementQuery::$cIblockObject = $cIblockObject;
+        
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('GetList')->withAnyArgs()->once()->andReturn(m::self());
+        $bxObject->shouldReceive('Fetch')->twice()->andReturn(
+            [
+                'ID'   => 1,
+                'NAME' => 'John Doe',
+                'PROPERTY_FOO_VALUE'        => 'bar',
+                'PROPERTY_FOO_DESCRIPTION'  => 'baz',
+                'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
+            ],
+            false
+        );
+        TestElement::$bxObject = $bxObject;
+        
+        $element = new TestElement(1);
+        
+        $expected = [
+            'ID'         => 1,
+            'NAME'       => 'John Doe',
+            'PROPERTY_FOO_VALUE'        => 'bar',
+            'PROPERTY_FOO_DESCRIPTION'  => 'baz',
+            'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
+        ];
+        $element->load();
+        $this->assertEquals($expected, $element->fields);
+        
+        // second call to make sure we do not query database twice.
+        $element->load();
+        $this->assertSame($expected, $element->fields);
+    }
+
     public function testGet()
     {
         $cIblockObject = m::mock('cIblockObject');

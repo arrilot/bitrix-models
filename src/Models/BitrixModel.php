@@ -9,7 +9,7 @@ use Exception;
 use InvalidArgumentException;
 use LogicException;
 
-abstract class BaseModel extends ArrayableModel
+abstract class BitrixModel extends ArrayableModel
 {
     use ModelEventsTrait;
 
@@ -56,15 +56,27 @@ abstract class BaseModel extends ArrayableModel
      */
     public function get()
     {
-        if (!$this->fieldsAreFetched) {
-            $this->refresh();
-        }
+        $this->load();
 
         return $this->fields;
     }
 
     /**
-     * Get user groups from cache or database.
+     * Load model fields from database if they are not loaded yet.
+     *
+     * @return $this
+     */
+    public function load()
+    {
+        if (!$this->fieldsAreFetched) {
+            $this->refresh();
+        }
+        
+        return $this;
+    }
+
+    /**
+     * Get model fields from cache or database.
      *
      * @return array
      */
@@ -84,13 +96,11 @@ abstract class BaseModel extends ArrayableModel
      */
     public function refresh()
     {
-        $this->refreshFields();
-        
-        return $this->fields;
+        return $this->refreshFields();
     }
 
     /**
-     * Refresh user fields and save them to a class field.
+     * Refresh model fields and save them to a class field.
      *
      * @return array
      */

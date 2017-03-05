@@ -5,7 +5,7 @@ namespace Arrilot\BitrixModels\Models;
 use Arrilot\BitrixModels\Queries\SectionQuery;
 use Exception;
 
-class SectionModel extends BaseModel
+class SectionModel extends BitrixModel
 {
     /**
      * Corresponding IBLOCK_ID

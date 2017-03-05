@@ -2,7 +2,7 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
-use Arrilot\BitrixModels\Models\BaseModel;
+use Arrilot\BitrixModels\Models\BitrixModel;
 use BadMethodCallException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -343,11 +343,11 @@ abstract class BaseQuery
      * Adds $item to $results using keyBy value.
      *
      * @param $results
-     * @param BaseModel $object
+     * @param BitrixModel $object
      *
      * @return void
      */
-    protected function addItemToResultsUsingKeyBy(&$results, BaseModel $object)
+    protected function addItemToResultsUsingKeyBy(&$results, BitrixModel $object)
     {
         $item = $object->fields;
         if (!isset($item[$this->keyBy])) {

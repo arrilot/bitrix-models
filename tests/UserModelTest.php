@@ -34,36 +34,33 @@ class UserModelTest extends TestCase
         $this->assertSame([1, 2], $user->getGroups());
     }
 
-    public function testInitializationWithCurrent()
+    public function testCurrentWithAuth()
     {
         $GLOBALS['USER'] = new BxUserWithAuth();
         global $USER;
+        
+        $this->mockLoadCurrentUserMethods();
 
-        $user = TestUser::current();
+        $user = TestUser::freshCurrent();
         $this->assertSame($USER->getId(), $user->id);
-        $this->assertSame(null, $user->fields);
-
-        $user = TestUser::current(['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]]);
-        $this->assertSame($USER->getId(), $user->id);
-        $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]], $user->fields);
-        $this->assertSame(['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]], $user->get());
-        $this->assertSame([1, 2], $user->getGroups());
+        $this->assertSame(['ID' => 1, 'NAME' => 'John Doe', 'GROUP_ID' => [1, 2, 3]], $user->fields);
+        $this->assertSame([1, 2, 3], $user->getGroups());
     }
 
-    public function testInitializationWithCurrentNotAuth()
+    public function testCurrentWithoutAuth()
     {
         $GLOBALS['USER'] = new BxUserWithoutAuth();
 
-        $user = TestUser::current();
+        $user = TestUser::freshCurrent();
         $this->assertSame(null, $user->id);
-        $this->assertSame(null, $user->fields);
+        $this->assertSame([], $user->fields);
     }
 
     public function testHasRoleWithId()
     {
         $GLOBALS['USER'] = new BxUserWithoutAuth();
 
-        $user = TestUser::current();
+        $user = TestUser::freshCurrent();
         $this->assertFalse($user->hasGroupWithId(1));
 
         $user = new TestUser(2, ['NAME' => 'John Doe', 'GROUP_ID' => [1, 2]]);
@@ -76,8 +73,10 @@ class UserModelTest extends TestCase
     public function testIsCurrent()
     {
         $GLOBALS['USER'] = new BxUserWithAuth();
+    
+        $this->mockLoadCurrentUserMethods();
 
-        $user = TestUser::current();
+        $user = TestUser::freshCurrent();
         $this->assertTrue($user->isCurrent());
 
         $user = new TestUser(1);
@@ -90,22 +89,24 @@ class UserModelTest extends TestCase
     public function testIsAuthorized()
     {
         $GLOBALS['USER'] = new BxUserWithAuth();
-        $user = TestUser::current();
+        $this->mockLoadCurrentUserMethods();
+        $user = TestUser::freshCurrent();
         $this->assertTrue($user->isAuthorized());
 
         $GLOBALS['USER'] = new BxUserWithoutAuth();
-        $user = TestUser::current();
+        $user = TestUser::freshCurrent();
         $this->assertFalse($user->isAuthorized());
     }
 
     public function testIsGuest()
     {
         $GLOBALS['USER'] = new BxUserWithAuth();
-        $user = TestUser::current();
+        $this->mockLoadCurrentUserMethods();
+        $user = TestUser::freshCurrent();
         $this->assertFalse($user->isGuest());
 
         $GLOBALS['USER'] = new BxUserWithoutAuth();
-        $user = TestUser::current();
+        $user = TestUser::freshCurrent();
         $this->assertTrue($user->isGuest());
     }
 
@@ -228,5 +229,14 @@ class UserModelTest extends TestCase
         $this->assertSame(1, $user->id);
         $this->assertSame(['GROUP_ID' => [1, 2]], $user->fields);
         $this->assertSame([1, 2], $user->getGroups());
+    }
+    
+    protected function mockLoadCurrentUserMethods()
+    {
+        $bxObject = m::mock('object');
+        $bxObject->shouldReceive('getList')->withAnyArgs()->once()->andReturn(m::self());
+        $bxObject->shouldReceive('Fetch')->twice()->andReturn(['ID' => 1, 'NAME' => 'John Doe', 'GROUP_ID' => [1, 2, 3]], false);
+    
+        TestUser::$bxObject = $bxObject;
     }
 }
