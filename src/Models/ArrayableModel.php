@@ -106,7 +106,7 @@ abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, Itera
      */
     private function getAccessor($field)
     {
-        $method = 'get'.camel_case($field).'Field';
+        $method = 'get'.camel_case($field).'Attribute';
 
         return method_exists($this, $method) ? $method : false;
     }

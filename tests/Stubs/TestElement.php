@@ -10,17 +10,17 @@ class TestElement extends ElementModel
 
     const IBLOCK_ID = 1;
 
-    public function getAccessorOneField($value)
+    public function getAccessorOneAttribute($value)
     {
         return '!'.$value.'!';
     }
 
-    public function getAccessorTwoField()
+    public function getAccessorTwoAttribute()
     {
         return $this['ID'].':'.$this['NAME'];
     }
 
-    public function getAccessorThreeField()
+    public function getAccessorThreeAttribute()
     {
         return [];
     }

@@ -256,11 +256,11 @@ $users = Product::query()->fromCategoryWithCode('sale')->getList();
 Для этого используются акссессоры.
 Также как и для "query scopes", для добавления аксессора необходимо добавить метод в соответсвующую модель.
 
-Правило именования метода - `$methodName = "get".camelCase($field)."field"`.
+Правило именования метода - `$methodName = "get".camelCase($field)."Attribute"`.
 Пример акссессора который принудительно делает первую букву имени заглавной:
 ```php
 
-    public function getXmlIdField($value)
+    public function getXmlIdAttribute($value)
     {
         return (int) $value;  
     }
@@ -270,9 +270,9 @@ $users = Product::query()->fromCategoryWithCode('sale')->getList();
 ```
 Этим надо пользоваться с осторожностью, потому оригинальное значение становится недоступным.
 
-Аксессоры можно создавать также и для несуществущих полей, например:
+Аксессоры можно создавать также и для несуществущих, виртуальных полей, например:
 ```php
-    public function getFullNameField()
+    public function getFullNameAttribute()
     {
         return $this['NAME']." ".$this['LAST_NAME'];
     }
@@ -284,7 +284,7 @@ $users = Product::query()->fromCategoryWithCode('sale')->getList();
     echo $user['FULL_NAME']; // John Doe
 ```
 
-Для того чтобы такие аксессоры отображались в toArray() и toJson() их указать в поле $appends модели.
+Для того чтобы такие виртуальные аксессоры отображались в toArray() и toJson(), их необходимо явно указать в поле $appends модели.
 ```php
     protected $appends = ['FULL_NAME'];
 ```
