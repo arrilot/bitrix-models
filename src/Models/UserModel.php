@@ -36,6 +36,13 @@ use Illuminate\Support\Collection;
 class UserModel extends BitrixModel
 {
     /**
+     * Bitrix entity object.
+     *
+     * @var object
+     */
+    public static $bxObject;
+
+    /**
      * Corresponding object class name.
      *
      * @var string

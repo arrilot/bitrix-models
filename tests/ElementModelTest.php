@@ -4,6 +4,8 @@ namespace Arrilot\Tests\BitrixModels;
 
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use Arrilot\Tests\BitrixModels\Stubs\TestElement;
+use Arrilot\Tests\BitrixModels\Stubs\TestSection;
+use Arrilot\Tests\BitrixModels\Stubs\TestUser;
 use Mockery as m;
 
 class ElementModelTest extends TestCase
@@ -392,5 +394,21 @@ class ElementModelTest extends TestCase
         $this->assertSame([], $element['ACCESSOR_THREE']);
         $this->assertTrue(isset($element['ACCESSOR_THREE']));
         $this->assertFalse(!empty($element['ACCESSOR_THREE']));
+    }
+    
+    public function testItPlaysNiceWithOtherBitrixModels()
+    {
+        $elementObject = m::mock('element_object');
+        TestElement::$bxObject = $elementObject;
+
+        $sectionObject = m::mock('section_object');
+        TestSection::$bxObject = $sectionObject;
+
+        $userObject = m::mock('user_object');
+        TestUser::$bxObject = $userObject;
+        
+        $this->assertSame(TestElement::$bxObject, $elementObject);
+        $this->assertSame(TestSection::$bxObject, $sectionObject);
+        $this->assertSame(TestUser::$bxObject, $userObject);
     }
 }
