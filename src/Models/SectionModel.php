@@ -85,6 +85,24 @@ class SectionModel extends BitrixModel
     }
 
     /**
+     * Create new item in database.
+     *
+     * @param $fields
+     *
+     * @throws Exception
+     *
+     * @return static|bool
+     */
+    public static function create($fields)
+    {
+        if (!isset($fields['IBLOCK_ID'])) {
+            $fields['IBLOCK_ID'] = static::iblockId();
+        }
+
+        return parent::create($fields);
+    }
+
+    /**
      * Get IDs of direct children of the section.
      * Additional filter can be specified.
      *

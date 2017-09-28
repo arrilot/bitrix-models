@@ -57,7 +57,7 @@ class Product extends ElementModel
 ### Добавление продукта
 
 ```php
-// $fields - массив, аналогичный передаваемому в CIblockElement::Add()
+// $fields - массив, аналогичный передаваемому в CIblockElement::Add(), но IBLOCK_ID в нём можно не указывать.
 $product = Product::create($fields);
 ```
 

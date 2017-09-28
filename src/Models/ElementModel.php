@@ -85,6 +85,24 @@ class ElementModel extends BitrixModel
     }
 
     /**
+     * Create new item in database.
+     *
+     * @param $fields
+     *
+     * @throws Exception
+     *
+     * @return static|bool
+     */
+    public static function create($fields)
+    {
+        if (!isset($fields['IBLOCK_ID'])) {
+            $fields['IBLOCK_ID'] = static::iblockId();
+        }
+
+        return parent::create($fields);
+    }
+
+    /**
      * Corresponding section model full qualified class name.
      * MUST be overridden if you are going to use section model for this iblock.
      *

@@ -62,16 +62,17 @@ class SectionModelTest extends TestCase
     public function testCreate()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('add')->with(['NAME' => 'Section 1'])->once()->andReturn(3);
+        $bxObject->shouldReceive('add')->with(['NAME' => 'Section 1', 'IBLOCK_ID' => TestSection::iblockId()])->once()->andReturn(3);
 
         TestSection::$bxObject = $bxObject;
 
         $newTestSection = TestSection::create(['NAME' => 'Section 1']);
 
         $this->assertSame(3, $newTestSection->id);
-        $this->assertSame([
+        $this->assertEquals([
             'NAME' => 'Section 1',
             'ID'   => 3,
+            'IBLOCK_ID' => TestSection::iblockId(),
         ], $newTestSection->fields);
     }
 

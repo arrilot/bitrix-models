@@ -297,14 +297,14 @@ class ElementModelTest extends TestCase
     public function testCreate()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('add')->with(['NAME' => 'John Doe'])->once()->andReturn(2);
+        $bxObject->shouldReceive('add')->with(['NAME' => 'John Doe', 'IBLOCK_ID' => TestElement::iblockId()])->once()->andReturn(2);
 
         TestElement::$bxObject = $bxObject;
 
         $newElement = TestElement::create(['NAME' => 'John Doe']);
 
         $this->assertSame(2, $newElement->id);
-        $this->assertSame(['NAME' => 'John Doe', 'ID' => 2], $newElement->fields);
+        $this->assertEquals(['NAME' => 'John Doe', 'ID' => 2, 'IBLOCK_ID' => TestElement::iblockId()], $newElement->fields);
     }
 
     public function testCount()
