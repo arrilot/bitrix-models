@@ -99,7 +99,7 @@ class ElementModel extends BitrixModel
             $fields['IBLOCK_ID'] = static::iblockId();
         }
 
-        return parent::create($fields);
+        return static::internalCreate($fields);
     }
 
     /**

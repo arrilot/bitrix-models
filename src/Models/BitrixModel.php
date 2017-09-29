@@ -177,25 +177,39 @@ abstract class BitrixModel extends ArrayableModel
      */
     public static function create($fields)
     {
-        $model = new static(null, $fields);
+        return static::internalCreate($fields);
+    }
 
+    /**
+     * Internal part of create to avoid problems with static and inheritance
+     *
+     * @param $fields
+     *
+     * @throws Exception
+     *
+     * @return static|bool
+     */
+    protected static function internalCreate($fields)
+    {
+        $model = new static(null, $fields);
+        
         if ($model->onBeforeSave() === false || $model->onBeforeCreate() === false) {
             return false;
         }
-
+        
         $bxObject = static::instantiateObject();
         $id = $bxObject->add($fields);
         $model->setId($id);
-
+        
         $result = $id ? true : false;
-
+        
         $model->onAfterCreate($result);
         $model->onAfterSave($result);
-
+        
         if (!$result) {
             throw new Exception($bxObject->LAST_ERROR);
         }
-
+        
         return $model;
     }
 
