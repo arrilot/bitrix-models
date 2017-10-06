@@ -359,26 +359,30 @@ abstract class BaseQuery
             $oldFields = $results[$keyByValue]->fields;
             foreach ($oldFields as $field => $oldValue) {
                 // пропускаем служебные поля.
-                if (in_array($field, ['_was_multiplied', 'PROPERTIES'])) {
+                if (in_array($field, ['_were_multiplied', 'PROPERTIES'])) {
                     continue;
                 }
+
+                $alreadyMultiplied = !empty($oldFields['_were_multiplied'][$field]);
 
                 // мультиплицируем только несовпадающие значения полей
                 $newValue = $item[$field];
                 if ($oldValue !== $newValue) {
-                    // если еще не мультиплицироваи объект то все поля надо превратить в массивы
-                    if (empty($oldFields['_was_multiplied'])) {
+                    // если еще не мультиплицировали поле, то его надо превратить в массив.
+                    if (!$alreadyMultiplied) {
                         $oldFields[$field] = [
                             $oldFields[$field]
                         ];
+                        $oldFields['_were_multiplied'][$field] = true;
                     }
 
-                    // в любом случае добавляем новое значение полю
-                    $oldFields[$field][] = $newValue;
+                    // добавляем новое значению поле если такого еще нет.
+                    if (empty($oldFields[$field]) || (is_array($oldFields[$field]) && !in_array($newValue, $oldFields[$field]))) {
+                        $oldFields[$field][] = $newValue;
+                    }
                 }
             }
 
-            $oldFields['_was_multiplied'] = true;
             $results[$keyByValue]->fields = $oldFields;
         }
     }

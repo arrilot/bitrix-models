@@ -131,7 +131,7 @@ class ElementQueryTest extends TestCase
 
         $expected = [
             1 => ['ID' => 1, 'PROPERTY_FOO_VALUE' => 'foo'],
-            2 => ['ID' => 2, 'PROPERTY_FOO_VALUE' => ['bar', 'bar2', 'bar3'], '_was_multiplied' => true],
+            2 => ['ID' => 2, 'PROPERTY_FOO_VALUE' => ['bar', 'bar2', 'bar3'], '_were_multiplied' => ['PROPERTY_FOO_VALUE' => true]],
         ];
         foreach ($items as $k => $item) {
             $this->assertSame($expected[$k], $item->fields);
