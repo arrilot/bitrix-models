@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\Queries\SectionQuery;
+use CIBlock;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -152,5 +153,21 @@ class SectionModel extends BitrixModel
                 return (int) $section['ID'];
             })
             ->all();
+    }
+
+    /**
+     * Proxy for GetPanelButtons
+     *
+     * @param array $options
+     * @return array
+     */
+    public function getPanelButtons($options = [])
+    {
+        return CIBlock::GetPanelButtons(
+            static::iblockId(),
+            0,
+            $this->id,
+            $options
+        );
     }
 }

@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\Queries\ElementQuery;
+use CIBlock;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -296,6 +297,22 @@ class ElementModel extends BitrixModel
         return $load
             ? $sectionModel::query()->getById($fields['IBLOCK_SECTION_ID'])
             : new $sectionModel($fields['IBLOCK_SECTION_ID']);
+    }
+
+    /**
+     * Proxy for GetPanelButtons
+     *
+     * @param array $options
+     * @return array
+     */
+    public function getPanelButtons($options = [])
+    {
+        return CIBlock::GetPanelButtons(
+            static::iblockId(),
+            $this->id,
+            0,
+            $options
+        );
     }
 
     /**
