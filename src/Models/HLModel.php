@@ -177,7 +177,7 @@ class HLModel extends ArrayableModel
         }
 
         $bxObject = static::instantiateObject();
-        $id = $bxObject->add($fields);
+        $id = $bxObject::add($fields);
         $model->setId($id);
 
         $result = $id ? true : false;
@@ -223,7 +223,7 @@ class HLModel extends ArrayableModel
             return false;
         }
 
-        $result = static::$bxObject->delete($this->id);
+        $result = static::$bxObject::delete($this->id);
 
         $this->onAfterDelete($result);
 
@@ -264,7 +264,7 @@ class HLModel extends ArrayableModel
         }
 
         $fields = $this->normalizeFieldsForSave($selectedFields);
-        $result = !empty($fields) ? static::$bxObject->update($this->id, $fields) : false;
+        $result = !empty($fields) ? static::$bxObject::update($this->id, $fields) : false;
 
         $this->onAfterUpdate($result);
         $this->onAfterSave($result);
