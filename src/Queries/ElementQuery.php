@@ -170,13 +170,13 @@ class ElementQuery extends BaseQuery
 
     public function getList()
     {
-        if (!$this->ttl) return parent::getListSimple();
+        if (!$this->ttl) return $this->getListSimple();
 
         $cache = Cache::createInstance();
         if ($cache->initCache($this->ttl, $this->getKey(), '/models/')) {
             $result = $cache->getVars();
         } elseif ($cache->startDataCache()) {
-            $result = parent::getListSimple();
+            $result = $this->getListSimple();
             $cache->endDataCache($result);
         }
 
