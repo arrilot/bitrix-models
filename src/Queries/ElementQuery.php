@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use CIBlock;
+use Bitrix\Main\Data\Cache;
 use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Models\ElementModel;
 use Exception;
@@ -132,12 +133,19 @@ class ElementQuery extends BaseQuery
         return $this;
     }
 
+    public function cache($ttl)
+    {
+        $this->ttl = $ttl;
+    
+        return $this;
+    }
+
     /**
      * Get list of items.
      *
      * @return Collection
      */
-    public function getList()
+    private function getListSimple()
     {
         if ($this->queryShouldBeStopped) {
             return new Collection();
@@ -158,6 +166,34 @@ class ElementQuery extends BaseQuery
         }
 
         return new Collection($items);
+    }
+
+    public function getList()
+    {
+        if (!$this->ttl) return parent::getListSimple();
+
+        $cache = Cache::createInstance();
+        if ($cache->initCache($this->ttl, $this->getKey(), '/models/')) {
+            $result = $cache->getVars();
+        } elseif ($cache->startDataCache()) {
+            $result = parent::getListSimple();
+            $cache->endDataCache($result);
+        }
+
+        return $result;
+    }
+
+    private function getKey()
+    {
+        $data = [
+            'sort' => $this->sort,
+            'filter' => $this->normalizeFilter(),
+            'groupBy' => $this->groupBy,
+            'navigation' => $this->navigation,
+            'select' => $this->normalizeSelect(),
+        ];
+
+        return md5( json_encode($data) );
     }
 
     /**
