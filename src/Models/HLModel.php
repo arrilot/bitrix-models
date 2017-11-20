@@ -324,12 +324,13 @@ class HLModel extends ArrayableModel
      */
     public static function instantiateObject()
     {
-        if (static::$bxObject) {
-            return static::$bxObject;
+        $tableName = static::tableName();
+        if (static::$bxObject[$tableName]) {
+            return static::$bxObject[$tableName];
         }
 
-        $item = HighloadBlockTable::getList(['filter' => ['TABLE_NAME' => static::tableName() ]])->fetch();
-        return static::$bxObject = HighloadBlockTable::compileEntity($item)->getDataClass();
+        $item = HighloadBlockTable::getList(['filter' => ['TABLE_NAME' => $tableName ]])->fetch();
+        return static::$bxObject[$tableName] = HighloadBlockTable::compileEntity($item)->getDataClass();
     }
 
     /**
