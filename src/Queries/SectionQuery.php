@@ -86,19 +86,27 @@ class SectionQuery extends BaseQuery
             return new Collection();
         }
 
-        $sections = [];
-        $rsSections = $this->bxObject->getList(
-            $this->sort,
-            $this->normalizeFilter(),
-            $this->countElements,
-            $this->normalizeSelect(),
-            $this->navigation
-        );
-        while ($arSection = $rsSections->Fetch()) {
-            $this->addItemToResultsUsingKeyBy($sections, new $this->modelName($arSection['ID'], $arSection));
-        }
+        $queryType = 'SectionQuery::getList';
+        $sort = $this->sort;
+        $filter = $this->normalizeFilter();
+        $countElements = $this->countElements;
+        $select = $this->normalizeSelect();
+        $navigation = $this->navigation;
+        $keyBy = $this->keyBy;
 
-        return new Collection($sections);
+        $callback = function() use ($sort, $filter, $countElements, $select, $navigation){
+            $sections = [];
+            $rsSections = $this->bxObject->getList($sort, $filter, $countElements, $select, $navigation);
+            while ($arSection = $rsSections->Fetch()) {
+                $this->addItemToResultsUsingKeyBy($sections, new $this->modelName($arSection['ID'], $arSection));
+            }
+
+            return new Collection($sections);
+        };
+
+        $cacheParams = compact('queryType', 'sort', 'filter', 'countElements', 'select', 'navigation', 'keyBy');
+
+        return $this->handleCacheIfNeeded($cacheParams, $callback);
     }
 
     /**
@@ -140,7 +148,13 @@ class SectionQuery extends BaseQuery
             return 0;
         }
 
-        return (int) $this->bxObject->getCount($this->normalizeFilter());
+        $queryType = 'SectionQuery::count';
+        $filter = $this->normalizeFilter();
+        $callback = function() use ($filter) {
+            return (int) $this->bxObject->getCount($filter);
+        };
+
+        return $this->handleCacheIfNeeded(compact('queryType', 'filter'), $callback);
     }
 
     /**

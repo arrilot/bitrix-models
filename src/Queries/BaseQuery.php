@@ -4,6 +4,8 @@ namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Models\BitrixModel;
 use BadMethodCallException;
+use Closure;
+use CPHPCache;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -67,6 +69,13 @@ abstract class BaseQuery
      * @var string|bool
      */
     public $keyBy = 'ID';
+
+    /**
+     * Number of minutes to cache a query
+     *
+     * @var double|int
+     */
+    public $cacheTtl = 0;
 
     /**
      * Indicates that the query should be stopped instead of touching the DB.
@@ -213,6 +222,20 @@ abstract class BaseQuery
     public function select($value)
     {
         $this->select = is_array($value) ? $value : func_get_args();
+
+        return $this;
+    }
+
+    /**
+     * Setter for cache ttl.
+     *
+     * @param double|int $minutes
+     *
+     * @return $this
+     */
+    public function cache($minutes)
+    {
+        $this->cacheTtl = $minutes;
 
         return $this;
     }
@@ -437,6 +460,41 @@ abstract class BaseQuery
         $strip = ['FIELDS', 'PROPS', 'PROPERTIES', 'PROPERTY_VALUES', 'GROUPS', 'GROUP_ID', 'GROUPS_ID'];
 
         return array_values(array_diff(array_unique($this->select), $strip));
+    }
+
+    /**
+     * Store closure's result in the cache for a given number of minutes.
+     *
+     * @param string $key
+     * @param double $minutes
+     * @param Closure $callback
+     * @return mixed
+     */
+    protected function rememberInCache($key, $minutes, Closure $callback)
+    {
+        $minutes = (double) $minutes;
+        if ($minutes <= 0) {
+            return $callback();
+        }
+
+        $obCache = new CPHPCache();
+        if ($obCache->InitCache($minutes * 60, $key, 'bitrix-models')) {
+            $vars = $obCache->GetVars();
+            return $vars['cache'];
+        }
+
+        $obCache->StartDataCache();
+        $cache = $callback();
+        $obCache->EndDataCache(['cache' => $cache]);
+
+        return $cache;
+    }
+
+    protected function handleCacheIfNeeded($cacheKeyParams, Closure $callback)
+    {
+        return $this->cacheTtl
+            ? $this->rememberInCache(md5(json_encode($cacheKeyParams)), $this->cacheTtl, $callback)
+            : $callback();
     }
 
     /**

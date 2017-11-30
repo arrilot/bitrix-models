@@ -95,24 +95,33 @@ class UserQuery extends BaseQuery
         if ($this->queryShouldBeStopped) {
             return new Collection();
         }
-
+    
+        $queryType = 'UserQuery::getList';
+        $sort = $this->sort;
+        $filter = $this->normalizeFilter();
         $params = [
             'SELECT'     => $this->propsMustBeSelected() ? ['UF_*'] : false,
             'NAV_PARAMS' => $this->navigation,
             'FIELDS'     => $this->normalizeSelect(),
         ];
+        $selectGroups = $this->groupsMustBeSelected();
+        $keyBy = $this->keyBy;
 
-        $users = [];
-        $rsUsers = $this->bxObject->getList($this->sort, $sortOrder = false, $this->normalizeFilter(), $params);
-        while ($arUser = $rsUsers->Fetch()) {
-            if ($this->groupsMustBeSelected()) {
-                $arUser['GROUP_ID'] = $this->bxObject->getUserGroup($arUser['ID']);
+        $callback = function() use ($sort, $filter, $params, $selectGroups){
+            $users = [];
+            $rsUsers = $this->bxObject->getList($sort, $sortOrder = false, $filter, $params);
+            while ($arUser = $rsUsers->Fetch()) {
+                if ($selectGroups) {
+                    $arUser['GROUP_ID'] = $this->bxObject->getUserGroup($arUser['ID']);
+                }
+        
+                $this->addItemToResultsUsingKeyBy($users, new $this->modelName($arUser['ID'], $arUser));
             }
+    
+            return new Collection($users);
+        };
 
-            $this->addItemToResultsUsingKeyBy($users, new $this->modelName($arUser['ID'], $arUser));
-        }
-
-        return new Collection($users);
+        return $this->handleCacheIfNeeded(compact('queryType', 'sort', 'filter', 'params', 'selectGroups', 'keyBy'), $callback);
     }
 
     /**
@@ -154,11 +163,17 @@ class UserQuery extends BaseQuery
             return 0;
         }
 
-        return (int) $this->bxObject->getList($order = 'ID', $by = 'ASC', $this->normalizeFilter(), [
-            'NAV_PARAMS' => [
-                'nTopCount' => 0,
-            ],
-        ])->NavRecordCount;
+        $queryType = 'UserQuery::count';
+        $filter = $this->normalizeFilter();
+        $callback = function() use ($filter) {
+            return (int) $this->bxObject->getList($order = 'ID', $by = 'ASC', $filter, [
+                'NAV_PARAMS' => [
+                    'nTopCount' => 0,
+                ],
+            ])->NavRecordCount;
+        };
+
+        return $this->handleCacheIfNeeded(compact('queryType', 'filter'), $callback);
     }
 
     /**

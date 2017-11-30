@@ -2,6 +2,7 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
+use Arrilot\BitrixCacher\Cache;
 use CIBlock;
 use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Models\ElementModel;
@@ -143,21 +144,25 @@ class ElementQuery extends BaseQuery
             return new Collection();
         }
 
-        $items = [];
+        $sort = $this->sort;
+        $filter = $this->normalizeFilter();
+        $groupBy = $this->groupBy;
+        $navigation = $this->navigation;
+        $select = $this->normalizeSelect();
+        $queryType = 'ElementQuery::getList';
+        $keyBy = $this->keyBy;
 
-        $rsItems = $this->bxObject->GetList(
-            $this->sort,
-            $this->normalizeFilter(),
-            $this->groupBy,
-            $this->navigation,
-            $this->normalizeSelect()
-        );
-    
-        while ($arItem = $rsItems->Fetch()) {
-            $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
-        }
+        $callback = function() use ($sort, $filter, $groupBy, $navigation, $select) {
+            $items = [];
+            $rsItems = $this->bxObject->GetList($sort, $filter, $groupBy, $navigation, $select);
+            while ($arItem = $rsItems->Fetch()) {
+                $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
+            }
 
-        return new Collection($items);
+            return new Collection($items);
+        };
+
+        return $this->handleCacheIfNeeded(compact('sort', 'filter', 'group', 'navigation', 'select', 'queryType', 'keyBy'), $callback);
     }
 
     /**
@@ -199,7 +204,14 @@ class ElementQuery extends BaseQuery
             return 0;
         }
 
-        return (int) $this->bxObject->GetList(false, $this->normalizeFilter(), []);
+        $filter = $this->normalizeFilter();
+        $queryType = "ElementQuery::count";
+
+        $callback = function () use ($filter) {
+            return (int) $this->bxObject->GetList(false, $filter, []);
+        };
+
+        return $this->handleCacheIfNeeded(compact('filter', 'queryType'), $callback);
     }
 
 //    /**
