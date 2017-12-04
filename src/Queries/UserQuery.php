@@ -9,7 +9,7 @@ use Arrilot\BitrixModels\Models\UserModel;
  * @method UserQuery active()
  * @method UserQuery fromGroup($groupId)
  */
-class UserQuery extends BaseQuery
+class UserQuery extends OldCoreQuery
 {
     /**
      * Query sort.
@@ -110,7 +110,7 @@ class UserQuery extends BaseQuery
         $callback = function() use ($sort, $filter, $params, $selectGroups){
             $users = [];
             $rsUsers = $this->bxObject->getList($sort, $sortOrder = false, $filter, $params);
-            while ($arUser = $rsUsers->Fetch()) {
+            while ($arUser = $this->performFetchUsingSelectedMethod($rsUsers)) {
                 if ($selectGroups) {
                     $arUser['GROUP_ID'] = $this->bxObject->getUserGroup($arUser['ID']);
                 }

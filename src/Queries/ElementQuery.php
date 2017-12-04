@@ -14,7 +14,7 @@ use Exception;
  * @method ElementQuery fromSectionWithId(int $id)
  * @method ElementQuery fromSectionWithCode(string $code)
  */
-class ElementQuery extends BaseQuery
+class ElementQuery extends OldCoreQuery
 {
     /**
      * CIblock object or test double.
@@ -43,6 +43,13 @@ class ElementQuery extends BaseQuery
      * @var int
      */
     protected $iblockId;
+
+    /**
+     * Iblock version.
+     *
+     * @var int
+     */
+    protected $iblockVersion;
 
     /**
      * List of standard entity fields.
@@ -97,6 +104,7 @@ class ElementQuery extends BaseQuery
         parent::__construct($bxObject, $modelName);
 
         $this->iblockId = $modelName::iblockId();
+        $this->iblockVersion = $modelName::IBLOCK_VERSION ?: 2;
     }
 
     /**
@@ -151,14 +159,26 @@ class ElementQuery extends BaseQuery
         $select = $this->normalizeSelect();
         $queryType = 'ElementQuery::getList';
         $keyBy = $this->keyBy;
+        list($select, $chunkQuery) = $this->multiplySelectForMaxJoinsRestrictionIfNeeded($select);
 
-        $callback = function() use ($sort, $filter, $groupBy, $navigation, $select) {
-            $items = [];
-            $rsItems = $this->bxObject->GetList($sort, $filter, $groupBy, $navigation, $select);
-            while ($arItem = $rsItems->Fetch()) {
-                $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
+        $callback = function() use ($sort, $filter, $groupBy, $navigation, $select, $chunkQuery) {
+            if ($chunkQuery) {
+                $itemsChunks = [];
+                foreach ($select as $chunkIndex => $selectForChunk) {
+                    $rsItems = $this->bxObject->GetList($sort, $filter, $groupBy, $navigation, $selectForChunk);
+                    while ($arItem = $this->performFetchUsingSelectedMethod($rsItems)) {
+                        $this->addItemToResultsUsingKeyBy($itemsChunks[$chunkIndex], new $this->modelName($arItem['ID'], $arItem));
+                    }
+                }
+
+                $items = $this->mergeChunks($itemsChunks);
+            } else {
+                $items = [];
+                $rsItems = $this->bxObject->GetList($sort, $filter, $groupBy, $navigation, $select);
+                while ($arItem = $this->performFetchUsingSelectedMethod($rsItems)) {
+                    $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
+                }
             }
-
             return new Collection($items);
         };
 
@@ -264,10 +284,6 @@ class ElementQuery extends BaseQuery
             $this->select = array_merge($this->standardFields, $this->select);
         }
 
-        if ($this->propsMustBeSelected()) {
-            $this->addAllPropsToSelect();
-        }
-
         $this->select[] = 'ID';
         $this->select[] = 'IBLOCK_ID';
 
@@ -275,19 +291,58 @@ class ElementQuery extends BaseQuery
     }
 
     /**
-     * Add all iblock property codes to select.
+     * Fetch all iblock property codes from database
      *
-     * return null
+     * return array
      */
-    protected function addAllPropsToSelect()
+    protected function fetchAllPropsForSelect()
     {
-        $this->select[] = 'ID';
-        $this->select[] = 'IBLOCK_ID';
-
-        //dd (static::$cIblockObject);
+        $props = [];
         $rsProps = static::$cIblockObject->GetProperties($this->iblockId);
         while ($prop = $rsProps->Fetch()) {
-            $this->select[] = 'PROPERTY_'.$prop['CODE'];
+            $props[] = 'PROPERTY_'.$prop['CODE'];
         }
+
+        return $props;
+    }
+    
+    protected function multiplySelectForMaxJoinsRestrictionIfNeeded($select)
+    {
+        if (!$this->propsMustBeSelected()) {
+            return [$select, false];
+        }
+
+        $chunkSize = 20;
+        $props = $this->fetchAllPropsForSelect();
+        if ($this->iblockVersion !== 1 || (count($props) <= $chunkSize)) {
+            return [array_merge($select, $props), false];
+        }
+
+        // начинаем формировать селекты из свойств
+        $multipleSelect = array_chunk($props, $chunkSize);
+
+        // добавляем в каждый селект поля "несвойства"
+        foreach ($multipleSelect as $i => $partOfProps) {
+            $multipleSelect[$i] = array_merge($select, $partOfProps);
+        }
+
+        return [$multipleSelect, true];
+    }
+    
+    protected function mergeChunks($chunks)
+    {
+        $items = [];
+        foreach ($chunks as $chunk) {
+            foreach ($chunk as $k => $item) {
+                if (isset($items[$k])) {
+                    $item->fields['_were_multiplied'] = array_merge((array) $items[$k]->fields['_were_multiplied'], (array) $item->fields['_were_multiplied']);
+                    $items[$k]->fields = (array) $item->fields + (array) $items[$k]->fields;
+                } else {
+                    $items[$k] = $item;
+                }
+            }
+        }
+
+        return $items;
     }
 }

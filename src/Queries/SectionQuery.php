@@ -8,7 +8,7 @@ use Arrilot\BitrixModels\Models\SectionModel;
 /**
  * @method SectionQuery active()
  */
-class SectionQuery extends BaseQuery
+class SectionQuery extends OldCoreQuery
 {
     /**
      * Query sort.
@@ -97,7 +97,7 @@ class SectionQuery extends BaseQuery
         $callback = function() use ($sort, $filter, $countElements, $select, $navigation){
             $sections = [];
             $rsSections = $this->bxObject->getList($sort, $filter, $countElements, $select, $navigation);
-            while ($arSection = $rsSections->Fetch()) {
+            while ($arSection = $this->performFetchUsingSelectedMethod($rsSections)) {
                 $this->addItemToResultsUsingKeyBy($sections, new $this->modelName($arSection['ID'], $arSection));
             }
 

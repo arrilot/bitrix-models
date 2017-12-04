@@ -48,6 +48,13 @@ class ElementModel extends BitrixModel
     const IBLOCK_ID = null;
 
     /**
+     * IBLOCK version (1 or 2)
+     *
+     * @var int
+     */
+    const IBLOCK_VERSION = 2;
+
+    /**
      * Bitrix entity object.
      *
      * @var object

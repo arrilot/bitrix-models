@@ -22,6 +22,16 @@ abstract class BitrixModel extends BaseBitrixModel
     protected static $objectClass = '';
 
     /**
+     * Fetch method and parameters.
+     *
+     * @var array
+     */
+    public static $fetchUsing = [
+        'method' => 'Fetch',
+        'params' => [],
+    ];
+
+    /**
      * Constructor.
      *
      * @param $id

@@ -2,7 +2,7 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
-use Arrilot\BitrixModels\Models\BitrixModel;
+use Arrilot\BitrixModels\Models\BaseBitrixModel;
 use BadMethodCallException;
 use Closure;
 use CPHPCache;
@@ -16,7 +16,7 @@ abstract class BaseQuery
     /**
      * Bitrix object to be queried.
      *
-     * @var object
+     * @var object|string
      */
     protected $bxObject;
 
@@ -54,13 +54,6 @@ abstract class BaseQuery
      * @var array|bool
      */
     public $navigation = false;
-
-    /**
-     * Query select.
-     *
-     * @var array
-     */
-    public $select = ['FIELDS', 'PROPS'];
 
     /**
      * The key to list items in array of results.
@@ -102,7 +95,7 @@ abstract class BaseQuery
     /**
      * Constructor.
      *
-     * @param object $bxObject
+     * @param object|string $bxObject
      * @param string $modelName
      */
     public function __construct($bxObject, $modelName)
@@ -154,6 +147,19 @@ abstract class BaseQuery
         $this->sort = is_array($by) ? $by : [$by => $order];
 
         return $this;
+    }
+
+    /**
+     * Another setter for sort.
+     *
+     * @param mixed  $by
+     * @param string $order
+     *
+     * @return $this
+     */
+    public function order($by, $order = 'ASC')
+    {
+        return $this->sort($by, $order);
     }
 
     /**
@@ -363,11 +369,11 @@ abstract class BaseQuery
      * Adds $item to $results using keyBy value.
      *
      * @param $results
-     * @param BitrixModel $object
+     * @param BaseBitrixModel $object
      *
      * @return void
      */
-    protected function addItemToResultsUsingKeyBy(&$results, BitrixModel $object)
+    protected function addItemToResultsUsingKeyBy(&$results, BaseBitrixModel $object)
     {
         $item = $object->fields;
         if (!isset($item[$this->keyBy])) {

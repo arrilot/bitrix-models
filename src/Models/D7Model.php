@@ -2,12 +2,21 @@
 
 namespace Arrilot\BitrixModels\Models;
 
+use Arrilot\BitrixModels\Adapters\D7Adapter;
 use Arrilot\BitrixModels\Queries\D7Query;
-use Bitrix\Highloadblock\HighloadBlockTable;
 use Exception;
 
 class D7Model extends BaseBitrixModel
 {
+    const TABLE_CLASS = null;
+
+    /**
+     * Adapter to interact with Bitrix D7 API.
+     *
+     * @var D7Adapter
+     */
+    protected static $adapter;
+
     /**
      * Constructor.
      *
@@ -17,8 +26,29 @@ class D7Model extends BaseBitrixModel
     public function __construct($id = null, $fields = null)
     {
         $this->id = $id;
-        
         $this->fill($fields);
+        static::instantiateAdapter();
+    }
+    
+    /**
+     * Setter for adapter (for testing)
+     * @param $adapter
+     */
+    public static function setAdapter($adapter)
+    {
+        static::$adapter = $adapter;
+    }
+
+    /**
+     * Instantiate adapter if it's not instantiated.
+     */
+    public static function instantiateAdapter()
+    {
+        if (static::$adapter) {
+            return;
+        }
+
+        static::$adapter = new D7Adapter(static::tableClass());
     }
 
     /**
@@ -28,15 +58,21 @@ class D7Model extends BaseBitrixModel
      */
     public static function query()
     {
-        return new D7Query(static::tableClass(), get_called_class());
+        return new D7Query(static::$adapter, get_called_class());
     }
     
     /**
-     * @return \Bitrix\Main\Entity\DataManager
+     * @return string
+     * @throws Exception
      */
     public static function tableClass()
     {
-        return HighloadBlockTable::compileEntity(HighloadBlockTable::getRowById(2))->getDataClass();
+        $tableClass = static::TABLE_CLASS;
+        if (!$tableClass) {
+            throw new Exception('You must set TABLE_CLASS constant inside a model or override tableClass() method');
+        }
+    
+        return $tableClass;
     }
 
     /**
@@ -56,8 +92,8 @@ class D7Model extends BaseBitrixModel
             return false;
         }
 
-        $bxObject = static::tableClass();
-        $resultObject = $bxObject::add($fields);
+        static::instantiateAdapter();
+        $resultObject = static::$adapter->add($fields);
         $result = $resultObject->isSuccess();
         if ($result) {
             $model->setId($resultObject->getId());
@@ -83,9 +119,9 @@ class D7Model extends BaseBitrixModel
         if ($this->onBeforeDelete() === false) {
             return false;
         }
-
-        $bxObject = static::tableClass();
-        $resultObject = $bxObject::delete($this->id);
+    
+        static::instantiateAdapter();
+        $resultObject = static::$adapter->delete($this->id);
         $result = $resultObject->isSuccess();
 
         $this->onAfterDelete($result);
@@ -109,8 +145,8 @@ class D7Model extends BaseBitrixModel
         }
 
         $fields = $this->normalizeFieldsForSave($selectedFields);
-        $bxObject = static::tableClass();
-        $resultObject = $bxObject::update($this->id, $fields);
+        static::instantiateAdapter();
+        $resultObject = static::$adapter->update($this->id, $fields);
         $result = $resultObject->isSuccess();
 
         $this->onAfterUpdate($result);
