@@ -2,10 +2,11 @@
 
 namespace Arrilot\BitrixModels\Models;
 
+use Arrilot\BitrixModels\Exceptions\ExceptionFromBitrix;
 use Arrilot\BitrixModels\Queries\SectionQuery;
 use CIBlock;
-use Exception;
 use Illuminate\Support\Collection;
+use LogicException;
 
 /**
  * SectionQuery methods
@@ -61,7 +62,7 @@ class SectionModel extends BitrixModel
     /**
      * Getter for corresponding iblock id.
      *
-     * @throws Exception
+     * @throws LogicException
      *
      * @return int
      */
@@ -69,7 +70,7 @@ class SectionModel extends BitrixModel
     {
         $id = static::IBLOCK_ID;
         if (!$id) {
-            throw new Exception('You must set $iblockId property or override iblockId() method');
+            throw new LogicException('You must set $iblockId property or override iblockId() method');
         }
         
         return $id;
@@ -90,7 +91,7 @@ class SectionModel extends BitrixModel
      *
      * @param $fields
      *
-     * @throws Exception
+     * @throws ExceptionFromBitrix
      *
      * @return static|bool
      */

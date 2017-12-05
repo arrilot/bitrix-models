@@ -4,8 +4,8 @@ namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use CIBlock;
-use Exception;
 use Illuminate\Support\Collection;
+use LogicException;
 
 /**
  * ElementQuery methods
@@ -78,7 +78,7 @@ class ElementModel extends BitrixModel
     /**
      * Getter for corresponding iblock id.
      *
-     * @throws Exception
+     * @throws LogicException
      *
      * @return int
      */
@@ -86,7 +86,7 @@ class ElementModel extends BitrixModel
     {
         $id = static::IBLOCK_ID;
         if (!$id) {
-            throw new Exception('You must set IBLOCK_ID constant inside a model or override iblockId() method');
+            throw new LogicException('You must set IBLOCK_ID constant inside a model or override iblockId() method');
         }
         
         return $id;
@@ -97,7 +97,7 @@ class ElementModel extends BitrixModel
      *
      * @param $fields
      *
-     * @throws Exception
+     * @throws LogicException
      *
      * @return static|bool
      */
@@ -114,13 +114,13 @@ class ElementModel extends BitrixModel
      * Corresponding section model full qualified class name.
      * MUST be overridden if you are going to use section model for this iblock.
      *
-     * @throws Exception
+     * @throws LogicException
      *
      * @return string
      */
     public static function sectionModel()
     {
-        throw new Exception('public static function sectionModel() MUST be overridden');
+        throw new LogicException('public static function sectionModel() MUST be overridden');
     }
 
     /**

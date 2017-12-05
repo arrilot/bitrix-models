@@ -4,11 +4,25 @@ namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\ModelEventsTrait;
 use Arrilot\BitrixModels\Queries\BaseQuery;
-use Exception;
+use LogicException;
 
 abstract class BaseBitrixModel extends ArrayableModel
 {
     use ModelEventsTrait;
+
+    /**
+     * Array of model fields keys that needs to be saved with next save().
+     *
+     * @var array
+     */
+    protected $fieldsSelectedForSave = [];
+
+    /**
+     * Array of errors that are passed to model events.
+     *
+     * @var array
+     */
+    protected $eventErrors = [];
 
     /**
      * Have fields been already fetched from DB?
@@ -22,7 +36,7 @@ abstract class BaseBitrixModel extends ArrayableModel
      *
      * @param $fields
      *
-     * @throws Exception
+     * @throws LogicException
      *
      * @return static|bool
      */
@@ -159,7 +173,7 @@ abstract class BaseBitrixModel extends ArrayableModel
      *
      * @param $fields
      *
-     * @throws Exception
+     * @throws LogicException
      *
      * @return static|bool
      */
@@ -206,7 +220,7 @@ abstract class BaseBitrixModel extends ArrayableModel
             array_set($this->fields, $key, $value);
             $keys[] = $key;
         }
-        
+
         return $this->save($keys);
     }
 
@@ -223,26 +237,26 @@ abstract class BaseBitrixModel extends ArrayableModel
         if ($this->fields === null) {
             return [];
         }
-        
+
         foreach ($this->fields as $field => $value) {
             if (!$this->fieldShouldNotBeSaved($field, $value, $selectedFields)) {
                 $fields[$field] = $value;
             }
         }
-        
+
         return $fields;
     }
 
     /**
      * Instantiate a query object for the model.
      *
-     * @throws Exception
+     * @throws LogicException
      *
      * @return BaseQuery
      */
     public static function query()
     {
-        throw new Exception('public static function query() is not implemented');
+        throw new LogicException('public static function query() is not implemented');
     }
 
     /**
