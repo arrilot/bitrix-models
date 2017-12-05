@@ -30,7 +30,7 @@ abstract class BaseBitrixModel extends ArrayableModel
      * @var bool
      */
     protected $fieldsAreFetched = false;
-    
+
     /**
      * Internal part of create to avoid problems with static and inheritance
      *
@@ -40,8 +40,11 @@ abstract class BaseBitrixModel extends ArrayableModel
      *
      * @return static|bool
      */
-    abstract protected static function internalCreate($fields);
-    
+    protected static function internalCreate($fields)
+    {
+        throw new LogicException('internalCreate is not implemented');
+    }
+
     /**
      * Save model to database.
      *

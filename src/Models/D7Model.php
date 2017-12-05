@@ -61,7 +61,7 @@ class D7Model extends BaseBitrixModel
      */
     public static function query()
     {
-        return new D7Query(static::$adapter, get_called_class());
+        return new D7Query(static::instantiateAdapter(), get_called_class());
     }
     
     /**
