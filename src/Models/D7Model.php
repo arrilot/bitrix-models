@@ -5,8 +5,31 @@ namespace Arrilot\BitrixModels\Models;
 use Arrilot\BitrixModels\Adapters\D7Adapter;
 use Arrilot\BitrixModels\Exceptions\ExceptionFromBitrix;
 use Arrilot\BitrixModels\Queries\D7Query;
+use Illuminate\Support\Collection;
 use LogicException;
 
+/**
+ * D7Query methods
+ *
+ * *TBD FIX THIS*
+ * @method static Collection getList()
+ * @method static D7Model first()
+ * @method static D7Model getById(int $id)
+ * @method static D7Query sort(string|array $by, string $order='ASC')
+ * @method static D7Query filter(array $filter)
+ * @method static D7Query addFilter(array $filters)
+ * @method static D7Query resetFilter()
+ * @method static D7Query navigation(array $filter)
+ * @method static D7Query select($value)
+ * @method static D7Query keyBy(string $value)
+ * @method static D7Query limit(int $value)
+ * @method static D7Query page(int $num)
+ * @method static D7Query take(int $value)
+ * @method static D7Query forPage(int $page, int $perPage=15)
+ * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, string $pageName = 'page')
+ * @method static \Illuminate\Pagination\Paginator simplePaginate(int $perPage = 15, string $pageName = 'page')
+ * @method static D7Query stopQuery()
+ */
 class D7Model extends BaseBitrixModel
 {
     const TABLE_CLASS = null;
