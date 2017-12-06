@@ -4,6 +4,7 @@ namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Models\BaseBitrixModel;
 use BadMethodCallException;
+use Bitrix\Main\Data\Cache;
 use Closure;
 use CPHPCache;
 use Illuminate\Pagination\Paginator;
@@ -483,17 +484,17 @@ abstract class BaseQuery
             return $callback();
         }
 
-        $obCache = new CPHPCache();
-        if ($obCache->InitCache($minutes * 60, $key, 'bitrix-models')) {
-            $vars = $obCache->GetVars();
+        $cache = Cache::createInstance();
+        if ($cache->initCache($minutes * 60, $key, 'bitrix-models')) {
+            $vars = $cache->getVars();
             return $vars['cache'];
         }
 
-        $obCache->StartDataCache();
-        $cache = $callback();
-        $obCache->EndDataCache(['cache' => $cache]);
+        $cache->startDataCache();
+        $result = $callback();
+        $cache->endDataCache(['cache' => $result]);
 
-        return $cache;
+        return $result;
     }
 
     protected function handleCacheIfNeeded($cacheKeyParams, Closure $callback)
