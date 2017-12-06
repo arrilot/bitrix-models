@@ -25,7 +25,7 @@ abstract class BitrixModel extends BaseBitrixModel
     /**
      * Fetch method and parameters.
      *
-     * @var array
+     * @var array|string
      */
     public static $fetchUsing = [
         'method' => 'Fetch',
