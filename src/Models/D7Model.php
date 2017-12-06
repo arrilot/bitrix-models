@@ -12,6 +12,11 @@ class D7Model extends BaseBitrixModel
     const TABLE_CLASS = null;
 
     /**
+     * @var null|string
+     */
+    protected static $cachedTableClass = null;
+
+    /**
      * Adapter to interact with Bitrix D7 API.
      *
      * @var D7Adapter
@@ -51,7 +56,7 @@ class D7Model extends BaseBitrixModel
             return static::$adapter;
         }
 
-        return static::$adapter = new D7Adapter(static::tableClass());
+        return static::$adapter = new D7Adapter(static::cachedTableClass());
     }
 
     /**
@@ -76,6 +81,20 @@ class D7Model extends BaseBitrixModel
         }
     
         return $tableClass;
+    }
+
+    /**
+     * Cached version of table class.
+     *
+     * @return string
+     */
+    public static function cachedTableClass()
+    {
+        if (is_null(static::$cachedTableClass)) {
+            static::$cachedTableClass = static::tableClass();
+        }
+
+        return static::$cachedTableClass;
     }
 
     /**

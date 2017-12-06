@@ -352,6 +352,9 @@ class ElementQueryTest extends TestCase
 
     public function testPaginate()
     {
+        if (!class_exists('Illuminate\Pagination\LengthAwarePaginator')) {
+            $this->markTestSkipped();
+        }
         $query = m::mock('Arrilot\BitrixModels\Queries\ElementQuery[getList, count]', [null, 'Arrilot\Tests\BitrixModels\Stubs\TestElement'])
             ->shouldAllowMockingProtectedMethods();
 
@@ -365,6 +368,10 @@ class ElementQueryTest extends TestCase
 
     public function testSimplePaginate()
     {
+        if (!class_exists('Illuminate\Pagination\Paginator')) {
+            $this->markTestSkipped();
+        }
+
         $query = m::mock('Arrilot\BitrixModels\Queries\ElementQuery[getList, count]', [null, 'Arrilot\Tests\BitrixModels\Stubs\TestElement'])
             ->shouldAllowMockingProtectedMethods();
 
