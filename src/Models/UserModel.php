@@ -15,6 +15,7 @@ use Illuminate\Support\Collection;
  * @method static UserModel first()
  * @method static UserModel getById(int $id)
  * @method static UserQuery sort(string|array $by, string $order='ASC')
+ * @method static UserQuery order(string|array $by, string $order='ASC') // same as sort()
  * @method static UserQuery filter(array $filter)
  * @method static UserQuery addFilter(array $filters)
  * @method static UserQuery resetFilter()
@@ -22,12 +23,14 @@ use Illuminate\Support\Collection;
  * @method static UserQuery select($value)
  * @method static UserQuery keyBy(string $value)
  * @method static UserQuery limit(int $value)
+ * @method static UserQuery offset(int $value)
  * @method static UserQuery page(int $num)
- * @method static UserQuery take(int $value)
+ * @method static UserQuery take(int $value) // same as limit()
  * @method static UserQuery forPage(int $page, int $perPage=15)
  * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, string $pageName = 'page')
  * @method static \Illuminate\Pagination\Paginator simplePaginate(int $perPage = 15, string $pageName = 'page')
  * @method static UserQuery stopQuery()
+ * @method static UserQuery cache(float|int $minutes)
  *
  * Scopes
  * @method static UserQuery active()

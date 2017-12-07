@@ -34,8 +34,10 @@ Arrilot\BitrixModels\Models\D7Model
 Для пример далее везде будем рассматривать модель для элемента инфоблока (ElementModel). 
 Для других сущностей API практически идентичен.
 
-> При работе с моделями крайне рекомендуется использовать инфоблоки второй версии (та что хранит свойства в отдельных таблицах).
-В противном случае некоторые моменты могут не работать должным образом.
+> ElementModel полноценно поддерживает только инфоблоки второй версии (та что хранит свойства в отдельных таблицах).
+С первой версией некоторые моменты могут не работать должным образом из-за особенностей работы CIBlockElement::GetList().
+Самая большая проблема: Если в инфоблоке есть множественные свойства, то запросы с limit(), take(), и first() будут отрабатывать неверно и получать меньше элементов чем нужно и не с полным набором множественных свойств.
+Если вы всё же собираетесь использовать ElementModel с инфоблоками первой версии, то обязательно выставите const IBLOCK_VERSION = 1; внутри класса модели.
 
 Создадим, модель для инфоблока Товары.
 ```php
@@ -432,7 +434,44 @@ class Subscriber extends D7Model
 ```php
 $subscribers = Subscriber::query()->cache(5)->filter(['=NAME'=>'John])->getList();
 ```
-Полный список методов можно посмотреть в классе `vendor/arrilot/bitrix-models/src/Models/D7Model.php`
+Полный список методов следующий
+ 
+```php
+/**
+ * static int count()
+ *
+ * D7Query methods
+ * @method static D7Query runtime(array|\Bitrix\Main\Entity\ExpressionField $fields)
+ * @method static D7Query enableDataDoubling()
+ * @method static D7Query disableDataDoubling()
+ * @method static D7Query cacheJoins(bool $value)
+ *
+ * BaseQuery methods
+ * @method static Collection getList()
+ * @method static D7Model first()
+ * @method static D7Model getById(int $id)
+ * @method static D7Query sort(string|array $by, string $order='ASC')
+ * @method static D7Query order(string|array $by, string $order='ASC') // same as sort()
+ * @method static D7Query filter(array $filter)
+ * @method static D7Query addFilter(array $filters)
+ * @method static D7Query resetFilter()
+ * @method static D7Query navigation(array $filter)
+ * @method static D7Query select($value)
+ * @method static D7Query keyBy(string $value)
+ * @method static D7Query limit(int $value)
+ * @method static D7Query offset(int $value)
+ * @method static D7Query page(int $num)
+ * @method static D7Query take(int $value) // same as limit()
+ * @method static D7Query forPage(int $page, int $perPage=15)
+ * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, string $pageName = 'page')
+ * @method static \Illuminate\Pagination\Paginator simplePaginate(int $perPage = 15, string $pageName = 'page')
+ * @method static D7Query stopQuery()
+ * @method static D7Query cache(float|int $minutes)
+ */
+```
+
+За подробностями смотрите  `vendor/arrilot/bitrix-models/src/Models/D7Model.php` и  `vendor/arrilot/bitrix-models/src/Queries/D7Query.php`
+
 
 ## Использование моделей Eloquent
 

@@ -9,13 +9,20 @@ use Illuminate\Support\Collection;
 use LogicException;
 
 /**
- * D7Query methods
+ * static int count()
  *
- * *TBD FIX THIS*
+ * D7Query methods
+ * @method static D7Query runtime(array|\Bitrix\Main\Entity\ExpressionField $fields)
+ * @method static D7Query enableDataDoubling()
+ * @method static D7Query disableDataDoubling()
+ * @method static D7Query cacheJoins(bool $value)
+ *
+ * BaseQuery methods
  * @method static Collection getList()
  * @method static D7Model first()
  * @method static D7Model getById(int $id)
  * @method static D7Query sort(string|array $by, string $order='ASC')
+ * @method static D7Query order(string|array $by, string $order='ASC') // same as sort()
  * @method static D7Query filter(array $filter)
  * @method static D7Query addFilter(array $filters)
  * @method static D7Query resetFilter()
@@ -23,12 +30,14 @@ use LogicException;
  * @method static D7Query select($value)
  * @method static D7Query keyBy(string $value)
  * @method static D7Query limit(int $value)
+ * @method static D7Query offset(int $value)
  * @method static D7Query page(int $num)
- * @method static D7Query take(int $value)
+ * @method static D7Query take(int $value) // same as limit()
  * @method static D7Query forPage(int $page, int $perPage=15)
  * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, string $pageName = 'page')
  * @method static \Illuminate\Pagination\Paginator simplePaginate(int $perPage = 15, string $pageName = 'page')
  * @method static D7Query stopQuery()
+ * @method static D7Query cache(float|int $minutes)
  */
 class D7Model extends BaseBitrixModel
 {

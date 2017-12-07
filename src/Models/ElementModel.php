@@ -18,6 +18,7 @@ use LogicException;
  * @method static ElementModel first()
  * @method static ElementModel getById(int $id)
  * @method static ElementQuery sort(string|array $by, string $order='ASC')
+ * @method static ElementQuery order(string|array $by, string $order='ASC') // same as sort()
  * @method static ElementQuery filter(array $filter)
  * @method static ElementQuery addFilter(array $filters)
  * @method static ElementQuery resetFilter()
@@ -25,12 +26,14 @@ use LogicException;
  * @method static ElementQuery select($value)
  * @method static ElementQuery keyBy(string $value)
  * @method static ElementQuery limit(int $value)
+ * @method static ElementQuery offset(int $value)
  * @method static ElementQuery page(int $num)
- * @method static ElementQuery take(int $value)
+ * @method static ElementQuery take(int $value) // same as limit()
  * @method static ElementQuery forPage(int $page, int $perPage=15)
  * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, string $pageName = 'page')
  * @method static \Illuminate\Pagination\Paginator simplePaginate(int $perPage = 15, string $pageName = 'page')
  * @method static ElementQuery stopQuery()
+ * @method static ElementQuery cache(float|int $minutes)
  *
  * Scopes
  * @method static ElementQuery active()

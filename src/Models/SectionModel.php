@@ -19,6 +19,7 @@ use LogicException;
  * @method static SectionModel first()
  * @method static SectionModel getById(int $id)
  * @method static SectionQuery sort(string|array $by, string $order='ASC')
+ * @method static SectionQuery order(string|array $by, string $order='ASC') // same as sort()
  * @method static SectionQuery filter(array $filter)
  * @method static SectionQuery addFilter(array $filters)
  * @method static SectionQuery resetFilter()
@@ -26,12 +27,14 @@ use LogicException;
  * @method static SectionQuery select($value)
  * @method static SectionQuery keyBy(string $value)
  * @method static SectionQuery limit(int $value)
+ * @method static SectionQuery offset(int $value)
  * @method static SectionQuery page(int $num)
- * @method static SectionQuery take(int $value)
+ * @method static SectionQuery take(int $value) // same as limit()
  * @method static SectionQuery forPage(int $page, int $perPage=15)
  * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, string $pageName = 'page')
  * @method static \Illuminate\Pagination\Paginator simplePaginate(int $perPage = 15, string $pageName = 'page')
  * @method static SectionQuery stopQuery()
+ * @method static SectionQuery cache(float|int $minutes)
  *
  * Scopes
  * @method static SectionQuery active()

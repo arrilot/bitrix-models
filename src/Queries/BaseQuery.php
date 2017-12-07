@@ -236,7 +236,7 @@ abstract class BaseQuery
     /**
      * Setter for cache ttl.
      *
-     * @param double|int $minutes
+     * @param float|int $minutes
      *
      * @return $this
      */
