@@ -177,6 +177,7 @@ class D7Model extends BaseBitrixModel
 
         $this->setEventErrorsOnFail($resultObject);
         $this->onAfterDelete($result);
+        $this->resetEventErrors();
         $this->throwExceptionOnFail($resultObject);
 
         return $result;
@@ -191,12 +192,16 @@ class D7Model extends BaseBitrixModel
      */
     public function save($selectedFields = [])
     {
-        $this->fieldsSelectedForSave = is_array($selectedFields) ? $selectedFields : func_get_args();
+        $fieldsSelectedForSave = is_array($selectedFields) ? $selectedFields : func_get_args();
+        $this->fieldsSelectedForSave = $fieldsSelectedForSave;
         if ($this->onBeforeSave() === false || $this->onBeforeUpdate() === false) {
+            $this->fieldsSelectedForSave = [];
             return false;
+        } else {
+            $this->fieldsSelectedForSave = [];
         }
 
-        $fields = $this->normalizeFieldsForSave($this->fieldsSelectedForSave);
+        $fields = $this->normalizeFieldsForSave($fieldsSelectedForSave);
         $resultObject = static::instantiateAdapter()->update($this->id, $fields);
         $result = $resultObject->isSuccess();
 

@@ -273,4 +273,12 @@ abstract class BaseBitrixModel extends ArrayableModel
     {
         return static::query()->$method(...$parameters);
     }
+
+    /**
+     * Reset event errors back to default.
+     */
+    protected function resetEventErrors()
+    {
+        $this->eventErrors = [];
+    }
 }

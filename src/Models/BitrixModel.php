@@ -97,8 +97,9 @@ abstract class BitrixModel extends BaseBitrixModel
         $model->setEventErrorsOnFail($result, $bxObject);
         $model->onAfterCreate($result);
         $model->onAfterSave($result);
+        $model->resetEventErrors();
         $model->throwExceptionOnFail($result, $bxObject);
-        
+
         return $model;
     }
     
@@ -118,6 +119,7 @@ abstract class BitrixModel extends BaseBitrixModel
 
         $this->setEventErrorsOnFail($result, static::$bxObject);
         $this->onAfterDelete($result);
+        $this->resetEventErrors();
         $this->throwExceptionOnFail($result, static::$bxObject);
 
         return $result;
@@ -132,21 +134,26 @@ abstract class BitrixModel extends BaseBitrixModel
      */
     public function save($selectedFields = [])
     {
-        $this->fieldsSelectedForSave = is_array($selectedFields) ? $selectedFields : func_get_args();
+        $fieldsSelectedForSave = is_array($selectedFields) ? $selectedFields : func_get_args();
+        $this->fieldsSelectedForSave = $fieldsSelectedForSave;
         if ($this->onBeforeSave() === false || $this->onBeforeUpdate() === false) {
+            $this->fieldsSelectedForSave = [];
             return false;
+        } else {
+            $this->fieldsSelectedForSave = [];
         }
 
-        $fields = $this->normalizeFieldsForSave($this->fieldsSelectedForSave);
+        $fields = $this->normalizeFieldsForSave($fieldsSelectedForSave);
         $result = !empty($fields) ? static::$bxObject->update($this->id, $fields) : false;
         if ($this instanceof ElementModel) {
-            $savePropsResult = $this->saveProps($this->fieldsSelectedForSave);
+            $savePropsResult = $this->saveProps($fieldsSelectedForSave);
             $result = $result || $savePropsResult;
         }
 
         $this->setEventErrorsOnFail($result, static::$bxObject);
         $this->onAfterUpdate($result);
         $this->onAfterSave($result);
+        $this->resetEventErrors();
         $this->throwExceptionOnFail($result, static::$bxObject);
 
         return $result;
