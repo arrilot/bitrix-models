@@ -4,6 +4,7 @@ namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixCacher\Cache;
 use CIBlock;
+use Bitrix\Main\Data\Cache;
 use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Models\ElementModel;
 use Exception;
@@ -141,12 +142,19 @@ class ElementQuery extends OldCoreQuery
         return $this;
     }
 
+    public function cache($ttl)
+    {
+        $this->ttl = $ttl;
+    
+        return $this;
+    }
+
     /**
      * Get list of items.
      *
      * @return Collection
      */
-    public function getList()
+    private function getListSimple()
     {
         if ($this->queryShouldBeStopped) {
             return new Collection();
@@ -183,6 +191,34 @@ class ElementQuery extends OldCoreQuery
         };
 
         return $this->handleCacheIfNeeded(compact('sort', 'filter', 'group', 'navigation', 'select', 'queryType', 'keyBy'), $callback);
+    }
+
+    public function getList()
+    {
+        if (!$this->ttl) return $this->getListSimple();
+
+        $cache = Cache::createInstance();
+        if ($cache->initCache($this->ttl, $this->getKey(), '/models/')) {
+            $result = $cache->getVars();
+        } elseif ($cache->startDataCache()) {
+            $result = $this->getListSimple();
+            $cache->endDataCache($result);
+        }
+
+        return $result;
+    }
+
+    private function getKey()
+    {
+        $data = [
+            'sort' => $this->sort,
+            'filter' => $this->normalizeFilter(),
+            'groupBy' => $this->groupBy,
+            'navigation' => $this->navigation,
+            'select' => $this->normalizeSelect(),
+        ];
+
+        return md5( json_encode($data) );
     }
 
     /**
