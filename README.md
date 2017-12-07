@@ -70,6 +70,16 @@ class Product extends ElementModel
 $product = Product::create($fields);
 ```
 
+> Заметка:
+В случае если поля $product в дальнейшем как-то используются, рекомендуется сразу же обновить объект новым запросом в БД .
+Нужно это из-за того, что форматы полей в CIblockElement::Add() и CIblockElement::GetList() не совпадают на 100%
+Делается это так: 
+```php
+$product = Product::create($fields)
+$product->refresh();
+```
+
+
 ### Обновление
 
 ```php
