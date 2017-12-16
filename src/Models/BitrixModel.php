@@ -194,7 +194,7 @@ abstract class BitrixModel extends BaseBitrixModel
 
         return (!empty($selectedFields) && !in_array($field, $selectedFields))
             || in_array($field, $blacklistedFields)
-            || (substr($field, 0, 1) === '~')
+            || ($field[0] === '~')
             || (substr($field, 0, 9) === 'PROPERTY_');
     }
 

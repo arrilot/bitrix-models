@@ -2,6 +2,7 @@
 
 namespace Arrilot\BitrixModels\Queries;
 
+use Arrilot\BitrixModels\Helpers;
 use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Models\SectionModel;
 
@@ -94,10 +95,24 @@ class SectionQuery extends OldCoreQuery
         $navigation = $this->navigation;
         $keyBy = $this->keyBy;
 
-        $callback = function() use ($sort, $filter, $countElements, $select, $navigation){
+        $callback = function() use ($sort, $filter, $countElements, $select, $navigation) {
             $sections = [];
             $rsSections = $this->bxObject->getList($sort, $filter, $countElements, $select, $navigation);
             while ($arSection = $this->performFetchUsingSelectedMethod($rsSections)) {
+
+                // Если передать nPageSize, то Битрикс почему-то перестает десериализовать множественные свойсвта...
+                // Проверим это еще раз, и если есть проблемы то пофиксим.
+                foreach ($arSection as $field => $value) {
+                    if (
+                    is_string($value)
+                    && Helpers::startsWith($value, 'a:')
+                    && (Helpers::startsWith($field, 'UF_') || Helpers::startsWith($field, '~UF_'))
+                    ) {
+                        $unserializedValue = @unserialize($value);
+                        $arSection[$field] = $unserializedValue === false ? $value : $unserializedValue;
+                    }
+                }
+
                 $this->addItemToResultsUsingKeyBy($sections, new $this->modelName($arSection['ID'], $arSection));
             }
 
