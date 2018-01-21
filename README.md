@@ -559,6 +559,14 @@ $brand = Brand::create(['UF_NAME' => 'Nike']);
 В заключение обращу внимание на то что, несмотря на то что API моделей Битрикса и моделей Eloquent очень похожи (во многом из-за того что bitrix-models разрабатывались под влияением Eloquent)
 это всё же разные вещи и внутри они совершенно независимые. Нельзя допустим сделать связь (relation) Eloquent модели и Битриксовой модели.
 
+### События моделей
+
+В Eloquent есть так называемые [https://laravel.com/docs/master/eloquent#events](События моделей/Model events), которые позволяют вклиниться в какой-то момент работы модели.
+В целом довольно похожая на Битриксовые события `OnBeforeIblockElementUpdate` и т д вещь.
+Если они вам нужны, то вместе с `illuminate/database` вам нужно поставить еще и зависимость `illuminate/events`:
+
+`composer require illuminate/events`
+
 ### Query Builder
 
 При подключении Eloquent мы бесплатно получаем и Query Builder от Laravel [https://laravel.com/docs/master/queries](https://laravel.com/docs/master/queries), который очень полезен если необходима прямая работа с БД минуя уровень абстракции моделей.

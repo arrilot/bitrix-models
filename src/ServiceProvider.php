@@ -5,6 +5,7 @@ namespace Arrilot\BitrixModels;
 use Arrilot\BitrixBlade\BladeProvider;
 use Bitrix\Main\Config\Configuration;
 use Illuminate\Container\Container;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
@@ -79,6 +80,10 @@ class ServiceProvider
             'prefix'    => '',
             'strict'    => false,
         ]);
+
+        if (class_exists(Dispatcher::class)) {
+            $capsule->setEventDispatcher(new Dispatcher());
+        }
 
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
