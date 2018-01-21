@@ -561,7 +561,7 @@ $brand = Brand::create(['UF_NAME' => 'Nike']);
 
 ### События моделей
 
-В Eloquent есть так называемые [https://laravel.com/docs/master/eloquent#events](События моделей/Model events), которые позволяют вклиниться в какой-то момент работы модели.
+В Eloquent есть так называемые [События моделей / Model events](https://laravel.com/docs/master/eloquent#events), которые позволяют вклиниться в какой-то момент работы модели.
 В целом довольно похожая на Битриксовые события `OnBeforeIblockElementUpdate` и т д вещь.
 Если они вам нужны, то вместе с `illuminate/database` вам нужно поставить еще и зависимость `illuminate/events`:
 
