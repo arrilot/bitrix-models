@@ -100,7 +100,7 @@ class UserQuery extends OldCoreQuery
         $sort = $this->sort;
         $filter = $this->normalizeFilter();
         $params = [
-            'SELECT'     => $this->propsMustBeSelected() ? ['UF_*'] : false,
+            'SELECT'     => $this->propsMustBeSelected() ? ['UF_*'] : ($this->normalizeUfSelect() ?: false),
             'NAV_PARAMS' => $this->navigation,
             'FIELDS'     => $this->normalizeSelect(),
         ];
@@ -215,5 +215,15 @@ class UserQuery extends OldCoreQuery
         $this->select[] = 'ID';
 
         return $this->clearSelectArray();
+    }
+
+    /**
+     * Normalize select UF before sending it to getList.
+     *
+     * @return array
+     */
+    protected function normalizeUfSelect()
+    {
+        return preg_grep('/^(UF_+)/', $this->select);
     }
 }
