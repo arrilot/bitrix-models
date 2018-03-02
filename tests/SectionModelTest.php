@@ -9,7 +9,7 @@ class SectionModelTest extends TestCase
 {
     public function setUp()
     {
-        TestSection::$bxObject = m::mock('object');
+        TestSection::$bxObject = m::mock('obj');
     }
 
     public function tearDown()
@@ -28,7 +28,7 @@ class SectionModelTest extends TestCase
 
     public function testDelete()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('delete')->once()->andReturn(true);
 
         TestSection::$bxObject = $bxObject;
@@ -39,7 +39,7 @@ class SectionModelTest extends TestCase
 
     public function testActivate()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'Y'], true, true)->once()->andReturn(true);
 
         TestSection::$bxObject = $bxObject;
@@ -50,7 +50,7 @@ class SectionModelTest extends TestCase
 
     public function testDeactivate()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'N'], true, true)->once()->andReturn(true);
 
         TestSection::$bxObject = $bxObject;
@@ -61,7 +61,7 @@ class SectionModelTest extends TestCase
 
     public function testCreate()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('add')->with(['NAME' => 'Section 1', 'IBLOCK_ID' => TestSection::iblockId()], true, true)->once()->andReturn(3);
 
         TestSection::$bxObject = $bxObject;
@@ -88,7 +88,7 @@ class SectionModelTest extends TestCase
 
     public function testFill()
     {
-        TestSection::$bxObject = m::mock('object');
+        TestSection::$bxObject = m::mock('obj');
         $section = new TestSection(1);
 
         $fields = ['ID' => 2, 'NAME' => 'Section 1'];

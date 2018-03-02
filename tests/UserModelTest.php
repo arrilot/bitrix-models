@@ -12,7 +12,7 @@ class UserModelTest extends TestCase
 {
     public function setUp()
     {
-        TestUser::$bxObject = m::mock('object');
+        TestUser::$bxObject = m::mock('obj');
     }
 
     public function tearDown()
@@ -113,7 +113,7 @@ class UserModelTest extends TestCase
 
     public function testDelete()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('delete')->once()->andReturn(true);
 
         TestUser::$bxObject = $bxObject;
@@ -124,7 +124,7 @@ class UserModelTest extends TestCase
 
     public function testActivate()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'Y'])->once()->andReturn(true);
 
         TestUser::$bxObject = $bxObject;
@@ -135,7 +135,7 @@ class UserModelTest extends TestCase
 
     public function testDeactivate()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'N'])->once()->andReturn(true);
 
         TestUser::$bxObject = $bxObject;
@@ -146,7 +146,7 @@ class UserModelTest extends TestCase
 
     public function testCreate()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('add')->with(['NAME' => 'John Doe'])->once()->andReturn(3);
 
         TestUser::$bxObject = $bxObject;
@@ -162,7 +162,7 @@ class UserModelTest extends TestCase
 
     public function testCount()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('getList')->with('ID', 'ASC', ['ACTIVE' => 'Y'], [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,
@@ -174,7 +174,7 @@ class UserModelTest extends TestCase
 
         $this->assertSame(2, TestUser::count(['ACTIVE' => 'Y']));
 
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('getList')->with('ID', 'ASC', [], [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,
@@ -208,7 +208,7 @@ class UserModelTest extends TestCase
         $this->assertSame($fields, $user->fields);
         $this->assertSame($fields, $user->get());
 
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('getUserGroup')->once()->andReturn([1]);
         TestUser::$bxObject = $bxObject;
         $user = new TestUser(1);
@@ -234,7 +234,7 @@ class UserModelTest extends TestCase
     
     protected function mockLoadCurrentUserMethods()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('getList')->withAnyArgs()->once()->andReturn(m::self());
         $bxObject->shouldReceive('Fetch')->twice()->andReturn(['ID' => 1, 'NAME' => 'John Doe', 'GROUP_ID' => [1, 2, 3]], false);
     

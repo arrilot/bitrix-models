@@ -22,14 +22,14 @@ class UserQueryTest extends TestCase
      */
     protected function createQuery($bxObject)
     {
-        TestUser::$bxObject = m::mock('object');
+        TestUser::$bxObject = m::mock('obj');
 
         return new UserQuery($bxObject, 'Arrilot\Tests\BitrixModels\Stubs\TestUser');
     }
 
     public function testCount()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('getList')->with('ID', 'ASC', [], [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,
@@ -42,7 +42,7 @@ class UserQueryTest extends TestCase
 
         $this->assertSame(6, $count);
 
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('getList')->with('ID', 'ASC', ['ACTIVE' => 'Y'], [
             'NAV_PARAMS' => [
                 'nTopCount' => 0,
@@ -58,7 +58,7 @@ class UserQueryTest extends TestCase
 
     public function testGetListWithScopes()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         TestUser::$bxObject = $bxObject;
         $bxObject->shouldReceive('getList')->with(
             ['SORT' => 'ASC'],
@@ -86,7 +86,7 @@ class UserQueryTest extends TestCase
 
     public function testGetByLogin()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         TestUser::$bxObject = $bxObject;
         $bxObject->shouldReceive('getList')->with(
             ['SORT' => 'ASC'],
@@ -108,7 +108,7 @@ class UserQueryTest extends TestCase
 
     public function testGetByEmail()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         TestUser::$bxObject = $bxObject;
         $bxObject->shouldReceive('getList')->with(
             ['SORT' => 'ASC'],

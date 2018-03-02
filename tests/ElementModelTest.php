@@ -12,7 +12,7 @@ class ElementModelTest extends TestCase
 {
     public function setUp()
     {
-        TestElement::$bxObject = m::mock('object');
+        TestElement::$bxObject = m::mock('obj');
         ElementQuery::$cIblockObject = m::mock('cIblockObject');
     }
 
@@ -39,7 +39,7 @@ class ElementModelTest extends TestCase
     public function testDelete()
     {
         // normal
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('delete')->once()->andReturn(true);
 
         TestElement::$bxObject = $bxObject;
@@ -51,7 +51,7 @@ class ElementModelTest extends TestCase
         $this->assertTrue($element->delete());
 
         // cancelled
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('delete')->never();
 
         TestElement::$bxObject = $bxObject;
@@ -65,7 +65,7 @@ class ElementModelTest extends TestCase
 
     public function testActivate()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'Y'], false, true)->once()->andReturn(true);
 
         TestElement::$bxObject = $bxObject;
@@ -76,7 +76,7 @@ class ElementModelTest extends TestCase
 
     public function testDeactivate()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'N'], false, true)->once()->andReturn(true);
 
         TestElement::$bxObject = $bxObject;
@@ -99,7 +99,7 @@ class ElementModelTest extends TestCase
         );
         ElementQuery::$cIblockObject = $cIblockObject;
         
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('GetList')->withAnyArgs()->once()->andReturn(m::self());
         $bxObject->shouldReceive('Fetch')->twice()->andReturn(
             [
@@ -144,7 +144,7 @@ class ElementModelTest extends TestCase
         );
         ElementQuery::$cIblockObject = $cIblockObject;
     
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('GetList')->withAnyArgs()->once()->andReturn(m::self());
         $bxObject->shouldReceive('Fetch')->twice()->andReturn(
             [
@@ -195,7 +195,7 @@ class ElementModelTest extends TestCase
         );
         ElementQuery::$cIblockObject = $cIblockObject;
 
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('GetList')->withAnyArgs()->twice()->andReturn(m::self());
         $bxObject->shouldReceive('Fetch')->times(4)->andReturn(
             [
@@ -238,7 +238,7 @@ class ElementModelTest extends TestCase
 
     public function testSave()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
 
         TestElement::$bxObject = $bxObject;
         $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get,onBeforeSave,onAfterSave,onBeforeUpdate,onAfterUpdate]', [1])
@@ -302,7 +302,7 @@ class ElementModelTest extends TestCase
 
     public function testCreate()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('add')->with(['NAME' => 'John Doe', 'IBLOCK_ID' => TestElement::iblockId()], false, true)->once()->andReturn(2);
 
         TestElement::$bxObject = $bxObject;
@@ -315,14 +315,14 @@ class ElementModelTest extends TestCase
 
     public function testCount()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('GetList')->with(false, ['ACTIVE' => 'Y', 'IBLOCK_ID' => 1], [])->once()->andReturn(2);
 
         TestElement::$bxObject = $bxObject;
 
         $this->assertEquals(2, TestElement::count(['ACTIVE' => 'Y', 'IBLOCK_ID' => 1]));
 
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         $bxObject->shouldReceive('GetList')->with(false, ['IBLOCK_ID' => 1], [])->once()->andReturn(3);
 
         TestElement::$bxObject = $bxObject;

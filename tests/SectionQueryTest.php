@@ -22,14 +22,14 @@ class SectionQueryTest extends TestCase
      */
     protected function createQuery($bxObject)
     {
-        TestSection::$bxObject = m::mock('object');
+        TestSection::$bxObject = m::mock('obj');
 
         return new SectionQuery($bxObject, 'Arrilot\Tests\BitrixModels\Stubs\TestSection');
     }
 
     public function testGetListWithScopes()
     {
-        $bxObject = m::mock('object');
+        $bxObject = m::mock('obj');
         TestSection::$bxObject = $bxObject;
         $bxObject->shouldReceive('getList')->with(
             ['SORT' => 'ASC'],
