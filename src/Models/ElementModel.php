@@ -2,6 +2,7 @@
 
 namespace Arrilot\BitrixModels\Models;
 
+use Arrilot\BitrixModels\Exceptions\ExceptionFromBitrix;
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use CIBlock;
 use Illuminate\Support\Collection;
@@ -79,6 +80,13 @@ class ElementModel extends BitrixModel
     protected $sectionsAreFetched = false;
 
     /**
+     * Update search after each create or update.
+     *
+     * @var bool
+     */
+    protected static $updateSearch = true;
+
+    /**
      * Getter for corresponding iblock id.
      *
      * @throws LogicException
@@ -111,6 +119,11 @@ class ElementModel extends BitrixModel
         }
 
         return static::internalCreate($fields);
+    }
+
+    public static function internalDirectCreate($bxObject, $fields)
+    {
+        return $bxObject->add($fields, false, static::$updateSearch);
     }
 
     /**
@@ -394,5 +407,27 @@ class ElementModel extends BitrixModel
         }
 
         return $propertyValues;
+    }
+
+    /**
+     * @param $fields
+     * @param $fieldsSelectedForSave
+     * @return bool
+     */
+    protected function internalUpdate($fields, $fieldsSelectedForSave)
+    {
+        $result = !empty($fields) ? static::$bxObject->update($this->id, $fields, false, static::$updateSearch) : false;
+        $savePropsResult = $this->saveProps($fieldsSelectedForSave);
+        $result = $result || $savePropsResult;
+
+        return $result;
+    }
+
+    /**
+     * @param $value
+     */
+    public static function setUpdateSearch($value)
+    {
+        static::$updateSearch = $value;
     }
 }

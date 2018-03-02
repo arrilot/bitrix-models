@@ -66,7 +66,7 @@ class ElementModelTest extends TestCase
     public function testActivate()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'Y'])->once()->andReturn(true);
+        $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'Y'], false, true)->once()->andReturn(true);
 
         TestElement::$bxObject = $bxObject;
         $element = new TestElement(1);
@@ -77,7 +77,7 @@ class ElementModelTest extends TestCase
     public function testDeactivate()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'N'])->once()->andReturn(true);
+        $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'N'], false, true)->once()->andReturn(true);
 
         TestElement::$bxObject = $bxObject;
         $element = new TestElement(1);
@@ -244,10 +244,10 @@ class ElementModelTest extends TestCase
         $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get,onBeforeSave,onAfterSave,onBeforeUpdate,onAfterUpdate]', [1])
             ->shouldAllowMockingProtectedMethods();
 
-        $element->shouldReceive('onBeforeSave')->times(3)->andReturn(true);
-        $element->shouldReceive('onAfterSave')->times(3);
-        $element->shouldReceive('onBeforeUpdate')->times(3)->andReturn(true);
-        $element->shouldReceive('onAfterUpdate')->times(3);
+        $element->shouldReceive('onBeforeSave')->times(4)->andReturn(true);
+        $element->shouldReceive('onAfterSave')->times(4);
+        $element->shouldReceive('onBeforeUpdate')->times(4)->andReturn(true);
+        $element->shouldReceive('onAfterUpdate')->times(4);
 
         $fields = [
             'ID'                        => 1,
@@ -263,7 +263,7 @@ class ElementModelTest extends TestCase
         $element->fields = $fields;
 
         // 1
-        $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'])->once()->andReturn(true);
+        $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'], false, true)->once()->andReturn(true);
         $this->assertTrue($element->save(['NAME']));
 
         // 2
@@ -272,7 +272,7 @@ class ElementModelTest extends TestCase
             ->once()
             ->andReturn(true);
 
-        $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'])->once()->andReturn(true);
+        $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'], false, true)->once()->andReturn(true);
         $this->assertTrue($element->save());
 
         // 3
@@ -281,6 +281,12 @@ class ElementModelTest extends TestCase
             ->once()
             ->andReturn(true);
         $this->assertTrue($element->save(['PROPERTY_FOO_VALUE']));
+
+        // 4
+        TestElement::setUpdateSearch(false);
+        $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'], false, false)->once()->andReturn(true);
+        $this->assertTrue($element->save(['NAME']));
+        TestElement::setUpdateSearch(true);
     }
 
     public function testUpdate()
@@ -297,7 +303,7 @@ class ElementModelTest extends TestCase
     public function testCreate()
     {
         $bxObject = m::mock('object');
-        $bxObject->shouldReceive('add')->with(['NAME' => 'John Doe', 'IBLOCK_ID' => TestElement::iblockId()])->once()->andReturn(2);
+        $bxObject->shouldReceive('add')->with(['NAME' => 'John Doe', 'IBLOCK_ID' => TestElement::iblockId()], false, true)->once()->andReturn(2);
 
         TestElement::$bxObject = $bxObject;
 

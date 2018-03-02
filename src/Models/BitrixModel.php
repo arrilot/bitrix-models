@@ -87,9 +87,9 @@ abstract class BitrixModel extends BaseBitrixModel
         if ($model->onBeforeSave() === false || $model->onBeforeCreate() === false) {
             return false;
         }
-        
+
         $bxObject = static::instantiateObject();
-        $id = $bxObject->add($model->fields);
+        $id = static::internalDirectCreate($bxObject, $model->fields);
         $model->setId($id);
         
         $result = $id ? true : false;
@@ -102,7 +102,12 @@ abstract class BitrixModel extends BaseBitrixModel
 
         return $model;
     }
-    
+
+    public static function internalDirectCreate($bxObject, $fields)
+    {
+        return $bxObject->add($fields);
+    }
+
     /**
      * Delete model.
      *
@@ -144,11 +149,7 @@ abstract class BitrixModel extends BaseBitrixModel
         }
 
         $fields = $this->normalizeFieldsForSave($fieldsSelectedForSave);
-        $result = !empty($fields) ? static::$bxObject->update($this->id, $fields) : false;
-        if ($this instanceof ElementModel) {
-            $savePropsResult = $this->saveProps($fieldsSelectedForSave);
-            $result = $result || $savePropsResult;
-        }
+        $result = $this->internalUpdate($fields, $fieldsSelectedForSave);
 
         $this->setEventErrorsOnFail($result, static::$bxObject);
         $this->onAfterUpdate($result);
@@ -157,6 +158,16 @@ abstract class BitrixModel extends BaseBitrixModel
         $this->throwExceptionOnFail($result, static::$bxObject);
 
         return $result;
+    }
+
+    /**
+     * @param $fields
+     * @param $fieldsSelectedForSave
+     * @return bool
+     */
+    protected function internalUpdate($fields, $fieldsSelectedForSave)
+    {
+        return !empty($fields) ? static::$bxObject->update($this->id, $fields) : false;
     }
 
     /**

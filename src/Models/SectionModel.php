@@ -63,6 +63,13 @@ class SectionModel extends BitrixModel
     protected static $objectClass = 'CIBlockSection';
 
     /**
+     * Update search after each create or update.
+     *
+     * @var bool
+     */
+    protected static $updateSearch = true;
+
+    /**
      * Getter for corresponding iblock id.
      *
      * @throws LogicException
@@ -173,5 +180,28 @@ class SectionModel extends BitrixModel
             $this->id,
             $options
         );
+    }
+
+    public static function internalDirectCreate($bxObject, $fields)
+    {
+        return $bxObject->add($fields, true, static::$updateSearch);
+    }
+
+    /**
+     * @param $fields
+     * @param $fieldsSelectedForSave
+     * @return bool
+     */
+    protected function internalUpdate($fields, $fieldsSelectedForSave)
+    {
+        return !empty($fields) ? static::$bxObject->update($this->id, $fields, true, static::$updateSearch) : false;
+    }
+
+    /**
+     * @param $value
+     */
+    public static function setUpdateSearch($value)
+    {
+        static::$updateSearch = $value;
     }
 }
