@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels;
 
 use Arrilot\BitrixBlade\BladeProvider;
+use Arrilot\BitrixModels\Debug\IlluminateQueryDebugger;
 use Bitrix\Main\Config\Configuration;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
@@ -30,6 +31,13 @@ class ServiceProvider
     {
         self::bootstrapIlluminateDatabase();
         class_alias(Capsule::class, 'DB');
+
+        if ($_COOKIE["show_sql_stat"] == "Y") {
+            Capsule::enableQueryLog();
+
+            $em = \Bitrix\Main\EventManager::getInstance();
+            $em->addEventHandler('main', 'OnAfterEpilog', [IlluminateQueryDebugger::class, 'onAfterEpilogHandler']);
+        }
     }
 
     /**
