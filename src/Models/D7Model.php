@@ -46,14 +46,14 @@ class D7Model extends BaseBitrixModel
     /**
      * @var null|string
      */
-    protected static $cachedTableClass = null;
+    protected static $cachedTableClasses = [];
 
     /**
-     * Adapter to interact with Bitrix D7 API.
+     * Array of adapters for each model to interact with Bitrix D7 API.
      *
-     * @var D7Adapter
+     * @var D7Adapter[]
      */
-    protected static $adapter;
+    protected static $adapters = [];
 
     /**
      * Constructor.
@@ -74,7 +74,7 @@ class D7Model extends BaseBitrixModel
      */
     public static function setAdapter($adapter)
     {
-        static::$adapter = $adapter;
+        static::$adapters[get_called_class()] = $adapter;
     }
 
     /**
@@ -84,11 +84,12 @@ class D7Model extends BaseBitrixModel
      */
     public static function instantiateAdapter()
     {
-        if (static::$adapter) {
-            return static::$adapter;
+        $class = get_called_class();
+        if (isset(static::$adapters[$class])) {
+            return static::$adapters[$class];
         }
 
-        return static::$adapter = new D7Adapter(static::cachedTableClass());
+        return static::$adapters[$class] = new D7Adapter(static::cachedTableClass());
     }
 
     /**
@@ -122,11 +123,12 @@ class D7Model extends BaseBitrixModel
      */
     public static function cachedTableClass()
     {
-        if (is_null(static::$cachedTableClass)) {
-            static::$cachedTableClass = static::tableClass();
+        $class = get_called_class();
+        if (!isset(static::$cachedTableClasses[$class])) {
+            static::$cachedTableClasses[$class] = static::tableClass();
         }
 
-        return static::$cachedTableClass;
+        return static::$cachedTableClasses[$class];
     }
 
     /**
