@@ -38,6 +38,8 @@ use LogicException;
  *
  * Scopes
  * @method static SectionQuery active()
+ * @method static SectionQuery childrenOf(SectionModel|int $section)
+ * @method static SectionQuery directChildrenOf(SectionModel|int $section)
  */
 class SectionModel extends BitrixModel
 {
@@ -203,5 +205,30 @@ class SectionModel extends BitrixModel
     public static function setUpdateSearch($value)
     {
         static::$updateSearch = $value;
+    }
+
+    /**
+     * @param $query
+     * @param SectionModel $section
+     * @return SectionQuery
+     */
+    public function scopeChildrenOf(SectionQuery $query, SectionModel $section)
+    {
+        $query->filter['>LEFT_MARGIN'] = $section->fields['LEFT_MARGIN'];
+        $query->filter['<RIGHT_MARGIN'] = $section->fields['RIGHT_MARGIN'];
+
+        return $query;
+    }
+
+    /**
+     * @param $query
+     * @param SectionModel|int $section
+     * @return SectionQuery
+     */
+    public function scopeDirectChildrenOf(SectionQuery $query, $section)
+    {
+        $query->filter['SECTION_ID'] = is_int($section) ? $section : $section->id;
+
+        return $query;
     }
 }

@@ -273,7 +273,12 @@ class ElementModel extends BitrixModel
             return [];
         }
 
-        $this->fields['IBLOCK_SECTION'] = static::$bxObject->getElementGroups($this->id, true);
+        $this->fields['IBLOCK_SECTION'] = [];
+        $dbSections = static::$bxObject->getElementGroups($this->id, true);
+        while ($section = $dbSections->Fetch()) {
+            $this->fields['IBLOCK_SECTION'][] = $section;
+        }
+
         $this->sectionsAreFetched = true;
 
         return $this->fields['IBLOCK_SECTION'];

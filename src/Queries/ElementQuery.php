@@ -158,6 +158,7 @@ class ElementQuery extends OldCoreQuery
         $navigation = $this->navigation;
         $select = $this->normalizeSelect();
         $queryType = 'ElementQuery::getList';
+        $fetchUsing = $this->fetchUsing;
         $keyBy = $this->keyBy;
         list($select, $chunkQuery) = $this->multiplySelectForMaxJoinsRestrictionIfNeeded($select);
 
@@ -182,7 +183,9 @@ class ElementQuery extends OldCoreQuery
             return new Collection($items);
         };
 
-        return $this->handleCacheIfNeeded(compact('sort', 'filter', 'group', 'navigation', 'select', 'queryType', 'keyBy'), $callback);
+        $cacheKeyParams = compact('sort', 'filter', 'group', 'navigation', 'select', 'queryType', 'keyBy', 'fetchUsing');
+
+        return $this->handleCacheIfNeeded($cacheKeyParams, $callback);
     }
 
     /**
