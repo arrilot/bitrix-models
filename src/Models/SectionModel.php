@@ -38,7 +38,7 @@ use LogicException;
  *
  * Scopes
  * @method static SectionQuery active()
- * @method static SectionQuery childrenOf(SectionModel|int $section)
+ * @method static SectionQuery childrenOf(SectionModel $section)
  * @method static SectionQuery directChildrenOf(SectionModel|int $section)
  */
 class SectionModel extends BitrixModel
