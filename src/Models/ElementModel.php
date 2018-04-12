@@ -11,13 +11,13 @@ use LogicException;
 /**
  * ElementQuery methods
  * @method static ElementQuery groupBy($value)
- * @method static ElementModel getByCode(string $code)
- * @method static ElementModel getByExternalId(string $id)
+ * @method static static getByCode(string $code)
+ * @method static static getByExternalId(string $id)
  *
  * Base Query methods
- * @method static Collection getList()
- * @method static ElementModel first()
- * @method static ElementModel getById(int $id)
+ * @method static Collection|static[] getList()
+ * @method static static first()
+ * @method static static getById(int $id)
  * @method static ElementQuery sort(string|array $by, string $order='ASC')
  * @method static ElementQuery order(string|array $by, string $order='ASC') // same as sort()
  * @method static ElementQuery filter(array $filter)

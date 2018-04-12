@@ -14,6 +14,7 @@ use LogicException;
 
 abstract class BaseQuery
 {
+    use BaseRelationQuery;
     /**
      * Bitrix object to be queried.
      *
