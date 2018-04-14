@@ -18,9 +18,9 @@ use LogicException;
  * @method static D7Query cacheJoins(bool $value)
  *
  * BaseQuery methods
- * @method static Collection getList()
- * @method static D7Model first()
- * @method static D7Model getById(int $id)
+ * @method static Collection|static[] getList()
+ * @method static static first()
+ * @method static static getById(int $id)
  * @method static D7Query sort(string|array $by, string $order='ASC')
  * @method static D7Query order(string|array $by, string $order='ASC') // same as sort()
  * @method static D7Query filter(array $filter)

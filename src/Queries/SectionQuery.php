@@ -81,12 +81,8 @@ class SectionQuery extends OldCoreQuery
      *
      * @return Collection
      */
-    public function getList()
+    protected function loadModels()
     {
-        if ($this->queryShouldBeStopped) {
-            return new Collection();
-        }
-
         $queryType = 'SectionQuery::getList';
         $sort = $this->sort;
         $filter = $this->normalizeFilter();

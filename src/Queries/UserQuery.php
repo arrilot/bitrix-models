@@ -90,12 +90,8 @@ class UserQuery extends OldCoreQuery
      *
      * @return Collection
      */
-    public function getList()
+    protected function loadModels()
     {
-        if ($this->queryShouldBeStopped) {
-            return new Collection();
-        }
-    
         $queryType = 'UserQuery::getList';
         $sort = $this->sort;
         $filter = $this->normalizeFilter();

@@ -146,12 +146,8 @@ class ElementQuery extends OldCoreQuery
      *
      * @return Collection
      */
-    public function getList()
+    protected function loadModels()
     {
-        if ($this->queryShouldBeStopped) {
-            return new Collection();
-        }
-
         $sort = $this->sort;
         $filter = $this->normalizeFilter();
         $groupBy = $this->groupBy;

@@ -22,13 +22,14 @@ trait BaseRelationQuery
      */
     public $multiple;
     /**
-     * @var string.
+     * @var array
      */
-    public $link_primary_key;
+    public $link;
     /**
-     * @var string.
+     * @var BaseBitrixModel the primary model of a relational query.
+     * This is used only in lazy loading with dynamic query options.
      */
-    public $link_foreign_key;
+    public $primaryModel;
 
     /**
      * Finds the related records for the specified primary record.
@@ -48,8 +49,37 @@ trait BaseRelationQuery
             }
         }
 
-        $this->filter([$this->link_primary_key => $model[$this->link_foreign_key]]);
-
         return $this->multiple ? $this->getList() : $this->first();
+    }
+
+    /**
+     * @param array $models
+     */
+    private function filterByModels($models)
+    {
+        $attributes = array_keys($this->link);
+
+        if (count($attributes) != 1) {
+            throw new \LogicException('Массив link может содержать только один элемент.');
+        }
+
+        $values = [];
+        $primary = current($attributes);
+        $attribute = reset($this->link);
+        foreach ($models as $model) {
+            if (($value = $model[$attribute]) !== null) {
+                if (is_array($value)) {
+                    $values = array_merge($values, $value);
+                } else {
+                    $values[] = $value;
+                }
+            }
+        }
+
+        if (empty($values)) {
+            $this->stopQuery();
+        }
+
+        $this->filter([$primary => array_unique($values, SORT_REGULAR)]);
     }
 }

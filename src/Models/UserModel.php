@@ -7,13 +7,13 @@ use Illuminate\Support\Collection;
 
 /**
  * UserQuery methods
- * @method static UserModel getByLogin(string $login)
- * @method static UserModel getByEmail(string $email)
+ * @method static static getByLogin(string $login)
+ * @method static static getByEmail(string $email)
  *
  * Base Query methods
- * @method static Collection getList()
- * @method static UserModel first()
- * @method static UserModel getById(int $id)
+ * @method static Collection|static[] getList()
+ * @method static static first()
+ * @method static static getById(int $id)
  * @method static UserQuery sort(string|array $by, string $order='ASC')
  * @method static UserQuery order(string|array $by, string $order='ASC') // same as sort()
  * @method static UserQuery filter(array $filter)

@@ -338,7 +338,7 @@ abstract class BaseBitrixModel extends ArrayableModel
      * ```php
      * public function getCountry()
      * {
-     *     return $this->hasOne(Country::className(), 'ID', 'PROPERTY_COUNTRY');
+     *     return $this->hasOne(Country::className(), ['ID' => 'PROPERTY_COUNTRY']);
      * }
      * ```
      *
@@ -349,13 +349,12 @@ abstract class BaseBitrixModel extends ArrayableModel
      * Call methods declared in [[BaseQuery]] to further customize the relation.
      *
      * @param string $class the class name of the related record
-     * @param string $link_primary_key
-     * @param string $link_foreign_key
+     * @param array $link
      * @return BaseQuery the relational query object.
      */
-    public function hasOne($class, $link_primary_key, $link_foreign_key)
+    public function hasOne($class, $link)
     {
-        return $this->createRelationQuery($class, $link_primary_key, $link_foreign_key, false);
+        return $this->createRelationQuery($class, $link, false);
     }
 
     /**
@@ -372,7 +371,7 @@ abstract class BaseBitrixModel extends ArrayableModel
      * ```php
      * public function getOrders()
      * {
-     *     return $this->hasMany(Order::className(), 'PROPERTY_COUNTRY_VALUE', 'ID');
+     *     return $this->hasMany(Order::className(), ['PROPERTY_COUNTRY_VALUE' => 'ID']);
      * }
      * ```
      *
@@ -383,32 +382,30 @@ abstract class BaseBitrixModel extends ArrayableModel
      * Call methods declared in [[BaseQuery]] to further customize the relation.
      *
      * @param string $class the class name of the related record
-     * @param string $link_primary_key
-     * @param string $link_foreign_key
+     * @param array $link
      * @return BaseQuery the relational query object.
      */
-    public function hasMany($class, $link_primary_key, $link_foreign_key)
+    public function hasMany($class, $link)
     {
-        return $this->createRelationQuery($class, $link_primary_key, $link_foreign_key, true);
+        return $this->createRelationQuery($class, $link, true);
     }
 
     /**
      * Creates a query instance for `has-one` or `has-many` relation.
      * @param string $class the class name of the related record.
-     * @param string $link_primary_key
-     * @param string $link_foreign_key
+     * @param array $link
      * @param bool $multiple whether this query represents a relation to more than one record.
      * @return BaseQuery the relational query object.
      * @see hasOne()
      * @see hasMany()
      */
-    protected function createRelationQuery($class, $link_primary_key, $link_foreign_key, $multiple)
+    protected function createRelationQuery($class, $link, $multiple)
     {
         /* @var $class BaseBitrixModel */
         /* @var $query BaseQuery */
         $query = $class::query();
-        $query->link_primary_key = $link_primary_key;
-        $query->link_foreign_key = $link_foreign_key;
+        $query->link = $link;
+        $query->primaryModel = $this;
         $query->multiple = $multiple;
         return $query;
     }

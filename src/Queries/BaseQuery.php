@@ -88,11 +88,30 @@ abstract class BaseQuery
     abstract public function count();
 
     /**
+     * Подготавливает запрос и вызывает loadModels()
+     *
+     * @return Collection
+     */
+    public function getList()
+    {
+        if ($this->queryShouldBeStopped) {
+            return new Collection();
+        }
+
+        if (!is_null($this->primaryModel)) {
+            // Запрос - подгрузка релейшена. Надо добавить filter
+            $this->filterByModels([$this->primaryModel]);
+        }
+
+        return $this->loadModels();
+    }
+
+    /**
      * Get list of items.
      *
      * @return Collection
      */
-    abstract public function getList();
+    abstract protected function loadModels();
 
     /**
      * Constructor.
