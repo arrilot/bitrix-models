@@ -4,6 +4,7 @@ namespace Arrilot\BitrixModels\Models;
 
 use Arrilot\BitrixModels\ModelEventsTrait;
 use Arrilot\BitrixModels\Queries\BaseQuery;
+use Illuminate\Support\Collection;
 use LogicException;
 
 abstract class BaseBitrixModel extends ArrayableModel
@@ -308,12 +309,43 @@ abstract class BaseBitrixModel extends ArrayableModel
 
             // Если геттер вернул запрос, значит $name - релейшен. Нужно выполнить запрос и сохранить во внутренний массив
             if ($value instanceof BaseQuery) {
-                $this->related[$name] = $value->findFor($name, $this);
+                $this->related[$name] = $value->findFor();
                 return $this->related[$name];
             }
         }
 
         throw new \Exception('Getting unknown property: ' . get_class($this) . '::' . $name);
+    }
+
+    /**
+     * Получить запрос для релейшена по имени
+     * @param string $name - название релейшена, например `orders` для релейшена, определенного через метод getOrders()
+     * @param bool $throwException - кидать ли исключение в случае ошибки
+     * @return BaseQuery - запрос для подгрузки релейшена
+     * @throws \InvalidArgumentException
+     */
+    public function getRelation($name, $throwException = true)
+    {
+        $getter = 'get' . $name;
+        try {
+            $relation = $this->$getter();
+        } catch (\BadMethodCallException $e) {
+            if ($throwException) {
+                throw new \InvalidArgumentException(get_class($this) . ' has no relation named "' . $name . '".', 0, $e);
+            }
+
+            return null;
+        }
+
+        if (!$relation instanceof BaseQuery) {
+            if ($throwException) {
+                throw new \InvalidArgumentException(get_class($this) . ' has no relation named "' . $name . '".');
+            }
+
+            return null;
+        }
+
+        return $relation;
     }
 
     /**
@@ -408,5 +440,16 @@ abstract class BaseBitrixModel extends ArrayableModel
         $query->primaryModel = $this;
         $query->multiple = $multiple;
         return $query;
+    }
+
+    /**
+     * Записать модели как связанные
+     * @param string $name - название релейшена
+     * @param Collection|BaseBitrixModel $records - связанные модели
+     * @see getRelation()
+     */
+    public function populateRelation($name, $records)
+    {
+        $this->related[$name] = $records;
     }
 }

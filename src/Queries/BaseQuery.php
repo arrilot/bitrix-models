@@ -103,7 +103,13 @@ abstract class BaseQuery
             $this->filterByModels([$this->primaryModel]);
         }
 
-        return $this->loadModels();
+        $models = $this->loadModels();
+
+        if (!empty($this->with)) {
+            $this->findWith($this->with, $models);
+        }
+
+        return $models;
     }
 
     /**
