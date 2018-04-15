@@ -27,11 +27,26 @@ trait BaseRelationQuery
      * @var BaseBitrixModel - модель, для которой производится загрузка релейшена
      */
     public $primaryModel;
-
     /**
      * @var array - список связей, которые должны быть подгружены при выполнении запроса
      */
     public $with;
+    /**
+     * @var string - название отношения, обратное текущему отношению
+     */
+    public $inverseOf;
+
+    /**
+     * Установить название отношения, обратное текущему отношению
+     *
+     * @param string $relationName
+     * @return $this
+     */
+    public function inverseOf($relationName)
+    {
+        $this->inverseOf = $relationName;
+        return $this;
+    }
 
     /**
      * Найти связанные записи для определенной модели [[$this->primaryModel]]
@@ -213,6 +228,10 @@ trait BaseRelationQuery
             $primaryModel->populateRelation($name, is_array($value) ? new Collection($value) : $value);
         }
 
+        if ($this->inverseOf !== null) {
+            $this->populateInverseRelation($primaryModels, $models, $name, $this->inverseOf);
+        }
+
         return $models;
     }
 
@@ -273,5 +292,60 @@ trait BaseRelationQuery
         }
 
         return $value;
+    }
+
+    /**
+     * Добавляет основную модель запроса в релейшен
+     * @param Collection|BaseBitrixModel[] $result
+     */
+    private function addInverseRelations(&$result)
+    {
+        if ($this->inverseOf === null) {
+            return;
+        }
+
+        foreach ($result as $i => $relatedModel) {
+            if (!isset($inverseRelation)) {
+                $inverseRelation = $relatedModel->getRelation($this->inverseOf);
+            }
+            $relatedModel->populateRelation($this->inverseOf, $inverseRelation->multiple ? new Collection([$this->primaryModel]) : $this->primaryModel);
+        }
+    }
+    /**
+     * @param Collection|BaseBitrixModel[] $primaryModels primary models
+     * @param Collection|BaseBitrixModel[] $models models
+     * @param string $primaryName the primary relation name
+     * @param string $name the relation name
+     */
+    private function populateInverseRelation(&$primaryModels, $models, $primaryName, $name)
+    {
+        if (empty($models) || empty($primaryModels)) {
+            return;
+        }
+
+        /** @var BaseBitrixModel $model */
+        $model = $models->first();
+        $relation = $model->getRelation($name);
+
+        if ($relation->multiple) {
+            $buckets = $this->buildBuckets($primaryModels, $relation->link , false);
+            foreach ($models as $model) {
+                $key = $this->getModelKey($model, $relation->link);
+                $model->populateRelation($name, new Collection(isset($buckets[$key]) ? $buckets[$key] : []));
+            }
+        } else {
+            foreach ($primaryModels as $i => $primaryModel) {
+                if ($this->multiple) {
+                    foreach ($primaryModel->related[$primaryName] as $j => $m) {
+                        /** @var BaseBitrixModel $m */
+                        $m->populateRelation($name, $primaryModel);
+                    }
+                } else {
+                    /** @var BaseBitrixModel $m */
+                    $m = $primaryModel->related[$primaryName];
+                    $m->populateRelation($name, $primaryModel);
+                }
+            }
+        }
     }
 }
