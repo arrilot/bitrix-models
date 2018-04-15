@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
  *
  * @method BaseBitrixModel first()
  * @method Collection|BaseBitrixModel[] getList()
+ * @property array $select
  */
 trait BaseRelationQuery
 {
@@ -134,6 +135,7 @@ trait BaseRelationQuery
         }
 
         $this->filter([$primary => array_unique($values, SORT_REGULAR)]);
+        $this->select[] = $primary;
     }
 
     /**

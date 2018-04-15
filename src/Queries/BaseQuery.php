@@ -15,6 +15,13 @@ use LogicException;
 abstract class BaseQuery
 {
     use BaseRelationQuery;
+
+    /**
+     * Query select.
+     *
+     * @var array
+     */
+    public $select = [];
     /**
      * Bitrix object to be queried.
      *
