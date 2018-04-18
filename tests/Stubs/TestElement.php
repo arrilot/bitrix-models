@@ -38,12 +38,12 @@ class TestElement extends ElementModel
         return false;
     }
 
-    public function getElements()
+    public function elements()
     {
         return $this->hasMany(TestElement2::class, ['ID' => 'PROPERTY_ELEMENT_VALUE']);
     }
 
-    public function getElement()
+    public function element()
     {
         return $this->hasOne(TestElement2::class, ['PROPERTY_ELEMENT_VALUE' => 'ID']);
     }

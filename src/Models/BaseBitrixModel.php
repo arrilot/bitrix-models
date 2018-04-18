@@ -302,7 +302,7 @@ abstract class BaseBitrixModel extends ArrayableModel
         }
 
         // Если нет сохраненных данных, ищем подходящий геттер
-        $getter = 'get' . $name;
+        $getter = $name;
         if (method_exists($this, $getter)) {
             // read property, e.g. getName()
             $value = $this->$getter();
@@ -326,7 +326,7 @@ abstract class BaseBitrixModel extends ArrayableModel
      */
     public function getRelation($name, $throwException = true)
     {
-        $getter = 'get' . $name;
+        $getter = $name;
         try {
             $relation = $this->$getter();
         } catch (\BadMethodCallException $e) {
@@ -368,7 +368,7 @@ abstract class BaseBitrixModel extends ArrayableModel
      * the following code in the `Customer` class:
      *
      * ```php
-     * public function getCountry()
+     * public function country()
      * {
      *     return $this->hasOne(Country::className(), ['ID' => 'PROPERTY_COUNTRY']);
      * }
@@ -401,7 +401,7 @@ abstract class BaseBitrixModel extends ArrayableModel
      * the following code in the `Customer` class:
      *
      * ```php
-     * public function getOrders()
+     * public function orders()
      * {
      *     return $this->hasMany(Order::className(), ['PROPERTY_COUNTRY_VALUE' => 'ID']);
      * }

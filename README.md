@@ -610,12 +610,12 @@ class Product extends ElementModel
         return iblock_id('products');
     }
     
-    public function getBrand()
+    public function brand()
     {
         return $this->hasOne(Brand::class, ['ID' => 'PROPERTY_BRAND_VALUE']);
     }
     
-    public function getQuestions()
+    public function questions()
     {
         return $this->hasMany(ProductQuestion::class, ['PROPERTY_PRODUCT_VALUE' => 'ID']);
     }
@@ -624,7 +624,7 @@ class Product extends ElementModel
 
 В вышеприведённом коде мы объявили связь brand и questions для класса Product.
 
-Каждый метод получения связных данных должен быть назван в формате getFoo. При этом foo будет являться именем связи. Помните, что имена связей чувствительны к регистру.
+Каждый метод получения связных данных должен быть назван в формате foo(). При этом foo будет являться именем связи. Помните, что имена связей чувствительны к регистру.
 
 При объявлении связи, вы должны указать следующую информацию:
 
@@ -712,7 +712,7 @@ class ProductQuestion extends ElementModel
         return iblock_id('product_question');
     }
     
-    public function getAnswers()
+    public function answers()
     {
         return $this->hasMany(ProductAnswer::class, ['PROPERTY_QUESTION_VALUE' => 'ID'])->inverseOf('question');
     }
