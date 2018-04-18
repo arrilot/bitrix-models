@@ -116,10 +116,6 @@ abstract class BaseQuery
             $this->findWith($this->with, $models);
         }
 
-        if ($this->inverseOf !== null) {
-            $this->addInverseRelations($models);
-        }
-
         return $models;
     }
 

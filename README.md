@@ -685,7 +685,7 @@ foreach($products as $product) {
 ])
 ```
 
-### Обратные связи
+### Предостережение от лищних запросов
 
 Рассмотрим следующий пример:
 
@@ -697,25 +697,3 @@ $question2 = $question->answers->first()->question;
 
 // $question и $question2 будут разными объектами, но с одинаковым набором данных. Т.е. для получения $question2 выполнится запрос к БД
 ```
-
-Чтобы избежать избыточного выполнения последнего SQL-запроса, мы должны показать, что question - обратная связь относительно answers, и сделаем это с помощью вызова метода inverseOf() как показано ниже:
-
-```php
-/**
- * Class ProductQuestion
- * @property $answers
- */
-class ProductQuestion extends ElementModel
-{
-    public static function iblockId()
-    {
-        return iblock_id('product_question');
-    }
-    
-    public function answers()
-    {
-        return $this->hasMany(ProductAnswer::class, 'PROPERTY_QUESTION_VALUE', 'ID')->inverseOf('question');
-    }
-```
-
-Теперь при загрузке answers в каждый ответ будут сохранен объект $question
