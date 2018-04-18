@@ -21,9 +21,13 @@ trait BaseRelationQuery
      */
     public $multiple;
     /**
-     * @var array - настройка связи моделей. [ключ_у_связанной_модели => ключ_у_текущей_модели]
+     * @var string - настройка связи моделей. ключ_у_связанной_модели
      */
-    public $link;
+    public $foreignKey;
+    /**
+     * @var string - настройка связи моделей. ключ_у_текущей_модели
+     */
+    public $localKey;
     /**
      * @var BaseBitrixModel - модель, для которой производится загрузка релейшена
      */
@@ -107,17 +111,9 @@ trait BaseRelationQuery
      */
     protected function filterByModels($models)
     {
-        $attributes = array_keys($this->link);
-
-        if (count($attributes) != 1) {
-            throw new \LogicException('Массив link может содержать только один элемент.');
-        }
-
         $values = [];
-        $primary = current($attributes);
-        $attribute = reset($this->link);
         foreach ($models as $model) {
-            if (($value = $model[$attribute]) !== null) {
+            if (($value = $model[$this->foreignKey]) !== null) {
                 if (is_array($value)) {
                     $values = array_merge($values, $value);
                 } else {
@@ -130,6 +126,7 @@ trait BaseRelationQuery
             $this->stopQuery();
         }
 
+        $primary = $this->localKey;
         if (preg_match('/^PROPERTY_(.*)_VALUE$/', $primary, $matches) && !empty($matches[1])) {
             $primary = 'PROPERTY_' . $matches[1];
         }
@@ -204,17 +201,13 @@ trait BaseRelationQuery
      */
     public function populateRelation($name, &$primaryModels)
     {
-        if (!is_array($this->link)) {
-            throw new \LogicException('Invalid link: it must be an array of key-value pairs.');
-        }
-
         $this->filterByModels($primaryModels);
 
         $models = $this->getList();
-        $buckets = $this->buildBuckets($models, $this->link);
+        $buckets = $this->buildBuckets($models, $this->foreignKey);
 
         foreach ($primaryModels as $i => $primaryModel) {
-            if ($this->multiple && count($this->link) === 1 && is_array($keys = $primaryModel[reset($this->link)])) {
+            if ($this->multiple && is_array($keys = $primaryModel[$this->foreignKey])) {
                 $value = [];
                 foreach ($keys as $key) {
                     $key = $this->normalizeModelKey($key);
@@ -223,7 +216,7 @@ trait BaseRelationQuery
                     }
                 }
             } else {
-                $key = $this->getModelKey($primaryModel, $this->link);
+                $key = $this->getModelKey($primaryModel, $this->foreignKey);
                 $value = isset($buckets[$key]) ? $buckets[$key] : ($this->multiple ? [] : null);
             }
 
@@ -240,14 +233,13 @@ trait BaseRelationQuery
     /**
      * Сгруппировать найденные модели
      * @param array $models
-     * @param array $link
+     * @param array|string $linkKeys
      * @param bool $checkMultiple
      * @return array
      */
-    private function buildBuckets($models, $link, $checkMultiple = true)
+    private function buildBuckets($models, $linkKeys, $checkMultiple = true)
     {
         $buckets = [];
-        $linkKeys = array_keys($link);
 
         foreach ($models as $model) {
             $key = $this->getModelKey($model, $linkKeys);
@@ -272,7 +264,7 @@ trait BaseRelationQuery
     private function getModelKey($model, $attributes)
     {
         $key = [];
-        foreach ($attributes as $attribute) {
+        foreach ((array)$attributes as $attribute) {
             $key[] = $this->normalizeModelKey($model[$attribute]);
         }
         if (count($key) > 1) {
@@ -330,9 +322,9 @@ trait BaseRelationQuery
         $relation = $model->getRelation($name);
 
         if ($relation->multiple) {
-            $buckets = $this->buildBuckets($primaryModels, $relation->link , false);
+            $buckets = $this->buildBuckets($primaryModels, $relation->foreignKey , false);
             foreach ($models as $model) {
-                $key = $this->getModelKey($model, $relation->link);
+                $key = $this->getModelKey($model, $relation->foreignKey);
                 $model->populateRelation($name, new Collection(isset($buckets[$key]) ? $buckets[$key] : []));
             }
         } else {

@@ -40,11 +40,11 @@ class TestElement extends ElementModel
 
     public function elements()
     {
-        return $this->hasMany(TestElement2::class, ['ID' => 'PROPERTY_ELEMENT_VALUE']);
+        return $this->hasMany(TestElement2::class, 'ID', 'PROPERTY_ELEMENT_VALUE');
     }
 
     public function element()
     {
-        return $this->hasOne(TestElement2::class, ['PROPERTY_ELEMENT_VALUE' => 'ID']);
+        return $this->hasOne(TestElement2::class, 'PROPERTY_ELEMENT_VALUE', 'ID');
     }
 }

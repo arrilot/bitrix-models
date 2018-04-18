@@ -612,12 +612,12 @@ class Product extends ElementModel
     
     public function brand()
     {
-        return $this->hasOne(Brand::class, ['ID' => 'PROPERTY_BRAND_VALUE']);
+        return $this->hasOne(Brand::class, 'ID', 'PROPERTY_BRAND_VALUE');
     }
     
     public function questions()
     {
-        return $this->hasMany(ProductQuestion::class, ['PROPERTY_PRODUCT_VALUE' => 'ID']);
+        return $this->hasMany(ProductQuestion::class, 'PROPERTY_PRODUCT_VALUE', 'ID');
     }
 }
 ```
@@ -714,7 +714,7 @@ class ProductQuestion extends ElementModel
     
     public function answers()
     {
-        return $this->hasMany(ProductAnswer::class, ['PROPERTY_QUESTION_VALUE' => 'ID'])->inverseOf('question');
+        return $this->hasMany(ProductAnswer::class, 'PROPERTY_QUESTION_VALUE', 'ID')->inverseOf('question');
     }
 ```
 
