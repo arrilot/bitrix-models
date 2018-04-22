@@ -14,6 +14,14 @@ use LogicException;
 
 abstract class BaseQuery
 {
+    use BaseRelationQuery;
+
+    /**
+     * Query select.
+     *
+     * @var array
+     */
+    public $select = [];
     /**
      * Bitrix object to be queried.
      *
@@ -87,11 +95,36 @@ abstract class BaseQuery
     abstract public function count();
 
     /**
+     * Подготавливает запрос и вызывает loadModels()
+     *
+     * @return Collection
+     */
+    public function getList()
+    {
+        if ($this->queryShouldBeStopped) {
+            return new Collection();
+        }
+
+        if (!is_null($this->primaryModel)) {
+            // Запрос - подгрузка релейшена. Надо добавить filter
+            $this->filterByModels([$this->primaryModel]);
+        }
+
+        $models = $this->loadModels();
+
+        if (!empty($this->with)) {
+            $this->findWith($this->with, $models);
+        }
+
+        return $models;
+    }
+
+    /**
      * Get list of items.
      *
      * @return Collection
      */
-    abstract public function getList();
+    abstract protected function loadModels();
 
     /**
      * Constructor.

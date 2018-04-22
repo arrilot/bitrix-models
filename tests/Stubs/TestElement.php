@@ -3,7 +3,15 @@
 namespace Arrilot\Tests\BitrixModels\Stubs;
 
 use Arrilot\BitrixModels\Models\ElementModel;
+use Illuminate\Support\Collection;
 
+/**
+ * Class TestElement
+ * @package Arrilot\Tests\BitrixModels\Stubs
+ *
+ * @property Collection|TestElement2[] $elements
+ * @property TestElement2 $element
+ */
 class TestElement extends ElementModel
 {
     protected $appends = ['ACCESSOR_THREE'];
@@ -28,5 +36,15 @@ class TestElement extends ElementModel
     public function scopeStopActionScope($query)
     {
         return false;
+    }
+
+    public function elements()
+    {
+        return $this->hasMany(TestElement2::class, 'ID', 'PROPERTY_ELEMENT_VALUE');
+    }
+
+    public function element()
+    {
+        return $this->hasOne(TestElement2::class, 'PROPERTY_ELEMENT_VALUE', 'ID');
     }
 }

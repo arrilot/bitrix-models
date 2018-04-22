@@ -86,12 +86,8 @@ class D7Query extends BaseQuery
      *
      * @return Collection
      */
-    public function getList()
+    protected function loadModels()
     {
-        if ($this->queryShouldBeStopped) {
-            return new Collection();
-        }
-
         $params = [
             'select' => $this->select,
             'filter' => $this->filter,

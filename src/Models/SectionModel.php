@@ -10,14 +10,14 @@ use LogicException;
 
 /**
  * SectionQuery methods
- * @method static SectionModel getByCode(string $code)
- * @method static SectionModel getByExternalId(string $id)
+ * @method static static getByCode(string $code)
+ * @method static static getByExternalId(string $id)
  * @method static SectionQuery countElements($value)
  *
  * Base Query methods
- * @method static Collection getList()
- * @method static SectionModel first()
- * @method static SectionModel getById(int $id)
+ * @method static Collection|static[] getList()
+ * @method static static first()
+ * @method static static getById(int $id)
  * @method static SectionQuery sort(string|array $by, string $order='ASC')
  * @method static SectionQuery order(string|array $by, string $order='ASC') // same as sort()
  * @method static SectionQuery filter(array $filter)
