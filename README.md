@@ -684,16 +684,3 @@ foreach($products as $product) {
     'question.answers'
 ])
 ```
-
-### Предостережение от лищних запросов
-
-Рассмотрим следующий пример:
-
-```php
-$question = ProsuctQuestion::getById(1);
-
-// Возьмем у вопроса первый ответ. А у ответа его вопрос.
-$question2 = $question->answers->first()->question;
-
-// $question и $question2 будут разными объектами, но с одинаковым набором данных. Т.е. для получения $question2 выполнится запрос к БД
-```
