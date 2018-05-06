@@ -1,6 +1,6 @@
 <?php
 
-namespace Arrilot\BitrixModels;
+namespace Arrilot\BitrixModels\Models\Traits;
 
 trait ModelEventsTrait
 {

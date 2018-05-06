@@ -72,7 +72,8 @@ trait BaseRelationQuery
      */
     public function with($with)
     {
-        $with = (array)$with;
+        $with = is_string($with) ? func_get_args() : $with;
+
         if (empty($this->with)) {
             $this->with = $with;
         } elseif (!empty($with)) {

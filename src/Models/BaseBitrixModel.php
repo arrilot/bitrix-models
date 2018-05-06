@@ -2,7 +2,7 @@
 
 namespace Arrilot\BitrixModels\Models;
 
-use Arrilot\BitrixModels\ModelEventsTrait;
+use Arrilot\BitrixModels\Models\Traits\ModelEventsTrait;
 use Arrilot\BitrixModels\Queries\BaseQuery;
 use Illuminate\Support\Collection;
 use LogicException;
@@ -31,11 +31,6 @@ abstract class BaseBitrixModel extends ArrayableModel
      * @var bool
      */
     protected $fieldsAreFetched = false;
-
-    /**
-     * @var array - Array related models indexed by the relation names
-     */
-    public $related = [];
 
     /**
      * Internal part of create to avoid problems with static and inheritance

@@ -4,12 +4,15 @@ namespace Arrilot\BitrixModels\Models;
 
 use ArrayAccess;
 use ArrayIterator;
+use Arrilot\BitrixModels\Models\Traits\HidesAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use IteratorAggregate;
 
 abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, IteratorAggregate
 {
+    use HidesAttributes;
+
     /**
      * ID of the model.
      *
@@ -30,6 +33,13 @@ abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, Itera
      * @var array
      */
     protected $appends = [];
+
+    /**
+     * Array related models indexed by the relation names.
+     *
+     * @var array
+     */
+    public $related = [];
 
     /**
      * Set method for ArrayIterator.
@@ -124,6 +134,22 @@ abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, Itera
             if (isset($this[$accessor])) {
                 $array[$accessor] = $this[$accessor];
             }
+        }
+
+        foreach ($this->related as $key => $value) {
+            if (is_object($value) && method_exists($value, 'toArray')) {
+                $array[$key] = $value->toArray();
+            } elseif (is_null($value) || $value === false) {
+                $array[$key] = $value;
+            }
+        }
+
+        if (count($this->getVisible()) > 0) {
+            $array = array_intersect_key($array, array_flip($this->getVisible()));
+        }
+
+        if (count($this->getHidden()) > 0) {
+            $array = array_diff_key($array, array_flip($this->getHidden()));
         }
 
         return $array;
