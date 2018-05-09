@@ -510,7 +510,7 @@ class Product extends ElementModel
     
     public function questions()
     {
-        return $this->hasMany(ProductQuestion::class, 'ID', PROPERTY_PRODUCT_VALUE');
+        return $this->hasMany(ProductQuestion::class, 'ID', 'PROPERTY_PRODUCT_VALUE');
     }
 }
 ```
