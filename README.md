@@ -684,3 +684,16 @@ DB::table('brands')->insert(['UF_NAME' => 'Nike']);
  2. Скопировать дефолтные вьюшки из [https://github.com/laravel/framework/tree/master/src/Illuminate/Pagination/resources/views](https://github.com/laravel/framework/tree/master/src/Illuminate/Pagination/resources/views) в `local/views/pagination`
 
 После этого вьюшки можно модифицировать или создавать новые.
+
+## Активность элементов в D7Model/EloquentModel
+
+В инфоблоках битрикса есть поле ACTIVE = 'Y'/'N', фильтрация по которому очень часто используется.
+В хайлоадблоках и кастомных таблицах такого поля по-умолчанию нет, однако пакет предоставляет trait который помогает в создании подобной функциональности.
+Как это работает:
+1. Добавляем поле UF_DEACTIVATED_AT типа datetime в таблицу/хайлоадблок.
+2. Добавляем в D7Model/EloquentModel трейт `use \Arrilot\BitrixModels\Models\Traits\DeactivationTrait;`
+3. Теперь в модели доступны следуюющие методы:
+    3.1 `$model->deactivate()` и `$model->activate()` - деактивирует или активирует элемент в БД.
+    3.2 `$model->markForDeactivation()` и `$model->markForActivation()` - тоже самое, но только меняет php переменную, не выполняет ->save(). Полезно если вместе с активацией нужно сделать и другие изменения в таблице и не хочется делать дополнительный запрос в БД.
+    3.3 Скоупы `->active()` и `->deactivated()`. Например `SomeD7Model::query()->active()->getList()`.
+
