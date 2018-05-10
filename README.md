@@ -510,7 +510,7 @@ class Product extends ElementModel
     
     public function questions()
     {
-        return $this->hasMany(ProductQuestion::class, 'ID', 'PROPERTY_PRODUCT_VALUE');
+        return $this->hasMany(ProductQuestion::class, 'ID', PROPERTY_PRODUCT_VALUE');
     }
 }
 ```
@@ -621,9 +621,9 @@ class Product extends EloquentModel
 Если таблица называется `products` (множественная форма названия класса), то `protected $table = 'products';` можно опустить - это стандартное для Eloquent поведение.
 Из нестандартного
  1. Первичным ключом является `ID`, а не `id`
- 2. Поля для времени создания и обновления записи называются `CREATED_AT` и `UPDATED_AT`, а не `created_at` и `updated_at`
+ 2. Поля для времени создания и обновления записи называются `UF_CREATED_AT` и `UF_UPDATED_AT`, а не `created_at` и `updated_at`
 
-> Если вы решили не добавлять в таблицу поля CREATED_AT и UPDATED_AT, то в модели нужно задать `public $timestamps = false;`
+> Если вы решили не добавлять в таблицу поля UF_CREATED_AT и UF_UPDATED_AT, то в модели нужно задать `public $timestamps = false;`
 
 ### Работа с хайлоадблоком через Eloquent
 

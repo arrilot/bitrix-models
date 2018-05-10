@@ -18,12 +18,12 @@ class EloquentModel extends Model
      *
      * @var string
      */
-    const CREATED_AT = 'CREATED_AT';
+    const CREATED_AT = 'UF_CREATED_AT';
 
     /**
      * The name of the "updated at" column.
      *
      * @var string
      */
-    const UPDATED_AT = 'UPDATED_AT';
+    const UPDATED_AT = 'UF_UPDATED_AT';
 }
