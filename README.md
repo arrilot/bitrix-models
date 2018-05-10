@@ -498,19 +498,39 @@ $subscribers = Subscriber::query()->cache(5)->filter(['=NAME'=>'John])->getList(
  *
  * @property Brand $brand
  * @property ProductQuestion $questions
+ * @property Storage $storages
  */
 class Product extends ElementModel
 {
     ...
     
+    /**
+     * ID Brand записан в текущую модель в свойтво PROPERTY_BRAND_VALUE (не множественное)
+     * (у товара может быть только один бренд, но у бренда много товаров)
+     */
     public function brand()
     {
         return $this->hasOne(Brand::class, 'ID', 'PROPERTY_BRAND_VALUE');
     }
     
+    /**
+     * У ProductQuestion в свойтве PROPERTY_PRODUCT_VALUE записан ID текущей модели
+     * (у товара может быть много вопросов, но вопрос относится только к одному товару)
+     *
+     * Но это будет так же работать, если PROPERTY_PRODUCT_VALUE будет множественным
+     */
     public function questions()
     {
-        return $this->hasMany(ProductQuestion::class, 'ID', 'PROPERTY_PRODUCT_VALUE');
+        return $this->hasMany(ProductQuestion::class, 'PROPERTY_PRODUCT_VALUE', 'ID');
+    }
+    
+    /**
+     * ID Storage записан в текущую модель в свойтво PROPERTY_STORAGE_VALUE (множественное)
+     * (у товара может быть много складов, на складе может быть много товаров)
+     */
+    public function storages()
+    {
+        return $this->hasMany(Storage::class, 'ID', 'PROPERTY_STORAGE_VALUE');
     }
 }
 ```
@@ -558,7 +578,7 @@ foreach($products as $product) {
 Чтобы избежать это необходимо использовать жадную загрузку:
 
 ```php
-// Выполняется один дополнительный запрос который получит все брэнды для всех полученных продуктов.
+// Выполняется один дополнительный запрос который получит все бренды для всех полученных продуктов.
 $products = Product::query()->with('brand')->getList();
 
 foreach($products as $product) {
