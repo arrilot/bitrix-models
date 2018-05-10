@@ -101,13 +101,13 @@ abstract class BaseQuery
      */
     public function getList()
     {
-        if ($this->queryShouldBeStopped) {
-            return new Collection();
-        }
-
         if (!is_null($this->primaryModel)) {
             // Запрос - подгрузка релейшена. Надо добавить filter
             $this->filterByModels([$this->primaryModel]);
+        }
+        
+        if ($this->queryShouldBeStopped) {
+            return new Collection();
         }
 
         $models = $this->loadModels();
