@@ -26,4 +26,44 @@ class EloquentModel extends Model
      * @var string
      */
     const UPDATED_AT = 'UF_UPDATED_AT';
+
+    /**
+     * @var array
+     */
+    public $multipleHighloadBlockFields = [];
+
+    /**
+     * Get an attribute from the model.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function getAttribute($key)
+    {
+        if (in_array($key, $this->multipleHighloadBlockFields)) {
+            return unserialize($this->attributes[$key]);
+        }
+
+        return parent::getAttribute($key);
+    }
+
+    /**
+     * Set a given attribute on the model.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setAttribute($key, $value)
+    {
+        if (in_array($key, $this->multipleHighloadBlockFields)) {
+            $this->attributes[$key] = serialize($value);
+
+            return $this;
+        }
+
+        parent::setAttribute($key, $value);
+
+        return $this;
+    }
 }

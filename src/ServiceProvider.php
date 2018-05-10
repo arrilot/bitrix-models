@@ -4,7 +4,9 @@ namespace Arrilot\BitrixModels;
 
 use Arrilot\BitrixBlade\BladeProvider;
 use Arrilot\BitrixModels\Debug\IlluminateQueryDebugger;
+use Arrilot\BitrixModels\Models\EloquentModel;
 use Bitrix\Main\Config\Configuration;
+use DB;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Pagination\Paginator;
@@ -29,7 +31,7 @@ class ServiceProvider
      */
     public static function registerEloquent()
     {
-        self::bootstrapIlluminateDatabase();
+        $capsule = self::bootstrapIlluminateDatabase();
         class_alias(Capsule::class, 'DB');
 
         if ($_COOKIE["show_sql_stat"] == "Y") {
@@ -38,6 +40,8 @@ class ServiceProvider
             $em = \Bitrix\Main\EventManager::getInstance();
             $em->addEventHandler('main', 'OnAfterEpilog', [IlluminateQueryDebugger::class, 'onAfterEpilogHandler']);
         }
+
+        static::addEventListenersForHelpersHighloadblockTables($capsule);
     }
 
     /**
@@ -71,6 +75,7 @@ class ServiceProvider
 
     /**
      * Bootstrap illuminate/database
+     * @return Capsule
      */
     protected static function bootstrapIlluminateDatabase()
     {
@@ -95,6 +100,8 @@ class ServiceProvider
 
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
+
+        return $capsule;
     }
 
     /**
@@ -123,5 +130,60 @@ class ServiceProvider
         $connections = $config->get('connections');
 
         return $connections['default'];
+    }
+
+    /**
+     * Для множественных полей Highload блоков битрикс использует вспомогательные таблицы.
+     * Данный метод вешает обработчики на eloquent события добавления и обновления записей которые будут актуализировать и эти таблицы.
+     *
+     * @param Capsule $capsule
+     */
+    private static function addEventListenersForHelpersHighloadblockTables(Capsule $capsule)
+    {
+        $dispatcher = $capsule->getEventDispatcher();
+        if (!$dispatcher) {
+            return;
+        }
+
+        $dispatcher->listen(['eloquent.created: *'], function($event, $payload) {
+            //                $model = $payload[0];
+            //                dump(func_get_args());
+        });
+
+        $dispatcher->listen(['eloquent.updated: *', 'eloquent.created: *'], function($event, $payload) {
+            /** @var EloquentModel $model */
+            $model = $payload[0];
+            if (empty($model->multipleHighloadBlockFields)) {
+                return;
+            }
+
+            $dirty = $model->getDirty();
+            foreach ($model->multipleHighloadBlockFields as $multipleHighloadBlockField) {
+                if (isset($dirty[$multipleHighloadBlockField]) && !empty($model['ID'])) {
+                    $tableName = $model->getTable().'_'.strtolower($multipleHighloadBlockField);
+
+                    if (substr($event, 0, 16) === 'eloquent.updated') {
+                        DB::table($tableName)->where('ID', $model['ID'])->delete();
+                    }
+
+                    $unserializedValues = unserialize($dirty[$multipleHighloadBlockField]);
+                    if (!$unserializedValues) {
+                        continue;
+                    }
+
+                    $newRows = [];
+                    foreach ($unserializedValues as $unserializedValue) {
+                        $newRows[] = [
+                            'ID' => $model['ID'],
+                            'VALUE' => $unserializedValue,
+                        ];
+                    }
+
+                    if ($newRows) {
+                        DB::table($tableName)->insert($newRows);
+                    }
+                }
+            }
+        });
     }
 }

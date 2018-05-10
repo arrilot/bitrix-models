@@ -122,6 +122,34 @@ abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, Itera
     }
 
     /**
+     * Add value to append.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function append($attributes)
+    {
+        $this->appends = array_unique(
+            array_merge($this->appends, is_string($attributes) ? func_get_args() : $attributes)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Setter for appends.
+     *
+     * @param  array  $appends
+     * @return $this
+     */
+    public function setAppends(array $appends)
+    {
+        $this->appends = $appends;
+
+        return $this;
+    }
+
+    /**
      * Cast model to array.
      *
      * @return array
