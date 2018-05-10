@@ -189,7 +189,7 @@ trait BaseRelationQuery
         $this->filterByModels($primaryModels);
 
         $models = $this->getList();
-        $buckets = $this->buildBuckets($models, $this->foreignKey);
+        $buckets = $this->buildBuckets($models, $this->localKey);
 
         foreach ($primaryModels as $i => $primaryModel) {
             if ($this->multiple && is_array($keys = $primaryModel[$this->foreignKey])) {
