@@ -565,4 +565,9 @@ abstract class BaseQuery
 
         throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
     }
+    
+    protected function prepareMultiFilter(&$key, &$value)
+    {
+    
+    }
 }
