@@ -139,7 +139,7 @@ class RelationTest extends TestCase
 
 
         $bxObject = m::mock('obj');
-        $bxObject->shouldReceive('GetList')->with(m::any(), ['IBLOCK_ID' => TestElement2::IBLOCK_ID, 'PROPERTY_ELEMENT' => [1]], m::any(), ['nPageSize' => 1], m::any())->once()->andReturn(m::self());
+        $bxObject->shouldReceive('GetList')->with(m::any(), ['IBLOCK_ID' => TestElement2::IBLOCK_ID, 'PROPERTY_ELEMENT' => 1], m::any(), ['nPageSize' => 1], m::any())->once()->andReturn(m::self());
         $brandField = [
             'ID' => 1,
             'NAME' => 'Название',
