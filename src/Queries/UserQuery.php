@@ -222,4 +222,9 @@ class UserQuery extends OldCoreQuery
     {
         return preg_grep('/^(UF_+)/', $this->select);
     }
+    
+    protected function prepareMultiFilter(&$key, &$value)
+    {
+        $value = join(' | ', $value);
+    }
 }
