@@ -211,7 +211,7 @@ trait BaseRelationQuery
                 $value = isset($buckets[$key]) ? $buckets[$key] : ($this->multiple ? [] : null);
             }
 
-            $primaryModel->populateRelation($name, is_array($value) ? new Collection($value) : $value);
+            $primaryModel->populateRelation($name, is_array($value) ? (new Collection($value))->keyBy(function ($item) {return $item->id;}) : $value);
         }
 
         return $models;
