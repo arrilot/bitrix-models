@@ -105,7 +105,7 @@ abstract class BaseQuery
             // Запрос - подгрузка релейшена. Надо добавить filter
             $this->filterByModels([$this->primaryModel]);
         }
-        
+
         if ($this->queryShouldBeStopped) {
             return new Collection();
         }
@@ -518,14 +518,21 @@ abstract class BaseQuery
         }
 
         $cache = Cache::createInstance();
-        if ($cache->initCache($minutes * 60, $key, 'bitrix-models')) {
+        if ($cache->initCache($minutes * 60, $key, '/bitrix-models')) {
             $vars = $cache->getVars();
-            return $vars['cache'];
+            return !empty($vars['isCollection']) ? new Collection($vars['cache']) : $vars['cache'];
         }
 
         $cache->startDataCache();
         $result = $callback();
-        $cache->endDataCache(['cache' => $result]);
+
+        // Bitrix cache is bad for storing collections. Let's convert it to array.
+        $isCollection = $result instanceof Collection;
+        if ($isCollection) {
+            $result = $result->all();
+        }
+
+        $cache->endDataCache(['cache' => $result, 'isCollection' => $isCollection]);
 
         return $result;
     }
