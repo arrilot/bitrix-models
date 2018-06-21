@@ -115,8 +115,14 @@ trait BaseRelationQuery
         if (preg_match('/^PROPERTY_(.*)_VALUE$/', $primary, $matches) && !empty($matches[1])) {
             $primary = 'PROPERTY_' . $matches[1];
         }
+        $values = array_unique($values, SORT_REGULAR);
+        if (count($values) == 1) {
+            $values = current($values);
+        } else {
+            $this->prepareMultiFilter($primary, $values);
+        }
 
-        $this->filter([$primary => array_unique($values, SORT_REGULAR)]);
+        $this->filter([$primary => $values]);
         $this->select[] = $primary;
     }
 
@@ -205,7 +211,7 @@ trait BaseRelationQuery
                 $value = isset($buckets[$key]) ? $buckets[$key] : ($this->multiple ? [] : null);
             }
 
-            $primaryModel->populateRelation($name, is_array($value) ? new Collection($value) : $value);
+            $primaryModel->populateRelation($name, is_array($value) ? (new Collection($value))->keyBy(function ($item) {return $item->id;}) : $value);
         }
 
         return $models;

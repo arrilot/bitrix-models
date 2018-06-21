@@ -730,7 +730,10 @@ DB::table('brands')->insert(['UF_NAME' => 'Nike']);
 1. Добавляем поле UF_DEACTIVATED_AT типа datetime в таблицу/хайлоадблок.
 2. Добавляем в D7Model/EloquentModel трейт `use \Arrilot\BitrixModels\Models\Traits\DeactivationTrait;`
 3. Теперь в модели доступны следуюющие методы:
-    3.1 `$model->deactivate()` и `$model->activate()` - деактивирует или активирует элемент в БД.
-    3.2 `$model->markForDeactivation()` и `$model->markForActivation()` - тоже самое, но только меняет php переменную, не выполняет ->save(). Полезно если вместе с активацией нужно сделать и другие изменения в таблице и не хочется делать дополнительный запрос в БД.
-    3.3 Скоупы `->active()` и `->deactivated()`. Например `SomeD7Model::query()->active()->getList()`.
+
+    3.1. `$model->deactivate()` и `$model->activate()` - деактивирует или активирует элемент в БД.
+    
+    3.2. `$model->markForDeactivation()` и `$model->markForActivation()` - тоже самое, но только меняет php переменную, не выполняет ->save(). Полезно если вместе с активацией нужно сделать и другие изменения в таблице и не хочется делать дополнительный запрос в БД.
+    
+    3.3. Скоупы `->active()` и `->deactivated()`. Например `SomeD7Model::query()->active()->getList()`.
 
