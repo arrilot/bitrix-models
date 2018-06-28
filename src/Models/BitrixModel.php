@@ -149,7 +149,9 @@ abstract class BitrixModel extends BaseBitrixModel
         }
 
         $fields = $this->normalizeFieldsForSave($fieldsSelectedForSave);
-        $result = $this->internalUpdate($fields, $fieldsSelectedForSave);
+        $result = $fields === null
+            ? true
+            : $this->internalUpdate($fields, $fieldsSelectedForSave);
 
         $this->setEventErrorsOnFail($result, static::$bxObject);
         $this->onAfterUpdate($result);
@@ -206,7 +208,8 @@ abstract class BitrixModel extends BaseBitrixModel
         return (!empty($selectedFields) && !in_array($field, $selectedFields))
             || in_array($field, $blacklistedFields)
             || ($field[0] === '~')
-            || (substr($field, 0, 9) === 'PROPERTY_');
+            || (substr($field, 0, 9) === 'PROPERTY_')
+            || (array_key_exists($field, $this->original) && $this->original[$field] === $value);
     }
 
     /**

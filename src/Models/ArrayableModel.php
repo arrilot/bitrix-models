@@ -28,6 +28,13 @@ abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, Itera
     public $fields;
 
     /**
+     * Array of original model fields.
+     *
+     * @var null|array
+     */
+    protected $original;
+
+    /**
      * Array of accessors to append during array transformation.
      *
      * @var array

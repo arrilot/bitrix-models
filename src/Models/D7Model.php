@@ -6,6 +6,7 @@ use Arrilot\BitrixModels\Adapters\D7Adapter;
 use Arrilot\BitrixModels\Exceptions\ExceptionFromBitrix;
 use Arrilot\BitrixModels\Queries\D7Query;
 use Illuminate\Support\Collection;
+use Bitrix\Main\Entity\UpdateResult;
 use LogicException;
 
 /**
@@ -204,7 +205,9 @@ class D7Model extends BaseBitrixModel
         }
 
         $fields = $this->normalizeFieldsForSave($fieldsSelectedForSave);
-        $resultObject = static::instantiateAdapter()->update($this->id, $fields);
+        $resultObject = $fields === null
+            ? new UpdateResult()
+            : static::instantiateAdapter()->update($this->id, $fields);
         $result = $resultObject->isSuccess();
 
         $this->setEventErrorsOnFail($resultObject);

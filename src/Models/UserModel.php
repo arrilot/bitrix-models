@@ -176,7 +176,8 @@ class UserModel extends BitrixModel
     public function refreshFields()
     {
         if ($this->id === null) {
-            return  $this->fields = [];
+            $this->original = [];
+            return $this->fields = [];
         }
 
         $groupBackup = isset($this->fields['GROUP_ID']) ? $this->fields['GROUP_ID'] : null;
@@ -188,6 +189,8 @@ class UserModel extends BitrixModel
         }
 
         $this->fieldsAreFetched = true;
+
+        $this->original = $this->fields;
 
         return $this->fields;
     }

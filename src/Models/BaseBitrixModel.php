@@ -124,10 +124,12 @@ abstract class BaseBitrixModel extends ArrayableModel
     public function refreshFields()
     {
         if ($this->id === null) {
+            $this->original = [];
             return $this->fields = [];
         }
         
         $this->fields = static::query()->getById($this->id)->fields;
+        $this->original = $this->fields;
         
         $this->fieldsAreFetched = true;
         
@@ -159,6 +161,8 @@ abstract class BaseBitrixModel extends ArrayableModel
         if (method_exists($this, 'afterFill')) {
             $this->afterFill();
         }
+
+        $this->original = $this->fields;
     }
 
     /**
@@ -233,7 +237,7 @@ abstract class BaseBitrixModel extends ArrayableModel
      *
      * @param $selectedFields
      *
-     * @return array
+     * @return array|null
      */
     protected function normalizeFieldsForSave($selectedFields)
     {
@@ -248,7 +252,7 @@ abstract class BaseBitrixModel extends ArrayableModel
             }
         }
 
-        return $fields;
+        return $fields ?: null;
     }
 
     /**

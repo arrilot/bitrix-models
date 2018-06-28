@@ -246,7 +246,8 @@ class ElementModel extends BitrixModel
     public function refreshFields()
     {
         if ($this->id === null) {
-            return  $this->fields = [];
+            $this->original = [];
+            return $this->fields = [];
         }
 
         $sectionsBackup = isset($this->fields['IBLOCK_SECTION']) ? $this->fields['IBLOCK_SECTION'] : null;
@@ -258,6 +259,8 @@ class ElementModel extends BitrixModel
         }
 
         $this->fieldsAreFetched = true;
+
+        $this->original = $this->fields;
 
         return $this->fields;
     }
