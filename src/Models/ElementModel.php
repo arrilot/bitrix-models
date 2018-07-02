@@ -418,12 +418,43 @@ class ElementModel extends BitrixModel
     }
 
     /**
+     * Determine whether the field should be stopped from passing to "update".
+     *
+     * @param string $field
+     * @param mixed  $value
+     * @param array  $selectedFields
+     *
+     * @return bool
+     */
+    protected function fieldShouldNotBeSaved($field, $value, $selectedFields)
+    {
+        $blacklistedFields = [
+            'ID',
+            'IBLOCK_ID',
+            'PROPERTIES',
+            'PROPERTY_VALUES',
+        ];
+
+        return (!empty($selectedFields) && !in_array($field, $selectedFields))
+            || in_array($field, $blacklistedFields)
+            || ($field[0] === '~');
+            //|| (substr($field, 0, 9) === 'PROPERTY_');
+    }
+
+    /**
      * @param $fields
      * @param $fieldsSelectedForSave
      * @return bool
      */
     protected function internalUpdate($fields, $fieldsSelectedForSave)
     {
+        $fields = $fields ?: [];
+        foreach ($fields as $key => $value) {
+            if (substr($key, 0, 9) === 'PROPERTY_') {
+                unset($fields[$key]);
+            }
+        }
+
         $result = !empty($fields) ? static::$bxObject->update($this->id, $fields, false, static::$updateSearch) : false;
         $savePropsResult = $this->saveProps($fieldsSelectedForSave);
         $result = $result || $savePropsResult;

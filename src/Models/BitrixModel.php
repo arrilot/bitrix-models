@@ -200,16 +200,14 @@ abstract class BitrixModel extends BaseBitrixModel
         $blacklistedFields = [
             'ID',
             'IBLOCK_ID',
-            'PROPERTIES',
             'GROUPS',
-            'PROPERTY_VALUES',
         ];
 
         return (!empty($selectedFields) && !in_array($field, $selectedFields))
             || in_array($field, $blacklistedFields)
             || ($field[0] === '~')
             || (substr($field, 0, 9) === 'PROPERTY_')
-            || (array_key_exists($field, $this->original) && $this->original[$field] === $value);
+            || (is_array($this->original) && array_key_exists($field, $this->original) && $this->original[$field] === $value);
     }
 
     /**

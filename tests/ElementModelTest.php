@@ -260,7 +260,7 @@ class ElementModelTest extends TestCase
             'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
         ];
         $element->shouldReceive('get')->andReturn($fields);
-        $element->fields = $fields;
+        $element->fill($fields);
 
         // 1
         $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'], false, true)->once()->andReturn(true);
