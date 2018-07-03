@@ -534,7 +534,7 @@ abstract class BaseQuery
 
         $cache->endDataCache(['cache' => $result, 'isCollection' => $isCollection]);
 
-        return $result;
+        return $isCollection ? new Collection($result) : $result;
     }
 
     protected function handleCacheIfNeeded($cacheKeyParams, Closure $callback)
