@@ -179,7 +179,7 @@ class ElementQuery extends OldCoreQuery
             return new Collection($items);
         };
 
-        $cacheKeyParams = compact('sort', 'filter', 'group', 'navigation', 'select', 'queryType', 'keyBy', 'fetchUsing');
+        $cacheKeyParams = compact('sort', 'filter', 'groupBy', 'navigation', 'select', 'queryType', 'keyBy', 'fetchUsing');
 
         return $this->handleCacheIfNeeded($cacheKeyParams, $callback);
     }
