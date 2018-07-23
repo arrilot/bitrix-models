@@ -343,7 +343,7 @@ abstract class BaseQuery
      */
     public function forPage($page, $perPage = 15)
     {
-        return $this->page($page)->take($perPage);
+        return $this->take($perPage)->page($page);
     }
 
     /**

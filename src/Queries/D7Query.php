@@ -144,6 +144,17 @@ class D7Query extends BaseQuery
 
         return $this;
     }
+
+    /**
+     * Set the "page number" value of the query.
+     *
+     * @param int $num
+     * @return $this
+     */
+    public function page($num)
+    {
+        return $this->offset((int) $this->limit * ($num - 1));
+    }
     
     /**
      * Setter for offset.
