@@ -15,7 +15,9 @@ use LogicException;
 abstract class BaseQuery
 {
     use BaseRelationQuery;
-
+    
+    public static $cacheDir = '/bitrix-models';
+    
     /**
      * Query select.
      *
@@ -518,7 +520,7 @@ abstract class BaseQuery
         }
 
         $cache = Cache::createInstance();
-        if ($cache->initCache($minutes * 60, $key, '/bitrix-models')) {
+        if ($cache->initCache($minutes * 60, $key, static::$cacheDir)) {
             $vars = $cache->getVars();
             return !empty($vars['isCollection']) ? new Collection($vars['cache']) : $vars['cache'];
         }
@@ -576,5 +578,14 @@ abstract class BaseQuery
     protected function prepareMultiFilter(&$key, &$value)
     {
     
+    }
+    
+    /**
+     * Проверка включен ли тегированный кеш
+     * @return bool
+     */
+    protected function isManagedCacheOn()
+    {
+        return \COption::SetOptionInt('main', 'component_managed_cache_on', 'N') == 'Y';
     }
 }
