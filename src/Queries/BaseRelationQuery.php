@@ -107,6 +107,7 @@ trait BaseRelationQuery
             }
         }
 
+        $values = array_filter($values);
         if (empty($values)) {
             $this->stopQuery();
         }
@@ -134,7 +135,7 @@ trait BaseRelationQuery
     public function findWith($with, &$models)
     {
         // --- получаем модель, на основании которой будем брать запросы релейшенов
-        $primaryModel = reset($models);
+        $primaryModel = $models->first();
         if (!$primaryModel instanceof BaseBitrixModel) {
             $primaryModel = $this->model;
         }
@@ -207,7 +208,7 @@ trait BaseRelationQuery
                     }
                 }
             } else {
-                $key = $this->getModelKey($primaryModel, $this->foreignKey);
+                $key = $this->normalizeModelKey($primaryModel[$this->foreignKey]);
                 $value = isset($buckets[$key]) ? $buckets[$key] : ($this->multiple ? [] : null);
             }
 
@@ -220,17 +221,27 @@ trait BaseRelationQuery
     /**
      * Сгруппировать найденные модели
      * @param array $models
-     * @param array|string $linkKeys
+     * @param string $linkKey
      * @param bool $checkMultiple
      * @return array
      */
-    private function buildBuckets($models, $linkKeys, $checkMultiple = true)
+    private function buildBuckets($models, $linkKey, $checkMultiple = true)
     {
         $buckets = [];
 
         foreach ($models as $model) {
-            $key = $this->getModelKey($model, $linkKeys);
-            $buckets[$key][] = $model;
+            $key = $model[$linkKey];
+            if (is_scalar($key)) {
+                $buckets[$key][] = $model;
+            } elseif (is_array($key)) {
+                foreach ($key as $k) {
+                    $k = $this->normalizeModelKey($k);
+                    $buckets[$k][] = $model;
+                }
+            } else {
+                $key = $this->normalizeModelKey($key);
+                $buckets[$key][] = $model;
+            }
         }
 
         if ($checkMultiple && !$this->multiple) {
@@ -240,25 +251,6 @@ trait BaseRelationQuery
         }
 
         return $buckets;
-    }
-
-    /**
-     * Получить значение атрибутов в виде строки
-     * @param BaseBitrixModel $model
-     * @param array|string $attributes
-     * @return string
-     */
-    private function getModelKey($model, $attributes)
-    {
-        $key = [];
-        foreach ((array)$attributes as $attribute) {
-            $key[] = $this->normalizeModelKey($model[$attribute]);
-        }
-        if (count($key) > 1) {
-            return serialize($key);
-        }
-        $key = reset($key);
-        return is_scalar($key) ? $key : serialize($key);
     }
 
     /**
