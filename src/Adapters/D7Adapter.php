@@ -2,11 +2,12 @@
 
 namespace Arrilot\BitrixModels\Adapters;
 
+use Bitrix\Main\Entity\ExpressionField;
+
 /**
  * Class D7Adapter
  *
  * @method \Bitrix\Main\DB\Result getList(array $parameters = [])
- * @method int getCount(array $filter = [])
  * @method \Bitrix\Main\Entity\UpdateResult update(int $id, array $fields)
  * @method \Bitrix\Main\Entity\DeleteResult delete(int $id)
  * @method \Bitrix\Main\Entity\AddResult add(array $fields)
@@ -52,5 +53,16 @@ class D7Adapter
         $className = $this->className;
 
         return $className::$method(...$parameters);
+    }
+    
+    public function getCount($filter)
+    {
+        $version = explode('.', SM_VERSION);
+        if ($version[0] <= 15) {
+            $result = call_user_func_array([$this->className, 'query'], [])->addSelect(new ExpressionField('CNT', 'COUNT(1)'))->setFilter($filter)->exec()->fetch();
+            return $result['CNT'];
+        } else {
+            return $this->__call('getCount', $filter);
+        }
     }
 }
