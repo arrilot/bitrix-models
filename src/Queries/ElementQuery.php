@@ -244,31 +244,31 @@ class ElementQuery extends OldCoreQuery
 
         return $this->handleCacheIfNeeded(compact('filter', 'queryType'), $callback);
     }
-
-//    /**
-//     * Normalize properties's format converting it to 'PROPERTY_"CODE"_VALUE'.
-//     *
-//     * @param array $fields
-//     *
-//     * @return null
-//     */
-//    protected function normalizePropertyResultFormat(&$fields)
-//    {
-//        if (empty($fields['PROPERTIES'])) {
-//            return;
-//        }
-//
-//        foreach ($fields['PROPERTIES'] as $code => $prop) {
-//            $fields['PROPERTY_'.$code.'_VALUE'] = $prop['VALUE'];
-//            $fields['~PROPERTY_'.$code.'_VALUE'] = $prop['~VALUE'];
-//            $fields['PROPERTY_'.$code.'_DESCRIPTION'] = $prop['DESCRIPTION'];
-//            $fields['~PROPERTY_'.$code.'_DESCRIPTION'] = $prop['~DESCRIPTION'];
-//            $fields['PROPERTY_'.$code.'_VALUE_ID'] = $prop['PROPERTY_VALUE_ID'];
-//            if (isset($prop['VALUE_ENUM_ID'])) {
-//                $fields['PROPERTY_'.$code.'_ENUM_ID'] = $prop['VALUE_ENUM_ID'];
-//            }
-//        }
-//    }
+    
+    /**
+     * Normalize properties's format converting it to 'PROPERTY_"CODE"_VALUE'.
+     *
+     * @param array $fields
+     *
+     * @return null
+     */
+    protected function normalizePropertyResultFormat(&$fields)
+    {
+        if (empty($fields['PROPERTIES'])) {
+            return;
+        }
+        
+        foreach ($fields['PROPERTIES'] as $code => $prop) {
+            $fields['PROPERTY_'.$code.'_VALUE'] = $prop['VALUE'];
+            $fields['~PROPERTY_'.$code.'_VALUE'] = $prop['~VALUE'];
+            $fields['PROPERTY_'.$code.'_DESCRIPTION'] = $prop['DESCRIPTION'];
+            $fields['~PROPERTY_'.$code.'_DESCRIPTION'] = $prop['~DESCRIPTION'];
+            $fields['PROPERTY_'.$code.'_VALUE_ID'] = $prop['PROPERTY_VALUE_ID'];
+            if (isset($prop['VALUE_ENUM_ID'])) {
+                $fields['PROPERTY_'.$code.'_ENUM_ID'] = $prop['VALUE_ENUM_ID'];
+            }
+        }
+    }
 
     /**
      * Normalize filter before sending it to getList.
@@ -355,5 +355,59 @@ class ElementQuery extends OldCoreQuery
         }
 
         return $items;
+    }
+    
+    protected function performFetchUsingSelectedMethod($rsItems)
+    {
+        if ($this->fetchUsing['method'] === 'GetNextElement') {
+            /** @var \_CIBElement $elItem */
+            $elItem = $rsItems->GetNextElement();
+            
+            if (!$elItem) {
+                return false;
+            }
+            
+            $arItem = $elItem->GetFields();
+            $arItem['PROPERTIES'] = $elItem->GetProperties();
+            $this->normalizePropertyResultFormat($arItem);
+            unset($arItem['PROPERTIES']);
+        } else {
+            $arItem = parent::performFetchUsingSelectedMethod($rsItems);
+        }
+        
+        return $arItem;
+    }
+    
+    /**
+     * Set fetch using from string or array.
+     *
+     * @param string|array $methodAndParams
+     * @return $this
+     */
+    public function fetchUsing($methodAndParams)
+    {
+        // simple case
+        if (is_string($methodAndParams) || empty($methodAndParams['method'])) {
+            if (in_array($methodAndParams, ['GetNextElement', 'getNextElement'])) {
+                $this->fetchUsing = ['method' => 'GetNextElement', 'params' => [true, true]];
+                $this->select(['FIELDS', 'PROPERTY_*']);
+            } else {
+                parent::fetchUsing($methodAndParams);
+            }
+            
+            return $this;
+        }
+        
+        // complex case
+        if (in_array($methodAndParams['method'], ['GetNextElement', 'getNextElement'])) {
+            $bTextHtmlAuto = isset($methodAndParams['params'][0]) ? $methodAndParams['params'][0] : true;
+            $useTilda = isset($methodAndParams['params'][1]) ? $methodAndParams['params'][1] : true;
+            $this->fetchUsing = ['method' => 'GetNextElement', 'params' => [$bTextHtmlAuto, $useTilda]];
+            $this->select(['FIELDS', 'PROPERTY_*']);
+        } else {
+            parent::fetchUsing($methodAndParams);
+        }
+        
+        return $this;
     }
 }
