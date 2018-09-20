@@ -80,11 +80,25 @@ class ElementModel extends BitrixModel
     protected $sectionsAreFetched = false;
 
     /**
-     * Update search after each create or update.
+     * Log in Bitrix workflow ($bWorkFlow for CIBlockElement::Add/Update).
+     *
+     * @var bool
+     */
+    protected static $workFlow = false;
+
+    /**
+     * Update search after each create or update (bUpdateSearch for CIBlockElement::Add/Update).
      *
      * @var bool
      */
     protected static $updateSearch = true;
+
+    /**
+     * Resize pictures during add/update (bResizePictures for CIBlockElement::Add/Update).
+     *
+     * @var bool
+     */
+    protected static $resizePictures = false;
 
     /**
      * Getter for corresponding iblock id.
@@ -102,7 +116,7 @@ class ElementModel extends BitrixModel
         
         return $id;
     }
-
+    
     /**
      * Create new item in database.
      *
@@ -111,6 +125,7 @@ class ElementModel extends BitrixModel
      * @throws LogicException
      *
      * @return static|bool
+     * @throws ExceptionFromBitrix
      */
     public static function create($fields)
     {
@@ -123,7 +138,7 @@ class ElementModel extends BitrixModel
 
     public static function internalDirectCreate($bxObject, $fields)
     {
-        return $bxObject->add($fields, false, static::$updateSearch);
+        return $bxObject->add($fields, static::$workFlow, static::$updateSearch, static::$resizePictures);
     }
 
     /**
@@ -455,7 +470,7 @@ class ElementModel extends BitrixModel
             }
         }
 
-        $result = !empty($fields) ? static::$bxObject->update($this->id, $fields, false, static::$updateSearch) : false;
+        $result = !empty($fields) ? static::$bxObject->update($this->id, $fields, static::$workFlow, static::$updateSearch, static::$resizePictures) : false;
         $savePropsResult = $this->saveProps($fieldsSelectedForSave);
         $result = $result || $savePropsResult;
 
@@ -465,8 +480,24 @@ class ElementModel extends BitrixModel
     /**
      * @param $value
      */
+    public static function setWorkflow($value)
+    {
+        static::$workFlow = $value;
+    }
+
+    /**
+     * @param $value
+     */
     public static function setUpdateSearch($value)
     {
         static::$updateSearch = $value;
+    }
+
+    /**
+     * @param $value
+     */
+    public static function setResizePictures($value)
+    {
+        static::$resizePictures = $value;
     }
 }
