@@ -87,14 +87,14 @@ class ElementModel extends BitrixModel
     protected static $workFlow = false;
 
     /**
-     * Update search after each create or update (bUpdateSearch for CIBlockElement::Add/Update).
+     * Update search after each create or update ($bUpdateSearch for CIBlockElement::Add/Update).
      *
      * @var bool
      */
     protected static $updateSearch = true;
 
     /**
-     * Resize pictures during add/update (bResizePictures for CIBlockElement::Add/Update).
+     * Resize pictures during add/update ($bResizePictures for CIBlockElement::Add/Update).
      *
      * @var bool
      */
