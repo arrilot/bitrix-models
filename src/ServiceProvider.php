@@ -14,6 +14,8 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ServiceProvider
 {
+    public static $illuminateDatabaseIsUsed = false;
+
     /**
      * Register the service provider.
      *
@@ -100,6 +102,8 @@ class ServiceProvider
 
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
+
+        static::$illuminateDatabaseIsUsed = true;
 
         return $capsule;
     }
