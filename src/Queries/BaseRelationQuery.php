@@ -196,74 +196,9 @@ trait BaseRelationQuery
         $this->filterByModels($primaryModels);
 
         $models = $this->getList();
-        $buckets = $this->buildBuckets($models, $this->localKey);
-
-        foreach ($primaryModels as $i => $primaryModel) {
-            if ($this->multiple && is_array($keys = $primaryModel[$this->foreignKey])) {
-                $value = [];
-                foreach ($keys as $key) {
-                    $key = $this->normalizeModelKey($key);
-                    if (isset($buckets[$key])) {
-                        $value = array_merge($value, $buckets[$key]);
-                    }
-                }
-            } else {
-                $key = $this->normalizeModelKey($primaryModel[$this->foreignKey]);
-                $value = isset($buckets[$key]) ? $buckets[$key] : ($this->multiple ? [] : null);
-            }
-
-            $primaryModel->populateRelation($name, is_array($value) ? (new Collection($value))->keyBy(function ($item) {return $item->id;}) : $value);
-        }
+        
+        Helpers::assocModels($primaryModels, $models, $this->foreignKey, $this->localKey, $name, $this->multiple);
 
         return $models;
-    }
-
-    /**
-     * Сгруппировать найденные модели
-     * @param array $models
-     * @param string $linkKey
-     * @param bool $checkMultiple
-     * @return array
-     */
-    private function buildBuckets($models, $linkKey, $checkMultiple = true)
-    {
-        $buckets = [];
-
-        foreach ($models as $model) {
-            $key = $model[$linkKey];
-            if (is_scalar($key)) {
-                $buckets[$key][] = $model;
-            } elseif (is_array($key)) {
-                foreach ($key as $k) {
-                    $k = $this->normalizeModelKey($k);
-                    $buckets[$k][] = $model;
-                }
-            } else {
-                $key = $this->normalizeModelKey($key);
-                $buckets[$key][] = $model;
-            }
-        }
-
-        if ($checkMultiple && !$this->multiple) {
-            foreach ($buckets as $i => $bucket) {
-                $buckets[$i] = reset($bucket);
-            }
-        }
-
-        return $buckets;
-    }
-
-    /**
-     * @param mixed $value raw key value.
-     * @return string normalized key value.
-     */
-    private function normalizeModelKey($value)
-    {
-        if (is_object($value) && method_exists($value, '__toString')) {
-            // ensure matching to special objects, which are convertable to string, for cross-DBMS relations, for example: `|MongoId`
-            $value = $value->__toString();
-        }
-
-        return $value;
     }
 }
