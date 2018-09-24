@@ -17,6 +17,9 @@ abstract class BaseBitrixModel extends ArrayableModel
      * @var array
      */
     protected $fieldsSelectedForSave = [];
+    
+    /** @var array Поля, хранящиеся в сериализованном виде */
+    public static $serializedFields = [];
 
     /**
      * Array of errors that are passed to model events.
