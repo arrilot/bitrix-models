@@ -588,4 +588,23 @@ abstract class BaseQuery
     {
         return \COption::SetOptionInt('main', 'component_managed_cache_on', 'N') == 'Y';
     }
+    
+    public function exec($query)
+    {
+        $queryType = 'BaseQuery::exec';
+    
+        $callback = function () use ($query) {
+            $rows = [];
+            $result = \Bitrix\Main\Application::getConnection()->query($query);
+            $modelName = $this->modelName;
+            $result->setSerializedFields($modelName::$serializedFields ?: []);
+            while ($row = $result->fetch()) {
+                $this->addItemToResultsUsingKeyBy($rows, new $this->modelName($row['ID'], $row));
+            }
+        
+            return new Collection($rows);
+        };
+    
+        return $this->handleCacheIfNeeded(compact('queryType', 'query'), $callback);
+    }
 }
