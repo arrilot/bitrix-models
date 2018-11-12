@@ -16,7 +16,7 @@ class ServiceProvider
 {
     protected static $configProvider;
     protected static $cacheManagerProvider;
-    
+    public static $illuminateDatabaseIsUsed = false;
     /**
      * Register the service provider.
      *
@@ -104,6 +104,8 @@ class ServiceProvider
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
 
+        static::$illuminateDatabaseIsUsed = true;
+
         return $capsule;
     }
 
@@ -148,9 +150,20 @@ class ServiceProvider
             return;
         }
 
-        $dispatcher->listen(['eloquent.created: *'], function($event, $payload) {
-            //                $model = $payload[0];
-            //                dump(func_get_args());
+        $dispatcher->listen(['eloquent.deleted: *'], function($event, $payload) {
+            /** @var EloquentModel $model */
+            $model = $payload[0];
+            if (empty($model->multipleHighloadBlockFields)) {
+                return;
+            }
+
+            $modelTable = $model->getTable();
+            foreach ($model->multipleHighloadBlockFields as $multipleHighloadBlockField) {
+                if (!empty($model['ID'])) {
+                    $tableName = $modelTable.'_'.strtolower($multipleHighloadBlockField);
+                    DB::table($tableName)->where('ID', $model['ID'])->delete();
+                }
+            }
         });
 
         $dispatcher->listen(['eloquent.updated: *', 'eloquent.created: *'], function($event, $payload) {
@@ -161,9 +174,10 @@ class ServiceProvider
             }
 
             $dirty = $model->getDirty();
+            $modelTable = $model->getTable();
             foreach ($model->multipleHighloadBlockFields as $multipleHighloadBlockField) {
                 if (isset($dirty[$multipleHighloadBlockField]) && !empty($model['ID'])) {
-                    $tableName = $model->getTable().'_'.strtolower($multipleHighloadBlockField);
+                    $tableName = $modelTable.'_'.strtolower($multipleHighloadBlockField);
 
                     if (substr($event, 0, 16) === 'eloquent.updated') {
                         DB::table($tableName)->where('ID', $model['ID'])->delete();

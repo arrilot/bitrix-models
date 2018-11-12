@@ -65,11 +65,25 @@ class SectionModel extends BitrixModel
     protected static $objectClass = 'CIBlockSection';
 
     /**
+     * Recalculate LEFT_MARGIN and RIGHT_MARGIN during add/update ($bResort for CIBlockSection::Add/Update).
+     *
+     * @var bool
+     */
+    protected static $resort = true;
+
+    /**
      * Update search after each create or update.
      *
      * @var bool
      */
     protected static $updateSearch = true;
+
+    /**
+     * Resize pictures during add/update ($bResizePictures for CIBlockSection::Add/Update).
+     *
+     * @var bool
+     */
+    protected static $resizePictures = false;
 
     /**
      * Getter for corresponding iblock id.
@@ -186,7 +200,7 @@ class SectionModel extends BitrixModel
 
     public static function internalDirectCreate($bxObject, $fields)
     {
-        return $bxObject->add($fields, true, static::$updateSearch);
+        return $bxObject->add($fields, static::$resort, static::$updateSearch, static::$resizePictures);
     }
 
     /**
@@ -196,7 +210,15 @@ class SectionModel extends BitrixModel
      */
     protected function internalUpdate($fields, $fieldsSelectedForSave)
     {
-        return !empty($fields) ? static::$bxObject->update($this->id, $fields, true, static::$updateSearch) : false;
+        return !empty($fields) ? static::$bxObject->update($this->id, $fields, static::$resort, static::$updateSearch, static::$resizePictures) : false;
+    }
+
+    /**
+     * @param $value
+     */
+    public static function setResort($value)
+    {
+        static::$resort = $value;
     }
 
     /**
@@ -205,6 +227,14 @@ class SectionModel extends BitrixModel
     public static function setUpdateSearch($value)
     {
         static::$updateSearch = $value;
+    }
+
+    /**
+     * @param $value
+     */
+    public static function setResizePictures($value)
+    {
+        static::$resizePictures = $value;
     }
 
     /**
