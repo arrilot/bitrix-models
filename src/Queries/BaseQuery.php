@@ -586,7 +586,7 @@ abstract class BaseQuery
      */
     protected function isManagedCacheOn()
     {
-        return \COption::SetOptionInt('main', 'component_managed_cache_on', 'N') == 'Y';
+        return \COption::GetOptionInt('main', 'component_managed_cache_on', 'N') == 'Y';
     }
     
     public function exec($query)
