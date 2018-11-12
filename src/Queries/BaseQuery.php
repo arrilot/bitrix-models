@@ -587,7 +587,8 @@ abstract class BaseQuery
      */
     protected function isManagedCacheOn()
     {
-        return ServiceProvider::configProvider()::GetOptionString('main', 'component_managed_cache_on', 'N') == 'Y';
+        $config = ServiceProvider::configProvider();
+        return $config::GetOptionString('main', 'component_managed_cache_on', 'N') == 'Y';
     }
     
     public function exec($query)
