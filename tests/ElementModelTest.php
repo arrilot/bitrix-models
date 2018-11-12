@@ -14,6 +14,7 @@ class ElementModelTest extends TestCase
     {
         TestElement::$bxObject = m::mock('obj');
         ElementQuery::$cIblockObject = m::mock('cIblockObject');
+        parent::setUp();
     }
 
     public function tearDown()

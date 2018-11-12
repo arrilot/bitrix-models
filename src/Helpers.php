@@ -2,6 +2,9 @@
 
 namespace Arrilot\BitrixModels;
 
+use Arrilot\BitrixModels\Models\BaseBitrixModel;
+use Illuminate\Support\Collection;
+
 class Helpers
 {
     /**

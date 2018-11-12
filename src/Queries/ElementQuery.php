@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixCacher\Cache;
+use Arrilot\BitrixModels\ServiceProvider;
 use CIBlock;
 use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Models\ElementModel;
@@ -160,9 +161,8 @@ class ElementQuery extends OldCoreQuery
 
         $callback = function() use ($sort, $filter, $groupBy, $navigation, $select, $chunkQuery) {
             if (static::isManagedCacheOn()) {
-                global $CACHE_MANAGER;
-                $CACHE_MANAGER->StartTagCache(static::$cacheDir);
-                $CACHE_MANAGER->RegisterTag("iblock_id_new");
+                ServiceProvider::cacheManagerProvider()->StartTagCache(static::$cacheDir);
+                ServiceProvider::cacheManagerProvider()->RegisterTag("iblock_id_new");
             }
             
             
@@ -186,7 +186,7 @@ class ElementQuery extends OldCoreQuery
     
             
             if (static::isManagedCacheOn()) {
-                $CACHE_MANAGER->EndTagCache();
+                ServiceProvider::cacheManagerProvider()->EndTagCache();
             }
             return new Collection($items);
         };

@@ -4,6 +4,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 
+use Arrilot\BitrixModels\Helpers;
 use Arrilot\BitrixModels\Models\BaseBitrixModel;
 use Illuminate\Support\Collection;
 

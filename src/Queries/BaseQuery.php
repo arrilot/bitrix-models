@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixModels\Models\BaseBitrixModel;
+use Arrilot\BitrixModels\ServiceProvider;
 use BadMethodCallException;
 use Bitrix\Main\Data\Cache;
 use Closure;
@@ -586,7 +587,7 @@ abstract class BaseQuery
      */
     protected function isManagedCacheOn()
     {
-        return \COption::GetOptionInt('main', 'component_managed_cache_on', 'N') == 'Y';
+        return ServiceProvider::configProvider()::GetOptionString('main', 'component_managed_cache_on', 'N') == 'Y';
     }
     
     public function exec($query)
