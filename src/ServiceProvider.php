@@ -4,6 +4,7 @@ namespace Arrilot\BitrixModels;
 
 use Arrilot\BitrixBlade\BladeProvider;
 use Arrilot\BitrixModels\Debug\IlluminateQueryDebugger;
+use Arrilot\BitrixModels\Models\BaseBitrixModel;
 use Arrilot\BitrixModels\Models\EloquentModel;
 use Bitrix\Main\Config\Configuration;
 use DB;
@@ -23,6 +24,7 @@ class ServiceProvider
      */
     public static function register()
     {
+        BaseBitrixModel::setCurrentLanguage(strtoupper(LANGUAGE_ID));
         self::bootstrapIlluminatePagination();
     }
 

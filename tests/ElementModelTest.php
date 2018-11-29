@@ -13,6 +13,7 @@ class ElementModelTest extends TestCase
     public function setUp()
     {
         TestElement::$bxObject = m::mock('obj');
+        TestElement::setCurrentLanguage('RU');
         ElementQuery::$cIblockObject = m::mock('cIblockObject');
     }
 
@@ -344,16 +345,30 @@ class ElementModelTest extends TestCase
 
     public function testToArray()
     {
-        $element = new TestElement(1, ['ID' => 1, 'NAME' => 'John Doe']);
+        $element = new TestElement(1, ['ID' => 1, 'NAME' => 'John Doe', 'PROPERTY_LANG_ACCESSOR_ONE_RU_VALUE' => 'la_ru']);
 
-        $this->assertSame(['ID' => 1, 'NAME' => 'John Doe', 'ACCESSOR_THREE' => []], $element->toArray());
+        $expected = [
+            'ID' => 1,
+            'NAME' => 'John Doe',
+            'ACCESSOR_THREE' => [],
+            'PROPERTY_LANG_ACCESSOR_ONE_RU_VALUE' => 'la_ru',
+            'PROPERTY_LANG_ACCESSOR_ONE' => 'la_ru'
+        ];
+        $this->assertEquals($expected, $element->toArray());
     }
 
     public function testToJson()
     {
-        $element = new TestElement(1, ['ID' => 1, 'NAME' => 'John Doe']);
+        $element = new TestElement(1, ['ID' => 1, 'NAME' => 'John Doe', 'PROPERTY_LANG_ACCESSOR_ONE_RU_VALUE' => 'la_ru',]);
 
-        $this->assertSame(json_encode(['ID' => 1, 'NAME' => 'John Doe', 'ACCESSOR_THREE' => []]), $element->toJson());
+        $expected = [
+            'ID' => 1,
+            'NAME' => 'John Doe',
+            'PROPERTY_LANG_ACCESSOR_ONE_RU_VALUE' => 'la_ru',
+            'ACCESSOR_THREE' => [],
+            'PROPERTY_LANG_ACCESSOR_ONE' => 'la_ru'
+        ];
+        $this->assertEquals(json_encode($expected), $element->toJson());
     }
 
     public function testFill()
@@ -401,7 +416,7 @@ class ElementModelTest extends TestCase
     public function testAccessors()
     {
         $element = new TestElement(1);
-        $element->fill(['ID' => 2, 'NAME' => 'John', 'ACCESSOR_ONE' => 'foo']);
+        $element->fill(['ID' => 2, 'NAME' => 'John', 'ACCESSOR_ONE' => 'foo', 'PROPERTY_LANG_ACCESSOR_ONE_RU_VALUE' => 'la_ru']);
 
         $this->assertSame('!foo!', $element['ACCESSOR_ONE']);
         $this->assertTrue(isset($element['ACCESSOR_ONE']));
@@ -412,6 +427,8 @@ class ElementModelTest extends TestCase
         $this->assertSame([], $element['ACCESSOR_THREE']);
         $this->assertTrue(isset($element['ACCESSOR_THREE']));
         $this->assertFalse(!empty($element['ACCESSOR_THREE']));
+        $this->assertTrue(isset($element['PROPERTY_LANG_ACCESSOR_ONE']));
+        $this->assertSame('la_ru', $element['PROPERTY_LANG_ACCESSOR_ONE']);
     }
     
     public function testItPlaysNiceWithOtherBitrixModels()

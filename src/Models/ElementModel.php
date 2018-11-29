@@ -478,6 +478,19 @@ class ElementModel extends BitrixModel
     }
 
     /**
+     * Get value from language field according to current language.
+     *
+     * @param $field
+     * @return mixed
+     */
+    protected function getValueFromLanguageField($field)
+    {
+        $key = $field . '_' . $this->getCurrentLanguage() . '_VALUE';
+
+        return isset($this->fields[$key]) ? $this->fields[$key] : null;
+    }
+
+    /**
      * @param $value
      */
     public static function setWorkflow($value)

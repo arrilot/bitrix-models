@@ -40,6 +40,13 @@ abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, Itera
      * @var array
      */
     protected $appends = [];
+    
+    /**
+     * Array of language fields with auto accessors.
+     *
+     * @var array
+     */
+    protected $languageAccessors = [];
 
     /**
      * Array related models indexed by the relation names.
@@ -74,7 +81,8 @@ abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, Itera
      */
     public function offsetExists($offset)
     {
-        return $this->getAccessor($offset) ? true : isset($this->fields[$offset]);
+        return $this->getAccessor($offset) || $this->getAccessorForLanguageField($offset)
+            ? true : isset($this->fields[$offset]);
     }
 
     /**
@@ -100,8 +108,16 @@ abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, Itera
     {
         $fieldValue = isset($this->fields[$offset]) ? $this->fields[$offset] : null;
         $accessor = $this->getAccessor($offset);
+        if ($accessor) {
+            return $this->$accessor($fieldValue);
+        }
 
-        return $accessor ? $this->$accessor($fieldValue) : $fieldValue;
+        $accessorForLanguageField = $this->getAccessorForLanguageField($offset);
+        if ($accessorForLanguageField) {
+            return $this->$accessorForLanguageField($offset);
+        }
+
+        return $fieldValue;
     }
 
     /**
@@ -126,6 +142,20 @@ abstract class ArrayableModel implements ArrayAccess, Arrayable, Jsonable, Itera
         $method = 'get'.camel_case($field).'Attribute';
 
         return method_exists($this, $method) ? $method : false;
+    }
+    
+    /**
+     * Get accessor for language field method name if it exists.
+     *
+     * @param string $field
+     *
+     * @return string|false
+     */
+    private function getAccessorForLanguageField($field)
+    {
+        $method = 'getValueFromLanguageField';
+
+        return in_array($field, $this->languageAccessors) && method_exists($this, $method) ? $method : false;
     }
 
     /**

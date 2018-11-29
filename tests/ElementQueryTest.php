@@ -77,8 +77,8 @@ class ElementQueryTest extends TestCase
         $items = $query->filter(['ACTIVE' => 'N'])->select('ID', 'NAME')->getList();
 
         $expected = [
-            1 => ['ID' => 1, 'NAME' => 'foo', 'ACCESSOR_THREE' => []],
-            2 => ['ID' => 2, 'NAME' => 'bar', 'ACCESSOR_THREE' => []],
+            1 => ['ID' => 1, 'NAME' => 'foo', 'ACCESSOR_THREE' => [], 'PROPERTY_LANG_ACCESSOR_ONE' => null],
+            2 => ['ID' => 2, 'NAME' => 'bar', 'ACCESSOR_THREE' => [], 'PROPERTY_LANG_ACCESSOR_ONE' => null],
         ];
 
         $this->assertSame($expected, $items->toArray());

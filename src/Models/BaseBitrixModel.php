@@ -12,6 +12,11 @@ abstract class BaseBitrixModel extends ArrayableModel
     use ModelEventsTrait;
 
     /**
+     * @var string|null
+     */
+    protected static $currentLanguage = null;
+    
+    /**
      * Array of model fields keys that needs to be saved with next save().
      *
      * @var array
@@ -454,5 +459,39 @@ abstract class BaseBitrixModel extends ArrayableModel
     public function populateRelation($name, $records)
     {
         $this->related[$name] = $records;
+    }
+    
+    /**
+     * Setter for currentLanguage.
+     *
+     * @param $language
+     * @return mixed
+     */
+    public static function setCurrentLanguage($language)
+    {
+        self::$currentLanguage = $language;
+    }
+    
+    /**
+     * Getter for currentLanguage.
+     *
+     * @return string
+     */
+    public static function getCurrentLanguage()
+    {
+        return self::$currentLanguage;
+    }
+    
+    /**
+     * Get value from language field according to current language.
+     *
+     * @param $field
+     * @return mixed
+     */
+    protected function getValueFromLanguageField($field)
+    {
+        $key = $field . '_' . $this->getCurrentLanguage();
+
+        return isset($this->fields[$key]) ? $this->fields[$key] : null;
     }
 }

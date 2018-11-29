@@ -14,7 +14,9 @@ use Illuminate\Support\Collection;
  */
 class TestElement extends ElementModel
 {
-    protected $appends = ['ACCESSOR_THREE'];
+    protected $appends = ['ACCESSOR_THREE', 'PROPERTY_LANG_ACCESSOR_ONE'];
+    
+    protected $languageAccessors = ['PROPERTY_LANG_ACCESSOR_ONE'];
 
     const IBLOCK_ID = 1;
 
