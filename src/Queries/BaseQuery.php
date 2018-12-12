@@ -410,7 +410,7 @@ abstract class BaseQuery
     protected function addItemToResultsUsingKeyBy(&$results, BaseBitrixModel $object)
     {
         $item = $object->fields;
-        if (!isset($item[$this->keyBy])) {
+        if (!array_key_exists($this->keyBy, $item)) {
             throw new LogicException("Field {$this->keyBy} is not found in object");
         }
 
