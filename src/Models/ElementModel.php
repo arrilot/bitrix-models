@@ -419,13 +419,44 @@ class ElementModel extends BitrixModel
     {
         $propertyValues = [];
         $saveOnlySelected = !empty($selectedFields);
+
+        // if we pass PROPERTY_X_DESCRIPTION as selected field, we need to add PROPERTY_X_VALUE as well.
+        if ($saveOnlySelected) {
+            foreach ($selectedFields as $code) {
+                if (preg_match('/^PROPERTY_(.*)_DESCRIPTION$/', $code, $matches) && !empty($matches[1])) {
+                    $propertyCode = $matches[1];
+                    $propertyValueKey = "PROPERTY_{$propertyCode}_VALUE";
+                    if (!in_array($propertyValueKey, $selectedFields)) {
+                        $selectedFields[] = $propertyValueKey;
+                    }
+                }
+            }
+        }
+
         foreach ($this->fields as $code => $value) {
             if ($saveOnlySelected && !in_array($code, $selectedFields)) {
                 continue;
             }
 
             if (preg_match('/^PROPERTY_(.*)_VALUE$/', $code, $matches) && !empty($matches[1])) {
-                $propertyValues[$matches[1]] = $value;
+                $propertyCode = $matches[1];
+
+                // if property values have descriptions
+                if (array_key_exists("PROPERTY_{$propertyCode}_DESCRIPTION", $this->fields)) {
+                    $description = $this->fields["PROPERTY_{$propertyCode}_DESCRIPTION"];
+
+                    if (is_array($value) && is_array($description)) {
+                        // for multiple property
+                        foreach ($value as $rowIndex => $rowValue) {
+                            $propertyValues[$propertyCode][] = ['VALUE' => $rowValue, 'DESCRIPTION' => $description[$rowIndex]];
+                        }
+                    } else {
+                        // for single property
+                        $propertyValues[$propertyCode] = ['VALUE' => $value, 'DESCRIPTION' => $description];
+                    }
+                } else {
+                    $propertyValues[$propertyCode] = $value;
+                }
             }
         }
 
