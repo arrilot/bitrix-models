@@ -420,10 +420,19 @@ class ElementModel extends BitrixModel
         $propertyValues = [];
         $saveOnlySelected = !empty($selectedFields);
 
-        // if we pass PROPERTY_X_DESCRIPTION as selected field, we need to add PROPERTY_X_VALUE as well.
         if ($saveOnlySelected) {
             foreach ($selectedFields as $code) {
+                // if we pass PROPERTY_X_DESCRIPTION as selected field, we need to add PROPERTY_X_VALUE as well.
                 if (preg_match('/^PROPERTY_(.*)_DESCRIPTION$/', $code, $matches) && !empty($matches[1])) {
+                    $propertyCode = $matches[1];
+                    $propertyValueKey = "PROPERTY_{$propertyCode}_VALUE";
+                    if (!in_array($propertyValueKey, $selectedFields)) {
+                        $selectedFields[] = $propertyValueKey;
+                    }
+                }
+
+                // if we pass PROPERTY_X_ENUM_ID as selected field, we need to add PROPERTY_X_VALUE as well.
+                if (preg_match('/^PROPERTY_(.*)_ENUM_ID$/', $code, $matches) && !empty($matches[1])) {
                     $propertyCode = $matches[1];
                     $propertyValueKey = "PROPERTY_{$propertyCode}_VALUE";
                     if (!in_array($propertyValueKey, $selectedFields)) {
@@ -440,6 +449,19 @@ class ElementModel extends BitrixModel
 
             if (preg_match('/^PROPERTY_(.*)_VALUE$/', $code, $matches) && !empty($matches[1])) {
                 $propertyCode = $matches[1];
+    
+                // if property type is a list we need to use enum ID/IDs as value/values
+                if (array_key_exists("PROPERTY_{$propertyCode}_ENUM_ID", $this->fields)) {
+                    $value = $this->fields["PROPERTY_{$propertyCode}_ENUM_ID"];
+                } else {
+                    // if we suspect multiple list and PROPERTY_{$propertyCode}_ENUM_ID is not explicitly set.
+                    if (is_array($value) && (count($value) == 0 || array_keys($value)[0] != 0)) {
+                        $propertyData = CIBlock::GetProperties(static::iblockId(), [], ["CODE" => $propertyCode, "PROPERTY_TYPE" => "L", "MULTIPLE" => "Y"])->Fetch();
+                        if ($propertyData) {
+                            $value = array_keys($value);
+                        }
+                    }
+                }
 
                 // if property values have descriptions
                 if (array_key_exists("PROPERTY_{$propertyCode}_DESCRIPTION", $this->fields)) {

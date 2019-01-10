@@ -245,7 +245,7 @@ class ElementModelTest extends TestCase
         $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get,onBeforeSave,onAfterSave,onBeforeUpdate,onAfterUpdate]', [1])
             ->shouldAllowMockingProtectedMethods();
 
-        $assertsCount = 8;
+        $assertsCount = 9;
         $element->shouldReceive('onBeforeSave')->times($assertsCount)->andReturn(true);
         $element->shouldReceive('onAfterSave')->times($assertsCount);
         $element->shouldReceive('onBeforeUpdate')->times($assertsCount)->andReturn(true);
@@ -260,6 +260,9 @@ class ElementModelTest extends TestCase
             'PROPERTY_FOO_DESCRIPTION'  => 'baz',
             '~PROPERTY_FOO_DESCRIPTION' => '~baz',
             'PROPERTY_FOO_VALUE_ID'     => 'bar_id',
+            'PROPERTY_TEST_LIST_ENUM_ID' => '1',
+            'PROPERTY_TEST_LIST_VALUE' => 'Test value of list',
+            'PROPERTY_TEST_LIST_VALUE_ID' => '28:72',
         ];
         $element->shouldReceive('get')->andReturn($fields);
         $element->fill($fields);
@@ -270,7 +273,10 @@ class ElementModelTest extends TestCase
 
         // 2
         $bxObject->shouldReceive('setPropertyValues')
-            ->with(1, TestElement::iblockId(), ['FOO' => ['VALUE' => 'bar', 'DESCRIPTION' => 'baz']])
+            ->with(1, TestElement::iblockId(), [
+                'FOO' => ['VALUE' => 'bar', 'DESCRIPTION' => 'baz'],
+                'TEST_LIST' => '1',
+            ])
             ->once()
             ->andReturn(true);
 
@@ -315,6 +321,13 @@ class ElementModelTest extends TestCase
         $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'], false, true, true)->once()->andReturn(true);
         $this->assertTrue($element->save(['NAME']));
         TestElement::setResizePictures(false);
+
+        // 9
+        $bxObject->shouldReceive('setPropertyValuesEx')
+            ->with(1, TestElement::iblockId(), ['TEST_LIST' => "1"])
+            ->once()
+            ->andReturn(true);
+        $this->assertTrue($element->save(['PROPERTY_TEST_LIST_ENUM_ID']));
     }
 
     public function testUpdate()
