@@ -10,6 +10,7 @@ class SectionModelTest extends TestCase
     public function setUp()
     {
         TestSection::$bxObject = m::mock('obj');
+        parent::setUp();
     }
 
     public function tearDown()
