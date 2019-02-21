@@ -245,7 +245,7 @@ class ElementModelTest extends TestCase
         $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get,onBeforeSave,onAfterSave,onBeforeUpdate,onAfterUpdate]', [1])
             ->shouldAllowMockingProtectedMethods();
 
-        $assertsCount = 9;
+        $assertsCount = 10;
         $element->shouldReceive('onBeforeSave')->times($assertsCount)->andReturn(true);
         $element->shouldReceive('onAfterSave')->times($assertsCount);
         $element->shouldReceive('onBeforeUpdate')->times($assertsCount)->andReturn(true);
@@ -263,6 +263,26 @@ class ElementModelTest extends TestCase
             'PROPERTY_TEST_LIST_ENUM_ID' => '1',
             'PROPERTY_TEST_LIST_VALUE' => 'Test value of list',
             'PROPERTY_TEST_LIST_VALUE_ID' => '28:72',
+            'PROPERTY_FOO2_VALUE'=> [
+                'VALUE' => [
+                    'name' => '',
+                    'type' => '',
+                    'tmp_name' => '',
+                    'size' => 0,
+                    'del' => 'Y',
+                ],
+            ],
+            '~PROPERTY_FOO2_VALUE' => [
+                'VALUE' => [
+                    'name' => '',
+                    'type' => '',
+                    'tmp_name' => '',
+                    'size' => 0,
+                    'del' => 'Y',
+                ],
+            ],
+            'PROPERTY_FOO2_DESCRIPTION'  => 'baz2',
+            '~PROPERTY_FOO2_DESCRIPTION' => '~baz2',
         ];
         $element->shouldReceive('get')->andReturn($fields);
         $element->fill($fields);
@@ -275,6 +295,16 @@ class ElementModelTest extends TestCase
         $bxObject->shouldReceive('setPropertyValues')
             ->with(1, TestElement::iblockId(), [
                 'FOO' => ['VALUE' => 'bar', 'DESCRIPTION' => 'baz'],
+                'FOO2'=> [
+                    'VALUE' => [
+                        'name' => '',
+                        'type' => '',
+                        'tmp_name' => '',
+                        'size' => 0,
+                        'del' => 'Y',
+                    ],
+                    'DESCRIPTION' => 'baz2'
+                ],
                 'TEST_LIST' => '1',
             ])
             ->once()
@@ -292,37 +322,55 @@ class ElementModelTest extends TestCase
 
         // 4
         $bxObject->shouldReceive('setPropertyValuesEx')
-            ->with(1, TestElement::iblockId(), ['FOO' => ['VALUE' => 'bar', 'DESCRIPTION' => 'baz']])
+            ->with(1, TestElement::iblockId(), [
+                'FOO2' => [
+                    'VALUE' => [
+                        'name' => '',
+                        'type' => '',
+                        'tmp_name' => '',
+                        'size' => 0,
+                        'del' => 'Y',
+                    ],
+                    'DESCRIPTION' => 'baz2'
+                ]
+            ])
             ->once()
             ->andReturn(true);
-        $this->assertTrue($element->save(['PROPERTY_FOO_DESCRIPTION']));
+        $this->assertTrue($element->save(['PROPERTY_FOO2_VALUE']));
 
         // 5
         $bxObject->shouldReceive('setPropertyValuesEx')
             ->with(1, TestElement::iblockId(), ['FOO' => ['VALUE' => 'bar', 'DESCRIPTION' => 'baz']])
             ->once()
             ->andReturn(true);
-        $this->assertTrue($element->save(['PROPERTY_FOO_VALUE', 'PROPERTY_FOO_DESCRIPTION']));
+        $this->assertTrue($element->save(['PROPERTY_FOO_DESCRIPTION']));
 
         // 6
+        $bxObject->shouldReceive('setPropertyValuesEx')
+            ->with(1, TestElement::iblockId(), ['FOO' => ['VALUE' => 'bar', 'DESCRIPTION' => 'baz']])
+            ->once()
+            ->andReturn(true);
+        $this->assertTrue($element->save(['PROPERTY_FOO_VALUE', 'PROPERTY_FOO_DESCRIPTION']));
+
+        // 7
         TestElement::setWorkflow(true);
         $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'], true, true, false)->once()->andReturn(true);
         $this->assertTrue($element->save(['NAME']));
         TestElement::setWorkflow(false);
 
-        // 7
+        // 8
         TestElement::setUpdateSearch(false);
         $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'], false, false, false)->once()->andReturn(true);
         $this->assertTrue($element->save(['NAME']));
         TestElement::setUpdateSearch(true);
 
-        // 8
+        // 9
         TestElement::setResizePictures(true);
         $bxObject->shouldReceive('update')->with(1, ['NAME' => 'John Doe'], false, true, true)->once()->andReturn(true);
         $this->assertTrue($element->save(['NAME']));
         TestElement::setResizePictures(false);
 
-        // 9
+        // 10
         $bxObject->shouldReceive('setPropertyValuesEx')
             ->with(1, TestElement::iblockId(), ['TEST_LIST' => "1"])
             ->once()

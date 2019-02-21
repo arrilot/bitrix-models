@@ -470,11 +470,17 @@ class ElementModel extends BitrixModel
                     if (is_array($value) && is_array($description)) {
                         // for multiple property
                         foreach ($value as $rowIndex => $rowValue) {
-                            $propertyValues[$propertyCode][] = ['VALUE' => $rowValue, 'DESCRIPTION' => $description[$rowIndex]];
+                            $propertyValues[$propertyCode][] = [
+                                'VALUE' => $this->preventValueNesting($rowValue),
+                                'DESCRIPTION' => $description[$rowIndex]
+                            ];
                         }
                     } else {
                         // for single property
-                        $propertyValues[$propertyCode] = ['VALUE' => $value, 'DESCRIPTION' => $description];
+                        $propertyValues[$propertyCode] = [
+                            'VALUE' => $this->preventValueNesting($value),
+                            'DESCRIPTION' => $description
+                        ];
                     }
                 } else {
                     $propertyValues[$propertyCode] = $value;
@@ -565,5 +571,16 @@ class ElementModel extends BitrixModel
     public static function setResizePictures($value)
     {
         static::$resizePictures = $value;
+    }
+
+    /**
+     * For some cases (for saving example props with file type) we get ['VALUE' => ['VALUE' => [...]]] that breaks everything.
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function preventValueNesting($value)
+    {
+        return is_array($value) && array_key_exists('VALUE', $value) ? $value['VALUE'] : $value;
     }
 }
