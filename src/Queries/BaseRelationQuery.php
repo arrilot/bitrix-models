@@ -4,6 +4,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 
+use Arrilot\BitrixModels\Helpers;
 use Arrilot\BitrixModels\Models\BaseBitrixModel;
 use Illuminate\Support\Collection;
 
@@ -107,6 +108,7 @@ trait BaseRelationQuery
             }
         }
 
+        $values = array_filter($values);
         if (empty($values)) {
             $this->stopQuery();
         }
@@ -134,7 +136,7 @@ trait BaseRelationQuery
     public function findWith($with, &$models)
     {
         // --- получаем модель, на основании которой будем брать запросы релейшенов
-        $primaryModel = reset($models);
+        $primaryModel = $models->first();
         if (!$primaryModel instanceof BaseBitrixModel) {
             $primaryModel = $this->model;
         }
@@ -195,83 +197,9 @@ trait BaseRelationQuery
         $this->filterByModels($primaryModels);
 
         $models = $this->getList();
-        $buckets = $this->buildBuckets($models, $this->localKey);
-
-        foreach ($primaryModels as $i => $primaryModel) {
-            if ($this->multiple && is_array($keys = $primaryModel[$this->foreignKey])) {
-                $value = [];
-                foreach ($keys as $key) {
-                    $key = $this->normalizeModelKey($key);
-                    if (isset($buckets[$key])) {
-                        $value = array_merge($value, $buckets[$key]);
-                    }
-                }
-            } else {
-                $key = $this->getModelKey($primaryModel, $this->foreignKey);
-                $value = isset($buckets[$key]) ? $buckets[$key] : ($this->multiple ? [] : null);
-            }
-
-            $primaryModel->populateRelation($name, is_array($value) ? (new Collection($value))->keyBy(function ($item) {return $item->id;}) : $value);
-        }
+    
+        Helpers::assocModels($primaryModels, $models, $this->foreignKey, $this->localKey, $name, $this->multiple);
 
         return $models;
-    }
-
-    /**
-     * Сгруппировать найденные модели
-     * @param array $models
-     * @param array|string $linkKeys
-     * @param bool $checkMultiple
-     * @return array
-     */
-    private function buildBuckets($models, $linkKeys, $checkMultiple = true)
-    {
-        $buckets = [];
-
-        foreach ($models as $model) {
-            $key = $this->getModelKey($model, $linkKeys);
-            $buckets[$key][] = $model;
-        }
-
-        if ($checkMultiple && !$this->multiple) {
-            foreach ($buckets as $i => $bucket) {
-                $buckets[$i] = reset($bucket);
-            }
-        }
-
-        return $buckets;
-    }
-
-    /**
-     * Получить значение атрибутов в виде строки
-     * @param BaseBitrixModel $model
-     * @param array|string $attributes
-     * @return string
-     */
-    private function getModelKey($model, $attributes)
-    {
-        $key = [];
-        foreach ((array)$attributes as $attribute) {
-            $key[] = $this->normalizeModelKey($model[$attribute]);
-        }
-        if (count($key) > 1) {
-            return serialize($key);
-        }
-        $key = reset($key);
-        return is_scalar($key) ? $key : serialize($key);
-    }
-
-    /**
-     * @param mixed $value raw key value.
-     * @return string normalized key value.
-     */
-    private function normalizeModelKey($value)
-    {
-        if (is_object($value) && method_exists($value, '__toString')) {
-            // ensure matching to special objects, which are convertable to string, for cross-DBMS relations, for example: `|MongoId`
-            $value = $value->__toString();
-        }
-
-        return $value;
     }
 }
