@@ -73,6 +73,13 @@ class ElementModel extends BitrixModel
     protected static $objectClass = 'CIBlockElement';
 
     /**
+     * Iblock PropertiesData from Bitrix DB
+     *
+     * @var null|array
+     */
+    protected static $iblockPropertiesData = [];
+
+    /**
      * Have sections been already fetched from DB?
      *
      * @var bool
@@ -139,6 +146,38 @@ class ElementModel extends BitrixModel
     public static function internalDirectCreate($bxObject, $fields)
     {
         return $bxObject->add($fields, static::$workFlow, static::$updateSearch, static::$resizePictures);
+    }
+
+    /**
+     * Fetches static::$iblockPropertiesData if it's not fetched and returns it.
+     *
+     * @return array
+     */
+    protected static function getCachedIblockPropertiesData()
+    {
+        $iblockId = static::iblockId();
+        if (!empty(self::$iblockPropertiesData[$iblockId])) {
+            return self::$iblockPropertiesData[$iblockId];
+        }
+
+        $props = [];
+        $dbRes = CIBlock::GetProperties($iblockId, [], []);
+        while($property = $dbRes->Fetch()) {
+            $props[$property['CODE']] = $property;
+        }
+
+        return self::$iblockPropertiesData[$iblockId] = $props;
+    }
+
+    /**
+     * Setter for self::$iblockPropertiesData[static::iblockId()] mainly for testing.
+     *
+     * @param $data
+     * @return void
+     */
+    public static function setCachedIblockPropertiesData($data)
+    {
+        self::$iblockPropertiesData[static::iblockId()] = $data;
     }
 
     /**
@@ -420,6 +459,8 @@ class ElementModel extends BitrixModel
         $propertyValues = [];
         $saveOnlySelected = !empty($selectedFields);
 
+        $iblockPropertiesData = static::getCachedIblockPropertiesData();
+
         if ($saveOnlySelected) {
             foreach ($selectedFields as $code) {
                 // if we pass PROPERTY_X_DESCRIPTION as selected field, we need to add PROPERTY_X_VALUE as well.
@@ -449,36 +490,37 @@ class ElementModel extends BitrixModel
 
             if (preg_match('/^PROPERTY_(.*)_VALUE$/', $code, $matches) && !empty($matches[1])) {
                 $propertyCode = $matches[1];
-    
+                $iblockPropertyData = (array) $iblockPropertiesData[$propertyCode];
+
+                // if file was not changed skip it or it will be duplicated
+                if ($iblockPropertyData && $iblockPropertyData['PROPERTY_TYPE'] === 'F' && !empty($this->original[$code]) && $this->original[$code] === $value) {
+                    continue;
+                }
+
                 // if property type is a list we need to use enum ID/IDs as value/values
                 if (array_key_exists("PROPERTY_{$propertyCode}_ENUM_ID", $this->fields)) {
                     $value = $this->fields["PROPERTY_{$propertyCode}_ENUM_ID"];
-                } else {
-                    // if we suspect multiple list and PROPERTY_{$propertyCode}_ENUM_ID is not explicitly set.
-                    if (is_array($value) && (count($value) == 0 || array_keys($value)[0] != 0)) {
-                        $propertyData = CIBlock::GetProperties(static::iblockId(), [], ["CODE" => $propertyCode, "PROPERTY_TYPE" => "L", "MULTIPLE" => "Y"])->Fetch();
-                        if ($propertyData) {
-                            $value = array_keys($value);
-                        }
-                    }
+                } elseif ($iblockPropertyData && $iblockPropertyData['PROPERTY_TYPE'] === 'L' && $iblockPropertyData['MULTIPLE'] === 'Y') {
+                    $value = array_keys($value);
                 }
 
                 // if property values have descriptions
-                if (array_key_exists("PROPERTY_{$propertyCode}_DESCRIPTION", $this->fields)) {
+                // we skip file properties here for now because they cause endless problems. Handle them manually.
+                if (array_key_exists("PROPERTY_{$propertyCode}_DESCRIPTION", $this->fields) && (!$iblockPropertyData || $iblockPropertyData['PROPERTY_TYPE'] !== 'F')) {
                     $description = $this->fields["PROPERTY_{$propertyCode}_DESCRIPTION"];
 
                     if (is_array($value) && is_array($description)) {
                         // for multiple property
                         foreach ($value as $rowIndex => $rowValue) {
                             $propertyValues[$propertyCode][] = [
-                                'VALUE' => $this->preventValueNesting($rowValue),
+                                'VALUE' => $rowValue,
                                 'DESCRIPTION' => $description[$rowIndex]
                             ];
                         }
                     } else {
                         // for single property
                         $propertyValues[$propertyCode] = [
-                            'VALUE' => $this->preventValueNesting($value),
+                            'VALUE' => $value,
                             'DESCRIPTION' => $description
                         ];
                     }
@@ -571,16 +613,5 @@ class ElementModel extends BitrixModel
     public static function setResizePictures($value)
     {
         static::$resizePictures = $value;
-    }
-
-    /**
-     * For some cases (for saving example props with file type) we get ['VALUE' => ['VALUE' => [...]]] that breaks everything.
-     *
-     * @param mixed $value
-     * @return mixed
-     */
-    protected function preventValueNesting($value)
-    {
-        return is_array($value) && array_key_exists('VALUE', $value) ? $value['VALUE'] : $value;
     }
 }

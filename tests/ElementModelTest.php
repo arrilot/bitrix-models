@@ -2,6 +2,7 @@
 
 namespace Arrilot\Tests\BitrixModels;
 
+use Arrilot\BitrixModels\Models\ElementModel;
 use Arrilot\BitrixModels\Queries\ElementQuery;
 use Arrilot\Tests\BitrixModels\Stubs\TestElement;
 use Arrilot\Tests\BitrixModels\Stubs\TestSection;
@@ -70,6 +71,11 @@ class ElementModelTest extends TestCase
         $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'Y'], false, true, false)->once()->andReturn(true);
 
         TestElement::$bxObject = $bxObject;
+        TestElement::setCachedIblockPropertiesData([
+            'FOO' => [],
+            'TEST_LIST' => [],
+            'FOO2' => [],
+        ]);
         $element = new TestElement(1);
 
         $this->assertTrue($element->activate());
@@ -81,6 +87,11 @@ class ElementModelTest extends TestCase
         $bxObject->shouldReceive('update')->with(1, ['ACTIVE' => 'N'], false, true, false)->once()->andReturn(true);
 
         TestElement::$bxObject = $bxObject;
+        TestElement::setCachedIblockPropertiesData([
+            'FOO' => [],
+            'TEST_LIST' => [],
+            'FOO2' => [],
+        ]);
         $element = new TestElement(1);
 
         $this->assertTrue($element->deactivate());
@@ -242,6 +253,23 @@ class ElementModelTest extends TestCase
         $bxObject = m::mock('obj');
 
         TestElement::$bxObject = $bxObject;
+        TestElement::setCachedIblockPropertiesData([
+            'FOO' =>  [
+                "ID" => "71",
+                "PROPERTY_TYPE" => "S",
+                "MULTIPLE" => "N",
+            ],
+            'TEST_LIST' =>  [
+                "ID" => "72",
+                "PROPERTY_TYPE" => "L",
+                "MULTIPLE" => "N",
+            ],
+            'TEST_LIST_MULTIPLE' =>  [
+                "ID" => "73",
+                "PROPERTY_TYPE" => "L",
+                "MULTIPLE" => "Y",
+            ],
+        ]);
         $element = m::mock('Arrilot\Tests\BitrixModels\Stubs\TestElement[get,onBeforeSave,onAfterSave,onBeforeUpdate,onAfterUpdate]', [1])
             ->shouldAllowMockingProtectedMethods();
 
@@ -263,26 +291,9 @@ class ElementModelTest extends TestCase
             'PROPERTY_TEST_LIST_ENUM_ID' => '1',
             'PROPERTY_TEST_LIST_VALUE' => 'Test value of list',
             'PROPERTY_TEST_LIST_VALUE_ID' => '28:72',
-            'PROPERTY_FOO2_VALUE'=> [
-                'VALUE' => [
-                    'name' => '',
-                    'type' => '',
-                    'tmp_name' => '',
-                    'size' => 0,
-                    'del' => 'Y',
-                ],
-            ],
-            '~PROPERTY_FOO2_VALUE' => [
-                'VALUE' => [
-                    'name' => '',
-                    'type' => '',
-                    'tmp_name' => '',
-                    'size' => 0,
-                    'del' => 'Y',
-                ],
-            ],
-            'PROPERTY_FOO2_DESCRIPTION'  => 'baz2',
-            '~PROPERTY_FOO2_DESCRIPTION' => '~baz2',
+            'PROPERTY_TEST_LIST_MULTIPLE_VALUE' => [19 => "5", 18 => "4"],
+            'PROPERTY_TEST_LIST_MULTIPLE_DESCRIPTION' => [null, null],
+            'PROPERTY_TEST_LIST_MULTIPLE_PROPERTY_VALUE_ID' => ['648', '649'],
         ];
         $element->shouldReceive('get')->andReturn($fields);
         $element->fill($fields);
@@ -295,17 +306,11 @@ class ElementModelTest extends TestCase
         $bxObject->shouldReceive('setPropertyValues')
             ->with(1, TestElement::iblockId(), [
                 'FOO' => ['VALUE' => 'bar', 'DESCRIPTION' => 'baz'],
-                'FOO2'=> [
-                    'VALUE' => [
-                        'name' => '',
-                        'type' => '',
-                        'tmp_name' => '',
-                        'size' => 0,
-                        'del' => 'Y',
-                    ],
-                    'DESCRIPTION' => 'baz2'
-                ],
                 'TEST_LIST' => '1',
+                'TEST_LIST_MULTIPLE'=> [
+                    ['VALUE' => 19, 'DESCRIPTION' => null],
+                    ['VALUE' => 18, 'DESCRIPTION' => null],
+                ],
             ])
             ->once()
             ->andReturn(true);
@@ -323,20 +328,14 @@ class ElementModelTest extends TestCase
         // 4
         $bxObject->shouldReceive('setPropertyValuesEx')
             ->with(1, TestElement::iblockId(), [
-                'FOO2' => [
-                    'VALUE' => [
-                        'name' => '',
-                        'type' => '',
-                        'tmp_name' => '',
-                        'size' => 0,
-                        'del' => 'Y',
-                    ],
-                    'DESCRIPTION' => 'baz2'
-                ]
+                'TEST_LIST_MULTIPLE' => [
+                    ['VALUE' => 19, 'DESCRIPTION' => null],
+                    ['VALUE' => 18, 'DESCRIPTION' => null],
+                ],
             ])
             ->once()
             ->andReturn(true);
-        $this->assertTrue($element->save(['PROPERTY_FOO2_VALUE']));
+        $this->assertTrue($element->save(['PROPERTY_TEST_LIST_MULTIPLE_VALUE']));
 
         // 5
         $bxObject->shouldReceive('setPropertyValuesEx')
