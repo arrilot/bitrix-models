@@ -246,6 +246,7 @@ class SectionModel extends BitrixModel
     {
         $query->filter['>LEFT_MARGIN'] = $section->fields['LEFT_MARGIN'];
         $query->filter['<RIGHT_MARGIN'] = $section->fields['RIGHT_MARGIN'];
+        $query->filter['>DEPTH_LEVEL'] = $section->fields['DEPTH_LEVEL'];
 
         return $query;
     }
