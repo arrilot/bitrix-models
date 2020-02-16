@@ -83,20 +83,29 @@ class ServiceProvider
      */
     protected static function bootstrapIlluminateDatabase()
     {
-        $config = self::getBitrixDbConfig();
-
         $capsule = new Capsule(self::instantiateServiceContainer());
-        $capsule->addConnection([
-            'driver'    => 'mysql',
-            'host'      => $config['host'],
-            'database'  => $config['database'],
-            'username'  => $config['login'],
-            'password'  => $config['password'],
-            'charset'   => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix'    => '',
-            'strict'    => false,
-        ]);
+
+	if ($dbConfig = Configuration::getInstance()->get('bitrix-models.illuminate-database')) {
+		foreach ($dbConfig['connections'] as $name => $connection) {
+			$capsule->addConnection($connection, $name);
+		}
+
+		$capsule->getDatabaseManager()->setDefaultConnection((isset($dbConfig['default'])) ? $dbConfig['default'] : 'default');
+	} else {
+		$config = self::getBitrixDbConfig();
+
+		$capsule->addConnection([
+			'driver' => 'mysql',
+			'host' => $config['host'],
+			'database' => $config['database'],
+			'username' => $config['login'],
+			'password' => $config['password'],
+			'charset' => 'utf8',
+			'collation' => 'utf8_unicode_ci',
+			'prefix' => '',
+			'strict' => false,
+		]);
+	}
 
         if (class_exists(Dispatcher::class)) {
             $capsule->setEventDispatcher(new Dispatcher());

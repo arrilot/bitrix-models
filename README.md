@@ -752,6 +752,67 @@ DB::table('brands')->insert(['UF_NAME' => 'Nike']);
 
 После этого вьюшки можно модифицировать или создавать новые.
 
+### Подключение к нескольким БД, детальная настройка подключения.
+
+По умолчанию, для подключения к БД, используется стандартная конфигурация, с которой работает Битрикс.
+Выглядеть она может, например, вот так (файл `.settings.php.`):
+
+```php
+'connections' => [
+    'value' => [
+        'default' => [
+            'className' => '\\Bitrix\\Main\\DB\\MysqliConnection',
+            'host' => 'localhost',
+            'database' => 'db',
+            'login' => 'login',
+            'password' => 'password',
+            'options' => 2,
+        ],
+    ],
+    'readonly' => true,
+]
+```
+
+Для того, чтобы иметь возможность задействовать весь функционал Eloquent, необходимо добавить в файл `.settings.php` массив `bitrix-models.illuminate-database` с описанием подключения:
+
+```php
+[
+    ...
+    'bitrix-models.illuminate-database' => [
+        'value' => [
+                'default' => 'mysql',
+                'connections' => [
+                    'mysql' => [
+                        'driver' => 'mysql',
+                        'url' => getenv('DB_MYSQL_URL'),
+                        'host' => getenv('DB_MYSQL_HOST'),
+                        'port' => getenv('DB_MYSQL_PORT'),
+                        'database' => getenv('DB_MYSQL_DATABASE'),
+                        'username' => getenv('DB_MYSQL_USERNAME'),
+                        'password' => getenv('DB_MYSQL_PASSWORD'),
+                        'unix_socket' => getenv('DB_MYSQL_SOCKET'),
+                        'charset' => 'utf8',
+                        'collation' => 'utf8_unicode_ci',
+                        'prefix' => '',
+                        'prefix_indexes' => true,
+                        'strict' => false,
+                        'engine' => null,
+                        'options' => [],
+                    ],
+                    'mysql_2' => [
+                        ...
+                    ],
+                ],
+            ],
+        'readonly' => true,
+    ],
+]
+```
+
+Важно! Если задан массив `bitrix-models.illuminate-database`, то все настройки подключения к БД для Eloquent берутся только из него, а стандартные - игнорируются.
+
+Больше примеров настройки подключения (connections): https://github.com/laravel/laravel/blob/5.7/config/database.php
+
 ## Активность элементов в D7Model/EloquentModel
 
 В инфоблоках битрикса есть поле ACTIVE = 'Y'/'N', фильтрация по которому очень часто используется.
