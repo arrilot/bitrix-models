@@ -129,7 +129,7 @@ class SectionQuery extends OldCoreQuery
      */
     public function getByCode($code)
     {
-        $this->filter['CODE'] = $code;
+        $this->filter['=CODE'] = $code;
 
         return $this->first();
     }
