@@ -16,6 +16,7 @@ class ElementModelTest extends TestCase
         TestElement::$bxObject = m::mock('obj');
         TestElement::setCurrentLanguage('RU');
         ElementQuery::$cIblockObject = m::mock('cIblockObject');
+        parent::setUp();
     }
 
     public function tearDown()

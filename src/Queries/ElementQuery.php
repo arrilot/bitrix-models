@@ -3,6 +3,7 @@
 namespace Arrilot\BitrixModels\Queries;
 
 use Arrilot\BitrixCacher\Cache;
+use Arrilot\BitrixModels\BitrixWrapper;
 use CIBlock;
 use Illuminate\Support\Collection;
 use Arrilot\BitrixModels\Models\ElementModel;
@@ -159,6 +160,11 @@ class ElementQuery extends OldCoreQuery
         list($select, $chunkQuery) = $this->multiplySelectForMaxJoinsRestrictionIfNeeded($select);
 
         $callback = function() use ($sort, $filter, $groupBy, $navigation, $select, $chunkQuery) {
+            if (static::isManagedCacheOn()) {
+                BitrixWrapper::cacheManagerProvider()->StartTagCache(static::$cacheDir);
+                BitrixWrapper::cacheManagerProvider()->RegisterTag("iblock_id_new");
+            }
+            
             if ($chunkQuery) {
                 $itemsChunks = [];
                 foreach ($select as $chunkIndex => $selectForChunk) {
@@ -176,6 +182,11 @@ class ElementQuery extends OldCoreQuery
                     $this->addItemToResultsUsingKeyBy($items, new $this->modelName($arItem['ID'], $arItem));
                 }
             }
+            
+            if (static::isManagedCacheOn()) {
+                BitrixWrapper::cacheManagerProvider()->EndTagCache();
+            }
+            
             return new Collection($items);
         };
 

@@ -13,6 +13,7 @@ class UserModelTest extends TestCase
     public function setUp()
     {
         TestUser::$bxObject = m::mock('obj');
+        parent::setUp();
     }
 
     public function tearDown()
